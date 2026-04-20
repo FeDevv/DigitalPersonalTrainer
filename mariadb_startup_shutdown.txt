@@ -1,0 +1,4 @@
+To run (once) MariaDB on MacBook --> brew services run mariadb (in terminal).
+To keep running MariaDB on MacBook even after restart (automatic startup) --> brew services start mariadb (in terminal).
+
+To run or keep running MariaDB on Windows --> win+R , search for 'services.msc' and find 'mariadb', then select whichever option you prefer.
