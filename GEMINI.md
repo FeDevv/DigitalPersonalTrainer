@@ -23,40 +23,24 @@ Il sistema è rigorosamente diviso per separare le responsabilità:
 *   **View**: Interfaccia CLI interattiva basata su console (`System.out`/`Scanner`).
 *   **Controller**: Orchestrazione del flusso, validazione dell'input e gestione delle eccezioni tra View e Model.
 
-### 2. Gestione degli Errori: Gerarchia di Eccezioni Custom
-Per un controllo totale e un debugging facilitato, implementiamo una gerarchia dedicata:
-*   `DPTException` (Base astratta)
-    *   `DatabaseException`: Errori di persistenza o violazione vincoli DB.
-    *   `AuthException`: Errori di autenticazione o permessi.
+### 2. Gestione degli Errori: Gerarchia di Eccezioni Custom (Unchecked)
+Il sistema utilizza una gerarchia di **Unchecked Exceptions** per ridurre il boilerplate e favorire una Clean Architecture:
+*   `DPTException` (Base astratta, estende `RuntimeException`)
+    *   `DatabaseException`: Errori di persistenza o connessione.
+    *   `AuthException`: Errori di autenticazione (Login fallito).
     *   `ValidationException`: Input utente non conforme ai requisiti.
 
-### 3. Design Patterns (GoF) & Principi SOLID
-*   **Singleton**: `DBConnectionManager` per gestire la connessione (fondamentale per ottimizzare gli 8GB di RAM).
-*   **DAO**: Astrazione della persistenza per isolare il codice SQL.
-*   **Factory**: Per istanziare dinamicamente i menu e i servizi in base al ruolo dell'utente loggato.
-*   **SOLID & DRY**: Codice modulare, manutenibile e privo di duplicazioni, pronto per l'analisi statica.
+### 3. Sicurezza: Architettura "Handshake & Switch" (RBAC)
+La sicurezza è delegata al Database MariaDB tramite il meccanismo di Role-Based Access Control:
+1.  **Fase di Handshake**: Accesso iniziale con l'utente `dpt_login` (permessi minimi, sola lettura credenziali).
+2.  **Fase di Switching**: Dopo l'autenticazione, l'app ricollega la sessione usando l'utente MariaDB specifico per il ruolo (Proprietario, PT, Segreteria, Cliente).
+3.  **Enforcement**: I permessi (GRANT/REVOKE) sono applicati a livello fisico dal motore del DB.
 
----
-
-## 💎 Standard di Qualità & SonarQube Readiness
-*   **Resource Management**: Uso obbligatorio di `try-with-resources` per ogni risorsa JDBC.
-*   **CLI Output**: Uso di `System.out` per la comunicazione con l'utente (accettato come compromesso iniziale per la versione CLI).
-*   **SQL Security**: Uso esclusivo di `PreparedStatement` per prevenire SQL Injection.
-*   **Clean Code**: Naming convention Java standard, costanti per valori statici e Javadoc per la documentazione della tesi.
-*   **Testing**: Implementazione di Unit Test con **JUnit 5** per validare la logica dei controller.
-
----
-
-## 📁 Struttura dei Package
-```text
-org.DPT
-├── model           # Classi POJO (Entità)
-├── persistence     # Interfacce DAO e implementazioni JDBC
-├── controller      # Logica di controllo MVC
-├── view            # Gestione input/output console
-├── exception       # Gerarchia delle eccezioni custom
-└── util            # Utility (DBConnectionManager, Configuration)
-```
+### 4. Design Patterns & Tecnologie
+*   **Singleton (Bill Pugh)**: `DBConnectionManager` per una gestione efficiente e thread-safe della connessione.
+*   **Java Records**: Utilizzati per DTO e oggetti di trasporto dati immutabili (es. `LoginResult`), ottimizzando l'uso della memoria (8GB RAM).
+*   **DAO**: Astrazione dell'accesso ai dati per isolare il codice SQL.
+*   **Dual-Controller MVC**: Separazione tra Logic Controller (regole di business) e Interface Controller (CLI/GUI).
 
 ---
 
