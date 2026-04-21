@@ -86,7 +86,7 @@ public class DBConnectionManager {
             }
         } catch (SQLException e) {
             // In un sistema reale useremmo un logger; qui stampiamo l'errore per il debug CLI
-            System.err.println("DBConnectionManager: Errore chiusura connessione - " + e.getMessage());
+            System.out.println("DBConnectionManager: Errore chiusura connessione - " + e.getMessage());
         } finally {
             currentConnection = null;
         }

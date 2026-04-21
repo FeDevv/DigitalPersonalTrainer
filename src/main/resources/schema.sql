@@ -34,11 +34,11 @@ CREATE USER 'dpt_cliente'@'localhost' IDENTIFIED BY 'dpt_cli_pwd';
 
 -- 3. Assegnazione Privilegi Granulari
 
--- [LOGIN]: Sola lettura delle credenziali per l'autenticazione (Column-level security)
-GRANT SELECT (Email, Password) ON digital_personal_trainer.PROPRIETARIO TO 'dpt_login'@'localhost';
-GRANT SELECT (Email, Password) ON digital_personal_trainer.PT TO 'dpt_login'@'localhost';
-GRANT SELECT (Email, Password) ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_login'@'localhost';
-GRANT SELECT (Email, Password, Codice_Fiscale) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
+-- [LOGIN]: Sola lettura delle credenziali e info minime per la sessione
+GRANT SELECT (ID_Proprietario, Nome, Cognome, Email, Password) ON digital_personal_trainer.PROPRIETARIO TO 'dpt_login'@'localhost';
+GRANT SELECT (ID_PT, Nome, Cognome, Email, Password, PT_Attivo) ON digital_personal_trainer.PT TO 'dpt_login'@'localhost';
+GRANT SELECT (ID_Addetto, Nome, Cognome, Email, Password, Addetto_Attivo) ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_login'@'localhost';
+GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Password, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
 
 -- [PROPRIETARIO]: Gestione del personale e del catalogo (Macchinari ed Esercizi)
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_proprietario'@'localhost';
