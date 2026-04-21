@@ -1,0 +1,29 @@
+# PROGRESSO PROGETTO: Digital Personal Trainer
+# DATA: 21 Aprile 2026
+
+## ✅ OBIETTIVI RAGGIUNTI
+
+1. ARCHITETTURA DI SICUREZZA (RBAC LATO DB)
+   - Implementato modello "Handshake & Switch": accesso iniziale con utente minimo (dpt_login) e passaggio a utente di ruolo dopo autenticazione.
+   - Configurato schema.sql con GRANT granulari per 5 utenti MariaDB (Login, Proprietario, PT, Segreteria, Cliente).
+   - Sincronizzato db.properties con i ruoli definiti.
+
+2. INFRASTRUTTURA CORE (PERSISTENCE & EXCEPTIONS)
+   - DBConnectionManager: Implementato Singleton Bill Pugh (Thread-safe, Lazy, RAM optimized) con logica di Role Switching.
+   - Gerarchia Eccezioni: Creata struttura Unchecked (DPTException -> RuntimeException) per un codice pulito e SoC.
+   - Modelli: Utilizzo di Java Records (Java 25) per immutabilità e performance.
+
+3. MODULO LOGIN (COMPLETATO)
+   - MVC completo: Separazione tra LoginController (Logica universale) e LoginCLIController (Interfaccia console).
+   - LoginDAO: Ricerca mirata basata sul ruolo scelto dall'utente per massima efficienza.
+   - Main: Punto di ingresso configurato per gestire il ciclo di vita della sessione.
+
+## 🚀 STATO ATTUALE
+- Il sistema permette il login, valida le credenziali, verifica lo stato dell'account (Attivo/Disattivato) e stabilisce una connessione MariaDB con i privilegi reali del ruolo.
+
+## 📅 PROSSIMI PASSI
+1. Creazione dello "User Menu Dispatcher": il componente che smista l'utente verso il menu specifico del suo ruolo (ProprietarioMenu, PTMenu, etc.).
+2. Sviluppo del modulo "Catalogo" (Proprietario): CRUD Macchinari ed Esercizi.
+3. Sviluppo del modulo "Gestione Clienti" (Segreteria).
+
+To resume this session: gemini --resume 575e6864-7662-4892-aaac-01b4ad5d0c18
