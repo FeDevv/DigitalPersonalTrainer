@@ -15,7 +15,68 @@ CREATE DATABASE IF NOT EXISTS digital_personal_trainer;
 USE digital_personal_trainer;
 
 -- ==============================================================================
--- 2. PULIZIA DELL'AMBIENTE (DROP OBJECTS)
+-- 2. CREAZIONE UTENTI E RUOLI (RBAC LATO DB)
+-- ==============================================================================
+
+-- 1. Pulizia utenti esistenti (per rendere lo script ri-eseguibile)
+DROP USER IF EXISTS 'dpt_login'@'localhost';
+DROP USER IF EXISTS 'dpt_proprietario'@'localhost';
+DROP USER IF EXISTS 'dpt_pt'@'localhost';
+DROP USER IF EXISTS 'dpt_segreteria'@'localhost';
+DROP USER IF EXISTS 'dpt_cliente'@'localhost';
+
+-- 2. Creazione Utenti con credenziali allineate a db.properties
+CREATE USER 'dpt_login'@'localhost' IDENTIFIED BY 'dpt_login_pwd';
+CREATE USER 'dpt_proprietario'@'localhost' IDENTIFIED BY 'dpt_prop_pwd';
+CREATE USER 'dpt_pt'@'localhost' IDENTIFIED BY 'dpt_pt_pwd';
+CREATE USER 'dpt_segreteria'@'localhost' IDENTIFIED BY 'dpt_seg_pwd';
+CREATE USER 'dpt_cliente'@'localhost' IDENTIFIED BY 'dpt_cli_pwd';
+
+-- 3. Assegnazione Privilegi Granulari
+
+-- [LOGIN]: Sola lettura delle credenziali per l'autenticazione (Column-level security)
+GRANT SELECT (Email, Password) ON digital_personal_trainer.PROPRIETARIO TO 'dpt_login'@'localhost';
+GRANT SELECT (Email, Password) ON digital_personal_trainer.PT TO 'dpt_login'@'localhost';
+GRANT SELECT (Email, Password) ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_login'@'localhost';
+GRANT SELECT (Email, Password, Codice_Fiscale) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
+
+-- [PROPRIETARIO]: Gestione del personale e del catalogo (Macchinari ed Esercizi)
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PT TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.CLIENTE TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.MACCHINARIO TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ESERCIZIO TO 'dpt_proprietario'@'localhost';
+
+-- [PT]: Gestione schede, catalogo esercizi e monitoraggio prestazioni
+GRANT SELECT ON digital_personal_trainer.CLIENTE TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.PT TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.MACCHINARIO TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.ESERCIZIO TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.ASSEGNA TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.SESSIONE TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_pt'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.SCHEDA TO 'dpt_pt'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.COMPOSTA TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.vw_prestazioni_pt TO 'dpt_pt'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_crea_nuova_scheda TO 'dpt_pt'@'localhost';
+
+-- [SEGRETERIA]: Gestione anagrafiche attori e assegnazioni PT-Cliente
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.CLIENTE TO 'dpt_segreteria'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_segreteria'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_segreteria'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ASSEGNA TO 'dpt_segreteria'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_segreteria'@'localhost';
+
+-- [CLIENTE]: Operatività limitata al proprio allenamento via Viste e Tabelle di log
+GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_cliente'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SESSIONE TO 'dpt_cliente'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_cliente'@'localhost';
+
+FLUSH PRIVILEGES;
+
+-- ==============================================================================
+-- 3. PULIZIA DELL'AMBIENTE (DROP OBJECTS)
 -- ==============================================================================
 -- L'ordine di eliminazione parte dagli oggetti dipendenti (Viste, Eventi, Procedure)
 -- per poi passare alle Tabelle in ordine inverso rispetto alle chiavi esterne.
@@ -40,11 +101,11 @@ DROP TABLE IF EXISTS PT;
 DROP TABLE IF EXISTS PROPRIETARIO;
 
 -- ==============================================================================
--- 3. CREAZIONE DELLE TABELLE (DDL)
+-- 4. CREAZIONE DELLE TABELLE (DDL)
 -- ==============================================================================
 
 -- ---------------------------------------------------------
--- [3.1 TABELLE ANAGRAFICHE DEGLI ATTORI]
+-- [4.1 TABELLE ANAGRAFICHE DEGLI ATTORI]
 -- ---------------------------------------------------------
 
 CREATE TABLE PROPRIETARIO (
@@ -95,7 +156,7 @@ CREATE TABLE CLIENTE (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------
--- [3.2 CATALOGO E ASSEGNAZIONI]
+-- [4.2 CATALOGO E ASSEGNAZIONI]
 -- ---------------------------------------------------------
 
 CREATE TABLE MACCHINARIO (
@@ -144,7 +205,7 @@ CREATE TABLE ASSEGNA (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------
--- [3.3 LOGICA DI ALLENAMENTO (SCHEDE E SESSIONI)]
+-- [4.3 LOGICA DI ALLENAMENTO (SCHEDE E SESSIONI)]
 -- ---------------------------------------------------------
 
 CREATE TABLE SCHEDA (
@@ -211,7 +272,7 @@ CREATE TABLE SERIE_ESEGUITA (
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
--- 4. VISTE (VIEWS)
+-- 5. VISTE (VIEWS)
 -- ==============================================================================
 
 -- Vista per isolare le prestazioni dei clienti per il singolo PT
@@ -252,7 +313,7 @@ FROM CLIENTE c
          JOIN ESERCIZIO e ON comp.Codice_Esercizio = e.Codice_Esercizio;
 
 -- ==============================================================================
--- 5. TRIGGER PER LOGICA DI BUSINESS AVANZATA
+-- 6. TRIGGER PER LOGICA DI BUSINESS AVANZATA
 -- ==============================================================================
 
 DELIMITER //
@@ -505,7 +566,7 @@ BEGIN
 END //
 
 -- ==============================================================================
--- 6. PROCEDURE ED EVENTI (LOGICA PROCEDURALE)
+-- 7. PROCEDURE ED EVENTI (LOGICA PROCEDURALE)
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
