@@ -81,7 +81,7 @@ public class LoginDAO {
         };
 
         if (statusCol != null && !rs.getBoolean(statusCol)) {
-            throw new AuthException("L'account è stato disattivato. Contattare l'amministratore.");
+            throw new AuthException("L'account è stato disattivato. Contattare la segreteria.");
         }
     }
 }
