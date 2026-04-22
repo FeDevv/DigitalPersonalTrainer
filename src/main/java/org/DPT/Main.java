@@ -10,36 +10,18 @@ import org.DPT.persistence.connection.DBConnectionManager;
 public class Main {
 
     public static void main(String[] args) {
-        LoginCLIController loginController = new LoginCLIController();
-        
-        try {
-            // Avvio del modulo di Login
-            LoginResult session = loginController.start();
-
-            if (session != null) {
-                // In futuro qui chiameremo il dispatcher dei menu in base al ruolo
-                System.out.println("DEBUG: Sessione avviata per " + session.nomeCompleto() + " (" + session.role() + ")");
-                System.out.println("DEBUG: Il sistema è ora connesso con privilegi reali lato DB.");
-                
-                // Per ora, visto che non abbiamo ancora gli altri moduli, chiudiamo qui.
-                System.out.println("\nLogica dei moduli successivi in fase di sviluppo...");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Errore fatale dell'applicazione: " + e.getMessage());
-        } finally {
-            // Pulizia risorse all'uscita
-            DBConnectionManager.getInstance().closeConnection();
-        }
+        appController appController = new appController();
+        appController.run();
     }
 }
 
 /*
-1. Lasciare il main pulito e creare un file appController (che sarà l'orchestrator del progetto, dato che lavoriamo per pacchetti)
-2. attualmente il flusso di operazioni per il login è main -> LoginCLIController -> LoginController. Vorrei far si che il punto d'ingresso sia sempre
+1. attualmente il flusso di operazioni per il login è main -> LoginCLIController -> LoginController. Vorrei far si che il punto d'ingresso sia sempre
 il controller logico, che in base al tipo di scelta di interfaccia, istanzia e avvia il corretto controller grafico.
-3. dato che voglio una struttura "pronta ad essere espansa", direi di creare il modulo BOOT (o semplicemente implemetarlo in appController) che
+
+2. dato che voglio una struttura "pronta ad essere espansa", direi di creare il modulo BOOT (o semplicemente implemetarlo in appController) che
 manterrà tutta la logica di avvio ("scegli il tipo di interfaccia", boot dei servizi ...)
-4. usiamo 1 scanner solo, lo creiamo all'inizio e facciamo dependency injection nei pacchetti che lo necessitano, ciò risulta facile in quanto abbiamo
+
+3. usiamo 1 scanner solo, lo creiamo all'inizio e facciamo dependency injection nei pacchetti che lo necessitano, ciò risulta facile in quanto abbiamo
 l'elemento centrale "appController" che fa da collante tra i vari package.
 */
