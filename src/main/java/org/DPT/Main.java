@@ -10,8 +10,8 @@ import org.DPT.persistence.connection.DBConnectionManager;
 public class Main {
 
     public static void main(String[] args) {
-        appController appController = new appController();
-        appController.run();
+        Orchestrator orchestrator = new Orchestrator();
+        orchestrator.run(args);
     }
 }
 

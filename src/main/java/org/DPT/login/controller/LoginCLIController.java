@@ -6,81 +6,68 @@ import org.DPT.exception.DatabaseException;
 import org.DPT.exception.ValidationException;
 import org.DPT.login.model.LoginResult;
 import org.DPT.login.model.UserCredentials;
-import org.DPT.login.view.LoginView;
+import org.DPT.login.view.LoginCLIView;
 
 import java.util.Scanner;
 
 /**
- * Interface Controller per la versione CLI.
- * Gestisce l'input da tastiera e coordina la LoginView con il LoginController logico.
+ * Interface Controller per la versione CLI del Login.
+ * Si occupa SOLO di I/O: legge input utente e comanda la View per l'output.
+ * Nessuna regola di business, nessuna gestione eccezioni di dominio.
  */
 public class LoginCLIController {
 
-    private final LoginController logicController;
-    private final LoginView view;
+    private final LoginCLIView view;
     private final Scanner scanner;
 
-    public LoginCLIController() {
-        this.logicController = new LoginController();
-        this.view = new LoginView();
-        this.scanner = new Scanner(System.in);
+    // Dependency Injection: lo Scanner arriva dal controller logico (condiviso dall'Orchestrator)
+    public LoginCLIController(Scanner scanner) {
+        this.view = new LoginCLIView();
+        this.scanner = scanner;
+    }
+
+    public void showHeader() {
+        view.displayHeader();
     }
 
     /**
-     * Avvia il ciclo di login.
-     * @return Il risultato del login se ha successo, null se l'utente sceglie di uscire.
+     * Pilota la View per mostrare il menu dei ruoli e legge un ID in modo sicuro.
+     * Gestisce la pulizia del buffer e gli errori di formato (lettere invece di numeri).
      */
-    public LoginResult start() {
-        view.displayHeader();
+    public int askForRoleSelection() {
+        view.displayRoleMenu(Role.values());
 
-        while (true) {
-            view.displayRoleMenu();
-            String scelta = scanner.nextLine();
-
-            if (scelta.equals("0")) {
-                view.displayGoodbye();
-                return null;
-            }
-
-            Role role = mapSelectionToRole(scelta);
-            if (role == null) {
-                view.displayError("Scelta non valida. Riprova.");
-                continue;
-            }
-
-            try {
-                LoginResult result = performLogin(role);
-                view.displaySuccess(result.nomeCompleto(), result.role());
-                return result;
-            } catch (ValidationException | AuthException e) {
-                view.displayError(e.getMessage());
-            } catch (DatabaseException e) {
-                view.displayError("Errore di connessione al database: " + e.getMessage());
-            }
+        while (!scanner.hasNextInt()) {
+            view.displayError("Inserisci un formato numerico valido.");
+            scanner.nextLine(); // Consuma input errato
+            view.displayRoleMenu(Role.values()); // Ristampa il menu pulito
         }
+
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // PULIZIA BUFFER (consuma il newline)
+        return choice;
     }
 
-    private LoginResult performLogin(Role role) {
+    public String askForEmail() {
         view.promptEmail();
-        String email = scanner.nextLine();
-
-        view.promptPassword();
-        String password = scanner.nextLine();
-
-        // Creazione del record con validazione integrata
-        UserCredentials creds = new UserCredentials(email, password, role);
-        
-        // Chiamata al controller logico (universale)
-        return logicController.login(creds);
+        return scanner.nextLine().trim();
     }
 
-    private Role mapSelectionToRole(String scelta) {
-        return switch (scelta) {
-            case "1" -> Role.PROPRIETARIO;
-            case "2" -> Role.PT;
-            case "3" -> Role.SEGRETERIA;
-            case "4" -> Role.CLIENTE;
-            default -> null;
-        };
+    public String askForPassword() {
+        view.promptPassword();
+        return scanner.nextLine().trim();
+    }
+
+    // Metodi ponte per permettere al controller logico di stampare esiti
+    public void reportError(String message) {
+        view.displayError(message);
+    }
+
+    public void reportSuccess(String nomeCompleto, Role role) {
+        view.displaySuccess(nomeCompleto, role);
+    }
+
+    public void reportGoodbye() {
+        view.displayGoodbye();
     }
 }
