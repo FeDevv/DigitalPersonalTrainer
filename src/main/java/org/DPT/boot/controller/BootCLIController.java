@@ -21,10 +21,17 @@ public class BootCLIController {
     }
 
     /**
+     * Stampa il messaggio di benvenuto iniziale.
+     */
+    public void showWelcome() {
+        view.displayWelcome();
+    }
+
+    /**
      * Pilota la View per mostrare il menu e gestisce l'acquisizione sicura dell'intero.
+     * Include la pulizia del buffer dello scanner.
      */
     public int askForUIModeSelection() {
-        view.displayWelcome();
         // Passa l'elenco dinamico alla view affinché lo stampi
         view.displayMenu(UIMode.values());
         view.displayInputPrompt();
@@ -32,11 +39,14 @@ public class BootCLIController {
         // Validazione formale dell'input (deve essere un numero)
         while (!scanner.hasNextInt()) {
             view.displayError("Inserisci un formato numerico valido.");
+            scanner.nextLine(); // Consuma il buffer errato
             view.displayInputPrompt();
-            scanner.next(); // Consuma il buffer errato
         }
 
-        return scanner.nextInt();
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // PULIZIA BUFFER: consuma il carattere 'Invio' rimasto (newline)
+
+        return choice;
     }
 
     /**

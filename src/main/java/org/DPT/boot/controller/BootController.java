@@ -35,6 +35,7 @@ public class BootController {
         }
 
         // 2. Fase Interattiva: delega l'acquisizione dati al controller I/O
+        cliController.showWelcome(); // Visualizzato solo una volta all'inizio della fase interattiva
         UIMode selectedMode = null;
 
         while (selectedMode == null) {
