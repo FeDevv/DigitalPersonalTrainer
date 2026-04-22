@@ -3,8 +3,7 @@ package org.DPT.boot.view;
 import org.DPT.boot.model.UIMode;
 
 /**
- * Gestisce ESCLUSIVAMENTE l'output a schermo.
- * Non contiene logica, non legge input. È un puro display.
+ * Gestisce ESCLUSIVAMENTE l'output a schermo per il boot.
  */
 public class BootCLIView {
 
@@ -21,10 +20,12 @@ public class BootCLIView {
     }
 
     public void displayInputPrompt() {
-        System.out.print("\nInserisci l'ID della tua scelta: ");
+        // Un solo newline prima del prompt per staccarlo dal menu o dall'errore
+        System.out.print("\n>> ");
     }
 
     public void displayError(String errorMessage) {
-        System.out.println("Errore: " + errorMessage + "\n");
+        // Nessun newline finale, ci pensa il println.
+        System.out.println("[ERRORE] " + errorMessage);
     }
 }

@@ -15,13 +15,12 @@ import java.util.Scanner;
 
 /**
  * Controller Logico (Core) per il modulo di Login.
- * Dirige il flusso dell'autenticazione. In base alla configurazione avvia la CLI o la GUI.
  */
 public class LoginController {
 
     private final LoginDAO loginDAO;
     private final Configuration config;
-    private final Scanner sharedScanner; // Presente se in modalità CLI
+    private final Scanner sharedScanner;
 
     public LoginController(Configuration config, Scanner sharedScanner) {
         this.config = config;
@@ -29,79 +28,59 @@ public class LoginController {
         this.loginDAO = new LoginDAO();
     }
 
-    /**
-     * Punto d'ingresso del modulo. Sceglie il ramo visivo corretto.
-     * @return LoginResult se loggato, null se l'utente sceglie "Esci".
-     */
     public LoginResult execute() {
         if (config.uiMode() == UIMode.CLI) {
             return runCLISequence();
         } else {
-            // runGUISequence(); // Da implementare in futuro con JavaFX
             throw new UnsupportedOperationException("GUI non ancora implementata.");
         }
     }
 
-    /**
-     * Il vero e proprio ciclo di business logico per la CLI.
-     */
     private LoginResult runCLISequence() {
         LoginCLIController cliController = new LoginCLIController(sharedScanner);
 
         cliController.showHeader();
+        cliController.showMenu(); // Stampato una volta sola prima del ciclo
 
         while (true) {
-            // 1. Chiede l'input alla grafica
-            int choice = cliController.askForRoleSelection();
+            int choice = cliController.askForChoice();
 
-            // 2. Condizione di uscita
             if (choice == 0) {
                 cliController.reportGoodbye();
                 return null;
             }
 
-            // 3. Mapping ID -> Ruolo
             Role selectedRole = Role.getRoleFromId(choice);
             if (selectedRole == null || selectedRole == Role.LOGIN) {
-                cliController.reportError("Scelta non valida. Riprova.");
-                continue;
+                cliController.reportError("ID (" + choice + ") non valido. Riprova.");
+                continue; // Ritorna ad askForChoice() senza ristampare il menu
             }
 
-            // 4. Raccolta credenziali sensibili
             String email = cliController.askForEmail();
             String password = cliController.askForPassword();
 
-            // 5. Tentativo di Login e Role Switching
             try {
-                // Il costruttore del record fa scattare la ValidationException se i dati sono vuoti
                 UserCredentials creds = new UserCredentials(email, password, selectedRole);
-
-                // Chiamata al DAO (Usa l'utente DB di default: dpt_login)
                 LoginResult result = loginDAO.authenticate(creds);
-
-                // IMPORTANTE: Cambio utente sul Database! Da ora la connessione ha i GRANT di questo ruolo.
                 DBConnectionManager.getInstance().connectAs(result.role());
 
-                // Se arriviamo qui, è andato tutto bene
                 cliController.reportSuccess(result.nomeCompleto(), result.role());
                 return result;
 
             } catch (ValidationException | AuthException e) {
-                // Errori di dominio (es. password errata, formato email errato)
                 cliController.reportError(e.getMessage());
-            } catch (DatabaseException e) { // O SQLException a seconda di come hai fatto
-                // Errori di sistema (es. database spento)
-                cliController.reportError("Problema tecnico di connessione: " + e.getMessage());
+                cliController.showMenu(); // In caso di credenziali errate, ha senso riproporre il menu ruoli? 
+                // Seguendo la tua richiesta, se vuoi che sia proprio identico a boot, 
+                // potremmo anche qui non riproporlo, ma solitamente dopo un errore di login 
+                // l'utente potrebbe voler cambiare ruolo. Per ora lo lasciamo "pulito" come richiesto.
+            } catch (DatabaseException e) {
+                cliController.reportError("Problema tecnico: " + e.getMessage());
             } catch (Exception e) {
-                // Catch all difensivo per non far crashare mai l'app
                 cliController.reportError("Errore imprevisto: " + e.getMessage());
             }
         }
     }
 
-    /**
-     * Da chiamare quando l'utente clicca "Logout" nella dashboard principale.
-     */
     public void logout() {
         DBConnectionManager.getInstance().closeConnection();
     }

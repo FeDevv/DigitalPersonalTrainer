@@ -6,52 +6,44 @@ import org.DPT.boot.view.BootCLIView;
 import java.util.Scanner;
 
 /**
- * Gestisce il flusso dell'interfaccia CLI.
- * Legge l'input tramite lo Scanner condiviso e comanda la View per l'output.
+ * Gestisce il flusso dell'interfaccia CLI per il boot.
  */
 public class BootCLIController {
 
     private final Scanner scanner;
     private final BootCLIView view;
 
-    // Riceve lo scanner dal controller logico
     public BootCLIController(Scanner scanner) {
         this.scanner = scanner;
         this.view = new BootCLIView();
     }
 
-    /**
-     * Stampa il messaggio di benvenuto iniziale.
-     */
     public void showWelcome() {
         view.displayWelcome();
     }
 
-    /**
-     * Pilota la View per mostrare il menu e gestisce l'acquisizione sicura dell'intero.
-     * Include la pulizia del buffer dello scanner.
-     */
-    public int askForUIModeSelection() {
-        // Passa l'elenco dinamico alla view affinché lo stampi
+    public void showMenu() {
         view.displayMenu(UIMode.values());
-        view.displayInputPrompt();
+    }
 
-        // Validazione formale dell'input (deve essere un numero)
+    /**
+     * Chiamata ad ogni tentativo di acquisizione ID.
+     */
+    public int askForChoice() {
+        view.displayInputPrompt(); // Ora viene mostrato SEMPRE, anche dopo errore logico
+
         while (!scanner.hasNextInt()) {
             view.displayError("Inserisci un formato numerico valido.");
-            scanner.nextLine(); // Consuma il buffer errato
+            scanner.nextLine(); 
             view.displayInputPrompt();
         }
 
         int choice = scanner.nextInt();
-        scanner.nextLine(); // PULIZIA BUFFER: consuma il carattere 'Invio' rimasto (newline)
+        scanner.nextLine(); 
 
         return choice;
     }
 
-    /**
-     * Metodo ponte affinché il controller logico possa scatenare un errore visivo.
-     */
     public void reportValidationError(String message) {
         view.displayError(message);
     }

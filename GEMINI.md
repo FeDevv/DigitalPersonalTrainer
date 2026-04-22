@@ -17,18 +17,18 @@
 ### 1. Pattern Architetturale: MVC (Model-View-Controller)
 Il sistema è rigorosamente diviso per separare le responsabilità:
 *   **Model**: 
-    *   **JavaBeans/DTO**: Classi che incapsulano i dati (es. `ClienteBean`) per lo scambio tra i layer.
-    *   **Java Records**: Utilizzati per oggetti di puro trasporto dati immutabili, sfruttando le feature di Java 25.
-    *   **DAO**: Logica di accesso JDBC.
-*   **View**: Interfaccia CLI interattiva basata su console (`System.out`/`Scanner`).
-*   **Controller**: Orchestrazione del flusso, validazione dell'input e gestione delle eccezioni tra View e Model.
+    *   **JavaBeans/DTO**: Classi che incapsulano i dati per lo scambio tra i layer.
+    *   **Java Records**: Utilizzati per oggetti di puro trasporto dati immutabili (Java 25).
+    *   **DAO**: Logica di accesso JDBC granulare.
+*   **View**: Interfaccia CLI interattiva (System.out/Scanner) o GUI futura.
+*   **Controller**: Diviso in **Logic Controller** (regole di business/flusso) e **Interface Controller** (gestione I/O specifica dell'interfaccia).
 
-### 2. Gestione degli Errori: Gerarchia di Eccezioni Custom (Unchecked)
-Il sistema utilizza una gerarchia di **Unchecked Exceptions** per ridurre il boilerplate e favorire una Clean Architecture:
-*   `DPTException` (Base astratta, estende `RuntimeException`)
-    *   `DatabaseException`: Errori di persistenza o connessione.
-    *   `AuthException`: Errori di autenticazione (Login fallito).
-    *   `ValidationException`: Input utente non conforme ai requisiti.
+### 2. Orchestration & Global Lifecycle
+L'applicazione è governata da un **Orchestrator** centrale che gestisce:
+*   **Resource Sharing**: Gestione di un unico stream `Scanner` iniettato nei moduli via Dependency Injection.
+*   **Bootstrapping**: Configurazione iniziale del sistema (CLI vs GUI) tramite il modulo `boot`.
+*   **Routing**: Instradamento dell'utente verso il modulo specifico basato sul Ruolo ottenuto post-login.
+*   **Teardown**: Chiusura sicura di connessioni DB e stream di sistema.
 
 ### 3. Sicurezza: Architettura "Handshake & Switch" (RBAC)
 La sicurezza è delegata al Database MariaDB tramite il meccanismo di Role-Based Access Control:
@@ -38,15 +38,16 @@ La sicurezza è delegata al Database MariaDB tramite il meccanismo di Role-Based
 
 ### 4. Design Patterns & Tecnologie
 *   **Singleton (Bill Pugh)**: `DBConnectionManager` per una gestione efficiente e thread-safe della connessione.
-*   **Java Records**: Utilizzati per DTO e oggetti di trasporto dati immutabili (es. `LoginResult`), ottimizzando l'uso della memoria (8GB RAM).
-*   **DAO**: Astrazione dell'accesso ai dati per isolare il codice SQL.
-*   **Dual-Controller MVC**: Separazione tra Logic Controller (regole di business) e Interface Controller (CLI/GUI).
+*   **Dual-Controller**: Ogni modulo (Boot, Login, PT) separa la logica decisionale dall'acquisizione dell'input, garantendo che il punto d'ingresso sia sempre il controller logico.
+*   **Dependency Injection**: Passaggio manuale delle risorse condivise (Scanner, Sessione) tra i vari pacchetti per mantenere basso l'accoppiamento.
 
 ---
 
 ## 🛠 Roadmap Operativa
-1. [ ] Configurazione `pom.xml` (MariaDB Driver & JUnit 5).
-2. [ ] Implementazione `DBConnectionManager` (Singleton).
-3. [ ] Creazione della gerarchia delle Eccezioni Custom.
-4. [ ] Definizione dei Modelli (POJO) basati sullo schema SQL.
-5. [ ] Sviluppo dei primi DAO e test di connessione.
+1. [x] Configurazione `pom.xml` (MariaDB Driver & JUnit 5).
+2. [x] Implementazione `DBConnectionManager` (Singleton).
+3. [x] Creazione della gerarchia delle Eccezioni Custom.
+4. [x] Implementazione modulo `Boot` e `Orchestrator`.
+5. [x] Sviluppo modulo `Login` con Role Switching.
+6. [ ] Sviluppo del modulo `Personal Trainer` (Dashboard e Lista Clienti).
+7. [ ] Implementazione moduli `Segreteria` e `Cliente`.
