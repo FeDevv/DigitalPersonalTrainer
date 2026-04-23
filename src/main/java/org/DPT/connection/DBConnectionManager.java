@@ -1,4 +1,4 @@
-package org.DPT.persistence.connection;
+package org.DPT.connection;
 
 import org.DPT.auth.Role;
 import org.DPT.exception.DatabaseException;

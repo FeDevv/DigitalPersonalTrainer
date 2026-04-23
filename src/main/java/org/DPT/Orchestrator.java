@@ -5,7 +5,8 @@ import org.DPT.boot.model.Configuration;
 import org.DPT.boot.model.UIMode;
 import org.DPT.login.controller.LoginController;
 import org.DPT.login.model.LoginResult;
-import org.DPT.persistence.connection.DBConnectionManager;
+import org.DPT.connection.DBConnectionManager;
+import org.DPT.proprietario.controller.ProprietarioController;
 
 import java.util.Scanner;
 
@@ -45,23 +46,17 @@ public class Orchestrator {
             // FASE 2: AUTENTICAZIONE
             // ==========================================
             LoginController loginController = new LoginController(config, sharedScanner);
-            LoginResult session = loginController.execute();
+            LoginResult sessionToken= loginController.execute();
 
             // Se l'utente ha premuto '0' per uscire
-            if (session == null) {
+            if (sessionToken == null) {
                 return;
             }
 
             // ==========================================
             // FASE 3: ROUTING (Dispatcher dei ruoli)
             // ==========================================
-            System.out.println("DEBUG: Routing in corso per " + session.nomeCompleto() + "...");
-            System.out.println("DEBUG: Connessione DB attiva con permessi blindati per ruolo: " + session.role());
-
-            // Qui in futuro faremo uno switch sul ruolo per lanciare i moduli specifici
-            // es: if (session.role() == Role.PT) { new PTController(sharedScanner, session).execute(); }
-
-            System.out.println("\nLogica dei moduli successivi in fase di sviluppo...");
+            dispatch(sessionToken, sharedScanner);
 
         } catch (Exception e) {
             // Gestione degli errori fatali non intercettati dai sottomoduli
@@ -72,6 +67,23 @@ public class Orchestrator {
             // FASE 4: TEARDOWN (Pulizia Risorse)
             // ==========================================
             shutDown();
+        }
+    }
+
+    /**
+     * Indirizza l'utente al modulo corretto in base al suo ruolo.
+     * @param sessionToken Informazioni della sessione corrente.
+     */
+    private void dispatch(LoginResult sessionToken, Scanner sharedScanner) {
+        switch (sessionToken.role()) {
+            case PROPRIETARIO -> {
+                ProprietarioController controller = new ProprietarioController(sharedScanner, sessionToken);
+                controller.execute();
+            }
+            case PT -> System.out.println("\n[INFO] Modulo Personal Trainer in arrivo...");
+            case SEGRETERIA -> System.out.println("\n[INFO] Modulo Segreteria in arrivo...");
+            case CLIENTE -> System.out.println("\n[INFO] Modulo Cliente in arrivo...");
+            default -> System.out.println("\n[ERRORE] Ruolo non riconosciuto per il dispatching.");
         }
     }
 

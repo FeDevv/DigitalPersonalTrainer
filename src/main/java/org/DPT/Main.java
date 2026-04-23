@@ -1,9 +1,5 @@
 package org.DPT;
 
-import org.DPT.login.controller.LoginCLIController;
-import org.DPT.login.model.LoginResult;
-import org.DPT.persistence.connection.DBConnectionManager;
-
 /**
  * Punto di ingresso principale dell'applicazione Digital Personal Trainer.
  */
@@ -15,3 +11,8 @@ public class Main {
     }
 
 }
+
+/*
+cambiare in shared "model" in "users"
+revisionare il pacchetto "proprietario"
+* */

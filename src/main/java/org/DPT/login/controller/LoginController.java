@@ -9,7 +9,7 @@ import org.DPT.exception.ValidationException;
 import org.DPT.login.model.LoginResult;
 import org.DPT.login.model.UserCredentials;
 import org.DPT.login.persistence.LoginDAO;
-import org.DPT.persistence.connection.DBConnectionManager;
+import org.DPT.connection.DBConnectionManager;
 
 import java.util.Scanner;
 

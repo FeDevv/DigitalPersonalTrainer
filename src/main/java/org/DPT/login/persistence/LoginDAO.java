@@ -5,7 +5,7 @@ import org.DPT.exception.AuthException;
 import org.DPT.exception.DatabaseException;
 import org.DPT.login.model.LoginResult;
 import org.DPT.login.model.UserCredentials;
-import org.DPT.persistence.connection.DBConnectionManager;
+import org.DPT.connection.DBConnectionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
