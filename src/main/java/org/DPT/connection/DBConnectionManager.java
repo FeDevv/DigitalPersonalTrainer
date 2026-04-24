@@ -1,6 +1,6 @@
 package org.DPT.connection;
 
-import org.DPT.auth.Role;
+import org.DPT.shared.auth.Role;
 import org.DPT.exception.DatabaseException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +12,7 @@ import java.util.Properties;
 /**
  * Gestore delle connessioni al Database (Singleton Bill Pugh).
  * Ottimizzato per thread-safety e performance senza blocchi synchronized.
+ * Segue il principio di separazione delle responsabilità: nessuna interazione diretta con l'UI.
  */
 public class DBConnectionManager {
 
@@ -51,7 +52,9 @@ public class DBConnectionManager {
 
     /**
      * Implementa il Role Switching chiudendo la connessione attiva e aprendone una nuova.
-     * @throws DatabaseException Se la connessione fallisce.
+     * @param role Il ruolo con cui collegarsi.
+     * @return La nuova connessione stabilita.
+     * @throws DatabaseException Se la connessione fallisce o le credenziali mancano.
      */
     public Connection connectAs(Role role) throws DatabaseException {
         closeConnection();
@@ -79,14 +82,18 @@ public class DBConnectionManager {
         return currentConnection;
     }
 
+    /**
+     * Chiude la connessione corrente se aperta.
+     * Gestisce l'eventuale SQLException rilanciandola come DatabaseException 
+     * per permettere ai layer superiori di decidere come notificare l'errore.
+     */
     public void closeConnection() {
         try {
             if (currentConnection != null && !currentConnection.isClosed()) {
                 currentConnection.close();
             }
         } catch (SQLException e) {
-            // In un sistema reale useremmo un logger; qui stampiamo l'errore per il debug CLI
-            System.out.println("DBConnectionManager: Errore chiusura connessione - " + e.getMessage());
+            throw new DatabaseException("Errore durante la chiusura della connessione al database", e);
         } finally {
             currentConnection = null;
         }
