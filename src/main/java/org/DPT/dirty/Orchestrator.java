@@ -4,7 +4,7 @@ import org.DPT.boot.controller.BootLogicController;
 import org.DPT.boot.model.Configuration;
 import org.DPT.boot.model.UIMode;
 import org.DPT.users.login.controller.LoginLogicController;
-import org.DPT.users.login.model.LoginResult;
+import org.DPT.users.login.model.AuthToken;
 import org.DPT.connection.DBConnectionManager;
 import org.DPT.dirty.proprietario.controller.ProprietarioController;
 
@@ -46,7 +46,7 @@ public class Orchestrator {
             // FASE 2: AUTENTICAZIONE
             // ==========================================
             LoginLogicController loginController = new LoginLogicController(config, sharedScanner);
-            LoginResult sessionToken= loginController.execute();
+            AuthToken sessionToken= loginController.execute();
 
             // Se l'utente ha premuto '0' per uscire
             if (sessionToken == null) {
@@ -74,15 +74,15 @@ public class Orchestrator {
      * Indirizza l'utente al modulo corretto in base al suo ruolo.
      * @param sessionToken Informazioni della sessione corrente.
      */
-    private void dispatch(LoginResult sessionToken, Scanner sharedScanner) {
+    private void dispatch(AuthToken sessionToken, Scanner sharedScanner) {
         switch (sessionToken.role()) {
-            case PROPRIETARIO -> {
+            case OWNER -> {
                 ProprietarioController controller = new ProprietarioController(sharedScanner, sessionToken);
                 controller.execute();
             }
             case PT -> System.out.println("\n[INFO] Modulo Personal Trainer in arrivo...");
-            case SEGRETERIA -> System.out.println("\n[INFO] Modulo Segreteria in arrivo...");
-            case CLIENTE -> System.out.println("\n[INFO] Modulo Cliente in arrivo...");
+            case RECEPTIONIST -> System.out.println("\n[INFO] Modulo Segreteria in arrivo...");
+            case CLIENT -> System.out.println("\n[INFO] Modulo Cliente in arrivo...");
             default -> System.out.println("\n[ERRORE] Ruolo non riconosciuto per il dispatching.");
         }
     }

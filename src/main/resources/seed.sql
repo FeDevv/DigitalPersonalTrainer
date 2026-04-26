@@ -11,7 +11,7 @@ USE digital_personal_trainer;
 -- 1. POPOLAMENTO TABELLE ANAGRAFICHE
 -- ==============================================================================
 
--- 1.1 Inserimento record tabella PROPRIETARIO
+-- 1.1 Inserimento record tabella OWNER
 INSERT INTO PROPRIETARIO (Nome, Cognome, Email, Password) VALUES
     ('Roberto', 'Ferrari', 'admin@digitalpt.it', 'password123');
 
@@ -29,7 +29,7 @@ INSERT INTO PT (Nome, Cognome, Email, Password, PT_Attivo) VALUES
                                                                ('Elena', 'Cardio', 'elena.pt@digitalpt.it', 'password123', 1),
                                                                ('Sara', 'Storico', 'sara.pt@digitalpt.it', 'password123', 1);
 
--- 1.4 Inserimento record tabella CLIENTE (8 Clienti)
+-- 1.4 Inserimento record tabella CLIENT (8 Clienti)
 -- Stato iniziale imposto a 1 per consentire il superamento dei controlli logici.
 INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo) VALUES
                                                                                                                             ('Andrea', 'Rossi', 'andrea@email.it', 'password123', 'RSSNDR90A01H501A', 'Via Roma 1, Milano', '1990-05-10', 1),

@@ -1,6 +1,6 @@
 package org.DPT.dirty.proprietario.controller;
 
-import org.DPT.users.login.model.LoginResult;
+import org.DPT.users.login.model.AuthToken;
 import org.DPT.dirty.proprietario.persistence.ProprietarioDAO;
 import org.DPT.dirty.shared.catalogo.persistence.CatalogoDAO;
 import org.DPT.exception.DatabaseException;
@@ -14,12 +14,12 @@ import java.util.Scanner;
 public class ProprietarioController {
 
     private final Scanner sharedScanner;
-    private final LoginResult sessionToken;
+    private final AuthToken sessionToken;
     private final ProprietarioCLIController cliController;
     private final CatalogoDAO catalogoDAO;
     private final ProprietarioDAO proprietarioDAO;
 
-    public ProprietarioController(Scanner sharedScanner, LoginResult sessionToken) {
+    public ProprietarioController(Scanner sharedScanner, AuthToken sessionToken) {
         this.sharedScanner = sharedScanner;
         this.sessionToken = sessionToken;
         this.cliController = new ProprietarioCLIController(sharedScanner);
@@ -120,7 +120,7 @@ public class ProprietarioController {
             switch (choice) {
                 case 1 -> manageUtenzaSpecifica("ADDETTO");
                 case 2 -> manageUtenzaSpecifica("PT");
-                case 3 -> manageUtenzaSpecifica("CLIENTE");
+                case 3 -> manageUtenzaSpecifica("CLIENT");
                 case 0 -> back = true;
                 default -> cliController.reportError("Scelta non valida.");
             }
@@ -139,8 +139,8 @@ public class ProprietarioController {
                 case 1 -> {
                     switch (tipo) {
                         case "PT" -> cliController.showUtenti(proprietarioDAO.getAllPT(), "PERSONAL TRAINER");
-                        case "ADDETTO" -> cliController.showUtenti(proprietarioDAO.getAllAddetti(), "ADDETTI SEGRETERIA");
-                        case "CLIENTE" -> cliController.showUtenti(proprietarioDAO.getAllClienti(), "CLIENTI");
+                        case "ADDETTO" -> cliController.showUtenti(proprietarioDAO.getAllAddetti(), "ADDETTI RECEPTIONIST");
+                        case "CLIENT" -> cliController.showUtenti(proprietarioDAO.getAllClienti(), "CLIENTI");
                     }
                 }
                 case 2 -> {
@@ -152,7 +152,7 @@ public class ProprietarioController {
                     switch (tipo) {
                         case "PT" -> proprietarioDAO.insertPT(nome, cognome, email, pass);
                         case "ADDETTO" -> proprietarioDAO.insertAddetto(nome, cognome, email, pass);
-                        case "CLIENTE" -> {
+                        case "CLIENT" -> {
                             String cf = cliController.askForCF();
                             String ind = cliController.askForIndirizzo();
                             String dataStr = cliController.askForDataNascita();
@@ -166,7 +166,7 @@ public class ProprietarioController {
                     switch (tipo) {
                         case "PT" -> proprietarioDAO.toggleStatoPT(id);
                         case "ADDETTO" -> proprietarioDAO.toggleStatoAddetto(id);
-                        case "CLIENTE" -> proprietarioDAO.toggleStatoCliente(id);
+                        case "CLIENT" -> proprietarioDAO.toggleStatoCliente(id);
                     }
                     cliController.reportSuccess("Stato " + tipo + " aggiornato.");
                 }

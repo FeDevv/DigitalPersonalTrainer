@@ -1,29 +1,34 @@
-RESIOCONTO SESSIONE REFACTORING DPT - 24/04/2026
+PIANO OPERATIVO: REFACTORING & ARCHITETTURA DPT
 
-1. STATO DEL REFACTORING:
-   - BOOT: Completato. Rinominato in BootLogicController. Implementa BaseCLI.
-   - LOGIN: Completato e Blindato. Struttura: LogicController -> UI Interface <- Factory.
-   - CONNECTION: Completato. DBConnectionManager silenziato, rimosso System.out.
-   - EXCEPTION: Validato. Gerarchia basata su RuntimeException (DPTException).
-   - SHARED: Creati sottopacchetti 'ui' (classi base) e 'auth' (Role enum).
-   - USERS: Nuova root per i moduli utente.
+--- STATO ATTUALE (Sessione 26/04/2026) ---
 
-2. STANDARD ARCHITETTURALI APPLICATI:
-   - DUAL-CONTROLLER: Separazione tra logica decisionale e gestione I/O.
-   - AGNOSTICISMO UI: Il LogicController parla solo con un'interfaccia (es. LoginUI).
-   - LOCAL FACTORY: Ogni pacchetto ha una factory interna per scegliere tra CLI e GUI.
-   - DTO (DATA TRANSFER OBJECT): Uso di Java Records per inviare pacchetti di dati completi tra View, Controller e DAO (es. UserCredentials).
-   - DRY UI: BaseCLIView e BaseCLIController centralizzano stampe generiche e acquisizione input (readInt, readString).
-   - FAIL-FAST: Validazione immediata nei costruttori dei record.
-   - ENCAPSULATION: Mantenimento dei DAO e delle implementazioni UI concrete "package-private" ove possibile.
+1. DEFINIZIONE STRUTTURA PACCHETTI (COMPLETATO)
+   - Moduli verticali creati: owner, pt, receptionist, client.
+   - Pacchetti shared configurati: catalog, workout, common.
+   - Refactoring totale dei nomi in Inglese (Codice) / Italiano (Output).
 
-3. PROSSIMI PASSI (DOMANI):
-   - Modulo PROPRIETARIO:
-     * Creazione DTO per Macchinario, Esercizio, PT, Cliente.
-     * Implementazione ProprietarioUI (Interface) e Factory.
-     * Refactoring DAO per accettare DTO completi.
-     * Allineamento CLIController e View alle classi Base.
-   - Modulo SHARED.CATALOGO: Revisione per uniformità.
-   - ORCHESTRATOR: Revisione finale per il routing basato sui nuovi LogicController.
+2. AUTHENTICATION LAYER (RAFFINATO)
+   - LoginModule: Ora genera un AuthToken (userId, Role) e rimane silente in caso di successo.
+   - Delegata la responsabilità del caricamento profilo ai singoli LogicController.
 
-To resume this session: gemini --resume 1936f014-1456-48ba-988b-33e86458e8ee
+3. USER MODEL LAYER (COMPLETATO)
+   - Creata gerarchia User (Abstract base class in common) -> Owner, PT, Receptionist, Client.
+   - Gestione centralizzata del campo 'active' (Logical Deletion).
+   - Utilizzo di LocalDate (Java-Time) per dati anagrafici.
+
+--- PROSSIMI PASSI (Programmati per domani) ---
+
+4. CATALOG MODELS (Punto di partenza)
+   - Implementazione dei modelli per 'Machine' ed 'Exercise' nel pacchetto shared.catalog.
+   - Utilizzo di Java Records dove non è richiesta ereditarietà.
+
+5. DATA ACCESS LAYER (DAO)
+   - Implementazione dei DAO specifici per ogni ruolo.
+   - Obiettivo: Caricamento del profilo utente completo dopo il login.
+   - Allineamento con le query dello schema SQL (Tabella PROPRIETARIO, PT, ADDETTO_SEGRETERIA, CLIENTE).
+
+6. REFACTORING MODULO "DIRTY" & ORCHESTRATION
+   - Migrazione logica PT e Proprietario dai vecchi file 'dirty'.
+   - Implementazione dello Switch nell'Orchestrator basato sull'AuthToken.
+
+To resume this session: gemini --resume 3d3c8061-6a4b-46ae-bf66-030b832166dd

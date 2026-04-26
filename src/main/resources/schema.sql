@@ -577,7 +577,7 @@ GRANT SELECT (ID_PT, Nome, Cognome, Email, Password, PT_Attivo) ON digital_perso
 GRANT SELECT (ID_Addetto, Nome, Cognome, Email, Password, Addetto_Attivo) ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_login'@'localhost';
 GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Password, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
 
--- [PROPRIETARIO]: Gestione del personale e del catalogo
+-- [OWNER]: Gestione del personale e del catalogo
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_proprietario'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PT TO 'dpt_proprietario'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_proprietario'@'localhost';
@@ -599,14 +599,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.COMPOSTA TO 'dp
 GRANT SELECT ON digital_personal_trainer.vw_prestazioni_pt TO 'dpt_pt'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_crea_nuova_scheda TO 'dpt_pt'@'localhost';
 
--- [SEGRETERIA]: Gestione anagrafiche e assegnazioni
+-- [RECEPTIONIST]: Gestione anagrafiche e assegnazioni
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.CLIENTE TO 'dpt_segreteria'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_segreteria'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_segreteria'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ASSEGNA TO 'dpt_segreteria'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_segreteria'@'localhost';
 
--- [CLIENTE]: Operatività limitata al proprio allenamento
+-- [CLIENT]: Operatività limitata al proprio allenamento
 GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_cliente'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SESSIONE TO 'dpt_cliente'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_cliente'@'localhost';

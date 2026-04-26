@@ -7,10 +7,10 @@ package org.DPT.shared.auth;
  */
 public enum Role {
     LOGIN(0, "Autenticazione di Sistema (Tecnico)"),
-    PROPRIETARIO(1, "Proprietario"),
+    OWNER(1, "Proprietario"),
     PT(2, "Personal Trainer"),
-    SEGRETERIA(3, "Segreteria"),
-    CLIENTE(4, "Cliente");
+    RECEPTIONIST(3, "Segreteria"),
+    CLIENT(4, "Cliente");
 
     private final int id;
     private final String description;

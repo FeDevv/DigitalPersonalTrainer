@@ -44,11 +44,6 @@ public class LoginCLIController extends BaseCLIController implements LoginUI {
     }
 
     @Override
-    public void reportSuccess(String nomeCompleto, Role role) {
-        loginView.displayLoginSuccess(nomeCompleto, role);
-    }
-
-    @Override
     public void reportGoodbye() {
         loginView.displayGoodbye();
     }

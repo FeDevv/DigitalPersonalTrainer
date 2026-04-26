@@ -6,7 +6,7 @@ import org.DPT.exception.AuthException;
 import org.DPT.exception.DatabaseException;
 import org.DPT.exception.ValidationException;
 import org.DPT.users.login.factory.LoginUIFactory;
-import org.DPT.users.login.model.LoginResult;
+import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.login.model.UserCredentials;
 import org.DPT.users.login.dao.LoginDAO;
 import org.DPT.connection.DBConnectionManager;
@@ -32,7 +32,7 @@ public class LoginLogicController {
      * Esegue la sequenza di login.
      * @return LoginResult con i dati di sessione o null se l'utente esce.
      */
-    public LoginResult execute() {
+    public AuthToken execute() {
         ui.showHeader();
         ui.showMenu();
 
@@ -56,10 +56,9 @@ public class LoginLogicController {
             try {
                 UserCredentials creds = new UserCredentials(email, password, selectedRole);
                 
-                LoginResult result = loginDAO.authenticate(creds);
+                AuthToken result = loginDAO.authenticate(creds);
                 DBConnectionManager.getInstance().connectAs(result.role());
 
-                ui.reportSuccess(result.nomeCompleto(), result.role());
                 return result;
 
             } catch (ValidationException | AuthException e) {

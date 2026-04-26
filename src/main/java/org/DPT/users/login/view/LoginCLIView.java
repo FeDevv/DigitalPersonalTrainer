@@ -24,13 +24,6 @@ public class LoginCLIView extends BaseCLIView {
         displayLine("0) Esci");
     }
 
-    public void displayLoginSuccess(String nomeCompleto, Role role) {
-        displayLine("\n----------------------------------------");
-        displayLine("Accesso eseguito come: " + nomeCompleto);
-        displayLine("Ruolo: " + role.getDescription());
-        displayLine("----------------------------------------\n");
-    }
-
     public void displayGoodbye() {
         displayLine("\nUscita dal modulo di Login. A presto!");
     }

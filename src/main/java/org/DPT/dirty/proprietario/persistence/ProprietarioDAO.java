@@ -180,7 +180,7 @@ public class ProprietarioDAO {
     }
 
     public List<UtenteSommario> getAllClienti() throws DatabaseException {
-        return fetchUtenti("SELECT ID_Cliente, Nome, Cognome, Email, Cliente_Attivo FROM CLIENTE", "ID_Cliente", "Cliente_Attivo");
+        return fetchUtenti("SELECT ID_Cliente, Nome, Cognome, Email, Cliente_Attivo FROM CLIENT", "ID_Cliente", "Cliente_Attivo");
     }
 
     private List<UtenteSommario> fetchUtenti(String sql, String idCol, String activeCol) throws DatabaseException {

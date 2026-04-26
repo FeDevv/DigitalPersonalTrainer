@@ -3,7 +3,7 @@ package org.DPT.users.login.dao;
 import org.DPT.shared.auth.Role;
 import org.DPT.exception.AuthException;
 import org.DPT.exception.DatabaseException;
-import org.DPT.users.login.model.LoginResult;
+import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.login.model.UserCredentials;
 import org.DPT.connection.DBConnectionManager;
 
@@ -24,7 +24,7 @@ public class LoginDAO {
      * @return LoginResult con i dati dell'utente.
      * @throws AuthException Se le credenziali sono errate o l'account è disattivato.
      */
-    public LoginResult authenticate(UserCredentials creds) {
+    public AuthToken authenticate(UserCredentials creds) {
         Connection conn = DBConnectionManager.getInstance().connectAs(Role.LOGIN);
         
         String sql = getQueryForRole(creds.role());
@@ -38,10 +38,9 @@ public class LoginDAO {
                 if (rs.next()) {
                     checkUserStatus(rs, creds.role());
 
-                    return new LoginResult(
+                    return new AuthToken(
                             rs.getInt(idCol),
-                            creds.role(),
-                            rs.getString("Nome") + " " + rs.getString("Cognome")
+                            creds.role()
                     );
                 } else {
                     throw new AuthException("Email o Password errati per il tipo di utenza selezionato.");
@@ -54,20 +53,20 @@ public class LoginDAO {
 
     private String getQueryForRole(Role role) {
         return switch (role) {
-            case PROPRIETARIO -> "SELECT ID_Proprietario, Nome, Cognome FROM PROPRIETARIO WHERE Email = ? AND Password = ?";
-            case PT -> "SELECT ID_PT, Nome, Cognome, PT_Attivo FROM PT WHERE Email = ? AND Password = ?";
-            case SEGRETERIA -> "SELECT ID_Addetto, Nome, Cognome, Addetto_Attivo FROM ADDETTO_SEGRETERIA WHERE Email = ? AND Password = ?";
-            case CLIENTE -> "SELECT ID_Cliente, Nome, Cognome, Cliente_Attivo FROM CLIENTE WHERE Email = ? AND Password = ?";
+            case OWNER -> "SELECT ID_Proprietario FROM PROPRIETARIO WHERE Email = ? AND Password = ?";
+            case PT -> "SELECT ID_PT, PT_Attivo FROM PT WHERE Email = ? AND Password = ?";
+            case RECEPTIONIST -> "SELECT ID_Addetto, Addetto_Attivo FROM ADDETTO_SEGRETERIA WHERE Email = ? AND Password = ?";
+            case CLIENT -> "SELECT ID_Cliente, Cliente_Attivo FROM CLIENTE WHERE Email = ? AND Password = ?";
             default -> throw new IllegalArgumentException("Ruolo non supportato per il login.");
         };
     }
 
     private String getIdColumnName(Role role) {
         return switch (role) {
-            case PROPRIETARIO -> "ID_Proprietario";
+            case OWNER -> "ID_Proprietario";
             case PT -> "ID_PT";
-            case SEGRETERIA -> "ID_Addetto";
-            case CLIENTE -> "ID_Cliente";
+            case RECEPTIONIST -> "ID_Addetto";
+            case CLIENT -> "ID_Cliente";
             default -> throw new IllegalStateException("ID colonna non definito per il ruolo: " + role);
         };
     }
@@ -75,8 +74,8 @@ public class LoginDAO {
     private void checkUserStatus(ResultSet rs, Role role) throws SQLException {
         String statusCol = switch (role) {
             case PT -> "PT_Attivo";
-            case SEGRETERIA -> "Addetto_Attivo";
-            case CLIENTE -> "Cliente_Attivo";
+            case RECEPTIONIST -> "Addetto_Attivo";
+            case CLIENT -> "Cliente_Attivo";
             default -> null; // Il proprietario non ha colonna attivo/disattivo
         };
 

@@ -13,6 +13,5 @@ public interface LoginUI {
     String askForEmail();
     String askForPassword();
     void reportError(String message);
-    void reportSuccess(String nomeCompleto, Role role);
     void reportGoodbye();
 }
