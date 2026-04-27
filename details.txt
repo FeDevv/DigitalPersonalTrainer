@@ -1,34 +1,32 @@
 PIANO OPERATIVO: REFACTORING & ARCHITETTURA DPT
 
---- STATO ATTUALE (Sessione 26/04/2026) ---
+--- STATO ATTUALE (Sessione 27/04/2026) ---
 
 1. DEFINIZIONE STRUTTURA PACCHETTI (COMPLETATO)
-   - Moduli verticali creati: owner, pt, receptionist, client.
-   - Pacchetti shared configurati: catalog, workout, common.
-   - Refactoring totale dei nomi in Inglese (Codice) / Italiano (Output).
+   - Moduli verticali: owner, pt, receptionist, client.
+   - Pacchetti shared: catalog, workout, common.
 
-2. AUTHENTICATION LAYER (RAFFINATO)
-   - LoginModule: Ora genera un AuthToken (userId, Role) e rimane silente in caso di successo.
-   - Delegata la responsabilità del caricamento profilo ai singoli LogicController.
+2. AUTHENTICATION LAYER (COMPLETATO)
+   - LoginModule standardizzato: genera AuthToken (userId, Role).
+   - Handshake & Switch: Sistema pronto per il cambio ruolo via DBConnectionManager.
 
-3. USER MODEL LAYER (COMPLETATO)
-   - Creata gerarchia User (Abstract base class in common) -> Owner, PT, Receptionist, Client.
-   - Gestione centralizzata del campo 'active' (Logical Deletion).
-   - Utilizzo di LocalDate (Java-Time) per dati anagrafici.
+3. MODEL LAYER (COMPLETATO)
+   - User Hierarchy: User (Abstract) -> Owner, PT, Receptionist, Client.
+   - Catalog: Machine, Exercise (Java Records).
+   - Workout: WorkoutSheet, SheetItem, WorkoutSession, PerformedSet (Java Records).
 
---- PROSSIMI PASSI (Programmati per domani) ---
+4. DATA ACCESS LAYER - DAO (COMPLETATO & VALIDATO)
+   - Implementati DAO per tutte le entità core (User, Catalog, Workout).
+   - Standardizzazione metodi: findById, getAll, findAll(active), insert.
+   - Integrità procedurale: Utilizzo di Stored Procedures (sp_crea_nuova_scheda, sp_disattiva_cliente) e Trigger DB per logica di business atomica.
+   - Naming: Codice in Inglese / Messaggi di errore in Italiano.
 
-4. CATALOG MODELS (Punto di partenza)
-   - Implementazione dei modelli per 'Machine' ed 'Exercise' nel pacchetto shared.catalog.
-   - Utilizzo di Java Records dove non è richiesta ereditarietà.
+--- PROSSIMI PASSI ---
 
-5. DATA ACCESS LAYER (DAO)
-   - Implementazione dei DAO specifici per ogni ruolo.
-   - Obiettivo: Caricamento del profilo utente completo dopo il login.
-   - Allineamento con le query dello schema SQL (Tabella PROPRIETARIO, PT, ADDETTO_SEGRETERIA, CLIENTE).
+5. ORCHESTRATION & GLOBAL LIFECYCLE
+   - Implementazione del nuovo Orchestrator centralizzato.
+   - Gestione dello switch dei LogicController basato sull'AuthToken.
 
-6. REFACTORING MODULO "DIRTY" & ORCHESTRATION
-   - Migrazione logica PT e Proprietario dai vecchi file 'dirty'.
-   - Implementazione dello Switch nell'Orchestrator basato sull'AuthToken.
-
-To resume this session: gemini --resume 3d3c8061-6a4b-46ae-bf66-030b832166dd
+6. LOGIC CONTROLLERS & REFACTORING "DIRTY"
+   - Migrazione logica PT e Proprietario dai file dirty ai nuovi moduli.
+   - Implementazione dei menu dinamici (Attiva/Disattiva) basati sulle liste filtrate dei DAO.

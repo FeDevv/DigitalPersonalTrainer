@@ -41,6 +41,11 @@ La sicurezza è delegata al Database MariaDB tramite il meccanismo di Role-Based
 ## 💎 Engineering Standards
 *   **SOLID & GoF Patterns**: Singleton (Bill Pugh), Factory Locale, Template Method (tramite classi Base).
 *   **DRY (Don't Repeat Yourself)**: Astrazione delle logiche CLI comuni in `shared.ui.BaseCLIController` e `shared.ui.BaseCLIView`.
-*   **Atomicità dei Dati**: I dati viaggiano esclusivamente tramite DTO completi.
+*   **Atomicità dei Dati**: I dati viaggiano esclusivamente tramite DTO completi (Java Records per entità atomiche, Classi per gerarchie).
+*   **Data Access Layer Standards**:
+    *   **Verticalizzazione**: Un DAO per ogni tabella/entità core.
+    *   **Metodi Standard**: Ogni DAO deve implementare `findById`, `getAll` e `findAll(boolean active)` per supportare menu dinamici.
+    *   **Mapping Centralizzato**: Ogni DAO utilizza un metodo privato `mapResultSetTo[Entity]` per garantire coerenza e ridurre il boilerplate.
+    *   **Procedural First**: Se esiste una Stored Procedure nello schema SQL, il DAO *deve* utilizzarla (es. `sp_crea_nuova_scheda`) invece di implementare la logica in Java.
 *   **Integrità del Buffer**: Gestione centralizzata del buffer `Scanner` (newline consumption) nei metodi `readInt` della classe base.
 *   **Encapsulation**: DAO e implementazioni UI concrete devono preferire lo scope package-private ove possibile.
