@@ -60,21 +60,20 @@ public class ExerciseDAO {
         return list;
     }
 
-    public Exercise insert(Exercise exercise) {
-        String sql = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, ?)";
+    public Exercise insert(org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO data, int ownerId) {
+        String sql = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, 1)";
         Connection conn = DBConnectionManager.getInstance().getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, exercise.ownerId());
-            if (exercise.machineId() != null) {
-                pstmt.setInt(2, exercise.machineId());
+            pstmt.setInt(1, ownerId);
+            if (data.machineId() != null) {
+                pstmt.setInt(2, data.machineId());
             } else {
                 pstmt.setNull(2, Types.SMALLINT);
             }
-            pstmt.setString(3, exercise.name());
-            pstmt.setString(4, exercise.description());
-            pstmt.setBoolean(5, exercise.bodyweight());
-            pstmt.setBoolean(6, exercise.active());
+            pstmt.setString(3, data.name());
+            pstmt.setString(4, data.description());
+            pstmt.setBoolean(5, data.isBodyweight());
 
             pstmt.executeUpdate();
 
@@ -82,19 +81,31 @@ public class ExerciseDAO {
                 if (generatedKeys.next()) {
                     return new Exercise(
                             generatedKeys.getInt(1),
-                            exercise.ownerId(),
-                            exercise.machineId(),
-                            exercise.name(),
-                            exercise.description(),
-                            exercise.bodyweight(),
-                            exercise.active()
+                            ownerId,
+                            data.machineId(),
+                            data.name(),
+                            data.description(),
+                            data.isBodyweight(),
+                            true
                     );
                 } else {
                     throw new DatabaseException("Crezione dell'esercizio non riuscita: no ID generated.");
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore durante l'inserimento nel database dell'esercizio " + exercise.name(), e);
+            throw new DatabaseException("Errore durante l'inserimento nel database dell'esercizio " + data.name(), e);
+        }
+    }
+
+    public void updateStatus(int id, boolean active) {
+        String sql = "UPDATE ESERCIZIO SET Esercizio_Attivo = ? WHERE Codice_Esercizio = ?";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, active);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore durante l'aggiornamento dello stato dell'esercizio: " + id, e);
         }
     }
 

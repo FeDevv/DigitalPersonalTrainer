@@ -24,3 +24,5 @@ anche altrove (es. nella creazione di un nuovo PT nel modulo Proprietario).
 il package "dirty" contiene tutti i pacchetti/file che non rispettano gli standard previsti,
 vanno refattorizzati e/o completati affinchè rispettino gli standard.
 */
+
+// To resume this session: gemini --resume 3806ed36-6d8f-4a30-8616-777672bab4cc

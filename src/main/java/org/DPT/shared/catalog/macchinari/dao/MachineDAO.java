@@ -60,15 +60,14 @@ public class MachineDAO {
         return list;
     }
 
-    public Machine insert(Machine machine) {
-        String sql = "INSERT INTO MACCHINARIO (ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo) VALUES (?, ?, ?, ?)";
+    public Machine insert(org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO data, int ownerId) {
+        String sql = "INSERT INTO MACCHINARIO (ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo) VALUES (?, ?, ?, 1)";
         Connection conn = DBConnectionManager.getInstance().getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, machine.ownerId());
-            pstmt.setString(2, machine.name());
-            pstmt.setString(3, machine.description());
-            pstmt.setBoolean(4, machine.active());
+            pstmt.setInt(1, ownerId);
+            pstmt.setString(2, data.name());
+            pstmt.setString(3, data.description());
 
             pstmt.executeUpdate();
 
@@ -76,17 +75,29 @@ public class MachineDAO {
                 if (generatedKeys.next()) {
                     return new Machine(
                             generatedKeys.getInt(1),
-                            machine.ownerId(),
-                            machine.name(),
-                            machine.description(),
-                            machine.active()
+                            ownerId,
+                            data.name(),
+                            data.description(),
+                            true
                     );
                 } else {
                     throw new DatabaseException("Creazione del macchinario non riuscita: no ID generated.");
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore durante l'inserimento del macchinario: " + machine.name(), e);
+            throw new DatabaseException("Errore durante l'inserimento del macchinario: " + data.name(), e);
+        }
+    }
+
+    public void updateStatus(int id, boolean active) {
+        String sql = "UPDATE MACCHINARIO SET Macchinario_Attivo = ? WHERE ID_Macchinario = ?";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, active);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore durante l'aggiornamento dello stato del macchinario: " + id, e);
         }
     }
 

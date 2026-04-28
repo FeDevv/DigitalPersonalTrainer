@@ -46,6 +46,13 @@ La sicurezza è delegata al Database MariaDB tramite il meccanismo di Role-Based
     *   **Verticalizzazione**: Un DAO per ogni tabella/entità core.
     *   **Metodi Standard**: Ogni DAO deve implementare `findById`, `getAll` e `findAll(boolean active)` per supportare menu dinamici.
     *   **Mapping Centralizzato**: Ogni DAO utilizza un metodo privato `mapResultSetTo[Entity]` per garantire coerenza e ridurre il boilerplate.
+    *   **Verticalizzazione & Purezza**: I DAO devono essere "puri" e verticali (un DAO per tabella/entità). È severamente vietato che un DAO istanzi o utilizzi altri DAO al suo interno per evitare il pattern "Middle Man" e dipendenze circolari.
+    *   **Cross-DAO Coordination**: Se una funzionalità richiede l'interazione con più entità (es. il Proprietario che crea un PT), il coordinamento deve avvenire esclusivamente all'interno del **LogicController** di riferimento, che inietterà e orchestrerà i DAO verticali necessari.
     *   **Procedural First**: Se esiste una Stored Procedure nello schema SQL, il DAO *deve* utilizzarla (es. `sp_crea_nuova_scheda`) invece di implementare la logica in Java.
 *   **Integrità del Buffer**: Gestione centralizzata del buffer `Scanner` (newline consumption) nei metodi `readInt` della classe base.
 *   **Encapsulation**: DAO e implementazioni UI concrete devono preferire lo scope package-private ove possibile.
+
+---
+
+## 📂 Documentazione delle Decisioni
+Il file `decisions.txt` funge da **Architecture Decision Log (ADL)**. Ogni scelta progettuale non banale (es. separazione DTO/Model, logica di coordinamento dei controller) deve essere documentata lì con il relativo razionale tecnico. Prima di proporre modifiche strutturali, consulta sempre questo file per comprendere le fondamenta del sistema.

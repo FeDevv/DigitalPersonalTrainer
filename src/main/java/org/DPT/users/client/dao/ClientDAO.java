@@ -5,6 +5,7 @@ import org.DPT.exception.DatabaseException;
 import org.DPT.users.client.model.Client;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +88,28 @@ public class ClientDAO {
     /**
      * Reactivates a client. Note: The client will need a new sheet assigned by a PT.
      */
-    public void activate(int clientId) {
-        updateActiveStatus(clientId, true);
+    public void activate(int id) {
+        updateActiveStatus(id, true);
     }
 
-    private void updateActiveStatus(int clientId, boolean active) {
+    public void insert(org.DPT.users.common.dto.ClientCreationDTO data) {
+        String sql = "INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, data.userBase().firstName());
+            pstmt.setString(2, data.userBase().lastName());
+            pstmt.setString(3, data.userBase().email());
+            pstmt.setString(4, data.userBase().password());
+            pstmt.setString(5, data.fiscalCode());
+            pstmt.setString(6, data.address());
+            pstmt.setDate(7, Date.valueOf(data.birthDate()));
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore durante l'inserimento del nuovo cliente: " + data.userBase().email(), e);
+        }
+    }
+
+    public void updateActiveStatus(int clientId, boolean active) {
         String sql = "UPDATE CLIENTE SET Cliente_Attivo = ? WHERE ID_Cliente = ?";
         Connection conn = DBConnectionManager.getInstance().getConnection();
 

@@ -1,0 +1,20 @@
+# Registro delle Decisioni Progettuali (DPT)
+
+In questo file sono documentate le scelte architetturali non banali che richiedono una giustificazione tecnica specifica.
+
+---
+
+## 1. Separazione tra Domain Models e Creation DTO (Input Records)
+
+**Data della decisione**: 28/04/2026
+
+**Contesto**: Durante lo sviluppo dei moduli utente, è sorta la necessità di decidere se utilizzare i modelli di dominio (es. `Client`) anche per le fasi di input/creazione o creare oggetti dedicati.
+
+**Decisione**: Si è scelto di mantenere una separazione netta tra l'oggetto che rappresenta l'entità nel sistema (**Model**) e l'oggetto che trasporta i dati per la creazione (**DTO/Request**).
+
+**Razionale Tecnico**:
+*   **Integrità dello Stato (Identity vs Intent)**: Un modello di dominio deve rappresentare un'entità con un'identità certa (ID). Durante la creazione, l'ID non esiste ancora. Usare il Model costringerebbe a usare ID fittizi (es. 0), violando il principio di consistenza dell'oggetto.
+*   **Sicurezza (Isolation of Secrets)**: I modelli di dominio (es. `User`) circolano in vari layer dell'applicazione. Includere la password nel Model la esporrebbe a rischi di sicurezza accidentali (es. log o stampe). Il DTO invece trasporta la password solo fino al DAO e poi viene eliminato.
+*   **Disaccoppiamento dell'Evoluzione**: I dati richiesti in fase di input possono differire drasticamente dai dati persistiti (es. un DTO potrebbe richiedere una "Conferma Password" che non esiste nel DB). La separazione permette alla UI e allo schema DB di evolvere indipendentemente.
+
+---

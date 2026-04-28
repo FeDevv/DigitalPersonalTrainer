@@ -72,7 +72,21 @@ public class PTDAO {
     public void activate(int id) { updateStatus(id, true); }
     public void deactivate(int id) { updateStatus(id, false); }
 
-    private void updateStatus(int id, boolean active) {
+    public void insert(org.DPT.users.common.dto.UserCreationDTO data) {
+        String sql = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, data.firstName());
+            pstmt.setString(2, data.lastName());
+            pstmt.setString(3, data.email());
+            pstmt.setString(4, data.password());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore durante l'inserimento del nuovo PT: " + data.email(), e);
+        }
+    }
+
+    public void updateStatus(int id, boolean active) {
         String sql = "UPDATE PT SET PT_Attivo = ? WHERE ID_PT = ?";
         Connection conn = DBConnectionManager.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
