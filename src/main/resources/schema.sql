@@ -140,6 +140,7 @@ CREATE TABLE ASSEGNA (
                          ID_PT SMALLINT UNSIGNED NOT NULL,
                          ID_Cliente MEDIUMINT UNSIGNED NOT NULL,
                          ID_Addetto TINYINT UNSIGNED NOT NULL,
+                         Assegnazione_Attiva TINYINT(1) NOT NULL DEFAULT 0,
                          PRIMARY KEY (ID_PT, ID_Cliente, ID_Addetto),
                          CONSTRAINT fk_assegna_pt
                              FOREIGN KEY (ID_PT) REFERENCES PT(ID_PT)
