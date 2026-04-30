@@ -5,6 +5,7 @@ import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
 import org.DPT.shared.catalog.macchinari.model.Machine;
 import org.DPT.shared.ui.BaseCLIController;
+import org.DPT.shared.utils.ValidationUtils;
 import org.DPT.users.common.dto.ClientCreationDTO;
 import org.DPT.users.common.dto.UserCreationDTO;
 import org.DPT.users.common.model.User;
@@ -70,25 +71,9 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     public UserCreationDTO askForStaffData() {
         String nome = readString("Nome");
         String cognome = readString("Cognome");
-        String email = readString("Email");
+        String email = ValidationUtils.validateEmail(readString("Email"));
         String pass = readString("Password");
         return new UserCreationDTO(nome, cognome, email, pass);
-    }
-
-    @Override
-    public ClientCreationDTO askForClientData() {
-        UserCreationDTO base = askForStaffData();
-        String cf = readString("Codice Fiscale");
-        String ind = readString("Indirizzo");
-        LocalDate data = null;
-        while (data == null) {
-            try {
-                data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG)"));
-            } catch (DateTimeParseException e) {
-                ownerView.displayError("Formato data non valido.");
-            }
-        }
-        return new ClientCreationDTO(base, cf, ind, data);
     }
 
     // --- TOGGLE & STATO ---

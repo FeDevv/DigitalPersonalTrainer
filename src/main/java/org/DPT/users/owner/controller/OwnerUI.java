@@ -27,7 +27,6 @@ public interface OwnerUI {
     MachineCreationDTO askForMachineData();
     ExerciseCreationDTO askForExerciseData();
     UserCreationDTO askForStaffData();
-    ClientCreationDTO askForClientData();
 
     // Toggle stato
     int askForIDMacchinarioDaToggle();

@@ -433,6 +433,19 @@ BEGIN
     CLOSE cur_esercizi;
 END //
 
+CREATE TRIGGER trg_disattiva_assegnazione_precedente
+    BEFORE INSERT ON ASSEGNA
+    FOR EACH ROW
+BEGIN
+    -- Disattiva l'eventuale assegnazione precedente per lo stesso cliente
+    UPDATE ASSEGNA
+    SET Assegnazione_Attiva = 0
+    WHERE ID_Cliente = NEW.ID_Cliente AND Assegnazione_Attiva = 1;
+
+    -- Attiva automaticamente la nuova assegnazione
+    SET NEW.Assegnazione_Attiva = 1;
+END //
+
 CREATE TRIGGER trg_check_pt_cliente_assegnati_insert
     BEFORE INSERT ON SCHEDA
     FOR EACH ROW
@@ -443,11 +456,11 @@ BEGIN
 
     SELECT COUNT(*) INTO v_esiste_assegnazione
     FROM ASSEGNA
-    WHERE ID_PT = NEW.ID_PT AND ID_Cliente = NEW.ID_Cliente;
+    WHERE ID_PT = NEW.ID_PT AND ID_Cliente = NEW.ID_Cliente AND Assegnazione_Attiva = 1;
 
     IF v_esiste_assegnazione = 0 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Sicurezza: Assegnazione inesistente. Il PT non e autorizzato a seguire questo Cliente.';
+            SET MESSAGE_TEXT = 'Sicurezza: Assegnazione inesistente o non attiva. Il PT non e autorizzato a seguire questo Cliente.';
     END IF;
 
     SELECT PT_Attivo INTO v_pt_attivo FROM PT WHERE ID_PT = NEW.ID_PT;

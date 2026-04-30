@@ -2,6 +2,7 @@ package org.DPT.users.login.model;
 
 import org.DPT.shared.auth.Role;
 import org.DPT.exception.ValidationException;
+import org.DPT.shared.utils.ValidationUtils;
 
 /**
  * Record immutabile per il trasporto delle credenziali di accesso.
@@ -9,18 +10,11 @@ import org.DPT.exception.ValidationException;
  */
 public record UserCredentials(String email, String password, Role role) {
 
-    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-
     /**
      * Validazione per assicurarsi che tutti i campi siano presenti.
      */
     public UserCredentials {
-        if (email == null || email.isBlank()) {
-            throw new ValidationException("L'email non può essere vuota.");
-        }
-        if (!email.matches(EMAIL_REGEX)) {
-            throw new ValidationException("Il formato dell'email non è valido.");
-        }
+        ValidationUtils.validateEmail(email);
         if (password == null || password.isBlank()) {
             throw new ValidationException("La password non può essere vuota.");
         }

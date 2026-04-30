@@ -48,7 +48,9 @@ public class OwnerCLIView extends BaseCLIView {
     public void displayUtenzaActionMenu(String tipo) {
         displaySectionTitle("Azioni " + tipo);
         displayLine("1. Visualizza lista " + tipo);
-        displayLine("2. Inserisci nuovo " + tipo);
+        if (!tipo.equals("CLIENTE")) {
+            displayLine("2. Inserisci nuovo " + tipo);
+        }
         displayLine("3. Attiva/Disattiva " + tipo);
         displayLine("0. Torna indietro");
     }

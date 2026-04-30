@@ -24,16 +24,24 @@ public class OwnerLogicController {
     private final AuthToken token;
     private final Owner profile;
 
-    private final OwnerDAO ownerDAO = new OwnerDAO();
-    private final PTDAO ptDAO = new PTDAO();
-    private final ReceptionistDAO receptionistDAO = new ReceptionistDAO();
-    private final ClientDAO clientDAO = new ClientDAO();
-    private final MachineDAO machineDAO = new MachineDAO();
-    private final ExerciseDAO exerciseDAO = new ExerciseDAO();
+    private final OwnerDAO ownerDAO = new OwnerDAO(); // Locale: istanziato internamente
+    private final PTDAO ptDAO;
+    private final ReceptionistDAO receptionistDAO;
+    private final ClientDAO clientDAO;
+    private final MachineDAO machineDAO;
+    private final ExerciseDAO exerciseDAO;
 
-    public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token) {
+    public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token,
+                                PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
+                                MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
         this.ui = OwnerUIFactory.getUI(config.uiMode(), scanner);
         this.token = token;
+        this.ptDAO = ptDAO;
+        this.receptionistDAO = receptionistDAO;
+        this.clientDAO = clientDAO;
+        this.machineDAO = machineDAO;
+        this.exerciseDAO = exerciseDAO;
+
         this.profile = ownerDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));
     }
@@ -139,14 +147,13 @@ public class OwnerLogicController {
                     }
                     case 2 -> {
                         if (tipo.equals("CLIENTE")) {
-                            ClientCreationDTO data = ui.askForClientData();
-                            clientDAO.insert(data);
+                            ui.reportError("L'inserimento clienti è riservato alla Segreteria.");
                         } else {
                             UserCreationDTO data = ui.askForStaffData();
                             if (tipo.equals("PT")) ptDAO.insert(data);
                             else receptionistDAO.insert(data);
+                            ui.reportSuccess(tipo + " inserito.");
                         }
-                        ui.reportSuccess(tipo + " inserito.");
                     }
                     case 3 -> {
                         int id = ui.askForIDUtente();

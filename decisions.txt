@@ -18,3 +18,20 @@ In questo file sono documentate le scelte architetturali non banali che richiedo
 *   **Disaccoppiamento dell'Evoluzione**: I dati richiesti in fase di input possono differire drasticamente dai dati persistiti (es. un DTO potrebbe richiedere una "Conferma Password" che non esiste nel DB). La separazione permette alla UI e allo schema DB di evolvere indipendentemente.
 
 ---
+
+## 2. Dependency Injection Ibrida e Gestione DAO
+
+**Data della decisione**: 30/04/2026
+
+**Contesto**: Necessità di coordinare l'interazione tra diversi moduli (es. il Proprietario che gestisce PT e Clienti) mantenendo l'architettura pulita e i pacchetti isolati.
+
+**Decisione**: Si è adottata una strategia di **Dependency Injection Ibrida**:
+1.  **DAO Locali**: Ogni LogicController istanzia direttamente i DAO appartenenti al proprio pacchetto (es. `OwnerLogicController` crea `OwnerDAO`).
+2.  **DAO Esterni**: I DAO appartenenti a pacchetti diversi vengono iniettati tramite costruttore dall'Orchestrator centrale.
+
+**Razionale Tecnico**:
+*   **Encapsulation (Package-Private)**: Permette di mantenere i DAO locali con visibilità di pacchetto dove possibile, riducendo la superficie pubblica dei moduli.
+*   **Coordinamento Pulito**: L'Orchestrator funge da "Registry" centrale, eliminando dipendenze circolari tra controller e garantendo che le risorse condivise siano gestite in un unico punto.
+*   **Flessibilità e Testabilità**: Facilita il mocking dei DAO esterni durante i test e permette di sostituire le implementazioni dei componenti globali senza modificare la logica interna dei singoli pacchetti.
+
+---
