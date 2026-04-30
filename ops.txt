@@ -1,0 +1,27 @@
+# Operazioni Modulo Personal Trainer (PT)
+
+Il PT gestisce la programmazione degli allenamenti per i clienti a lui assegnati e monitora i loro progressi.
+
+## 1. Gestione Catalogo (Sola Lettura)
+*   **Visualizzazione Macchinari**: Consultazione dell'elenco macchinari disponibili in palestra.
+*   **Visualizzazione Esercizi**: Consultazione del catalogo esercizi pre-configurato dal Proprietario (inclusi dettagli su macchinario associato o corpo libero).
+
+## 2. Gestione Schede di Allenamento
+*   **Routine Unica**: La scheda consiste in una singola routine di esercizi (non divisa in giornate o cicli).
+*   **Selezione Guidata**: Durante la redazione della scheda (PT) o la creazione di esercizi (Proprietario), il sistema mostra sempre l'elenco degli elementi disponibili (Clienti, Esercizi, Macchinari) per permettere la scelta tramite ID senza che l'utente debba conoscerli a priori.
+*   **Visualizzazione Clienti Assegnati**: Elenco dei clienti attualmente sotto la supervisione del PT (tramite tabella `ASSEGNA` con `Assegnazione_Attiva = 1`).
+*   **Creazione Nuova Scheda**: Redazione di una nuova scheda per un cliente assegnato.
+    *   *Logica DB*: Utilizzo di `sp_crea_nuova_scheda`. Questa procedura archivia automaticamente la scheda precedente (`Scheda_Attiva = 0`) e ne crea una nuova.
+    *   *Composizione*: Aggiunta di esercizi dal catalogo alla scheda tramite la tabella `COMPOSTA` (specificando serie, ripetizioni, recupero e note).
+*   **Visualizzazione Storico Schede**: Consultazione di tutte le schede redatte dal PT nel tempo, limitatamente ai propri clienti (filtrate per `ID_PT`).
+
+## 3. Monitoraggio e Reporting
+*   **Generazione Report Prestazioni**: Visualizzazione dei progressi per i clienti assegnati in un intervallo temporale.
+    *   *Fonte Dati*: Vista `vw_prestazioni_pt`.
+    *   *Filtri*: Il report deve mostrare solo gli allenamenti svolti sotto la supervisione del PT richiedente.
+    *   *Metriche*: Numero allenamenti, durata (minuti) e percentuale di completamento (calcolata dai trigger del DB).
+
+## 4. Vincoli di Business e Sicurezza (Lato DB)
+*   **Autarchia delle Schede**: Un PT non può vedere le schede create da altri PT per lo stesso cliente.
+*   **Integrità Assegnazione**: Il trigger `trg_check_pt_cliente_assegnati_insert` impedisce al PT di creare schede per clienti che non gli sono attualmente assegnati.
+*   **Catalogo Chiuso**: Il PT non ha permessi di INSERT/UPDATE su `ESERCIZIO` o `MACCHINARIO`.

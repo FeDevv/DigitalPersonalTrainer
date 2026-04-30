@@ -35,3 +35,33 @@ In questo file sono documentate le scelte architetturali non banali che richiedo
 *   **Flessibilità e Testabilità**: Facilita il mocking dei DAO esterni durante i test e permette di sostituire le implementazioni dei componenti globali senza modificare la logica interna dei singoli pacchetti.
 
 ---
+
+## 3. Fail-Fast Validation nei DTO (DTO Hardening)
+
+**Data della decisione**: 30/04/2026
+
+**Contesto**: Prevenire la circolazione di dati inconsistenti (es. email malformate, età non valide) tra i vari layer dell'applicazione.
+
+**Decisione**: I record DTO devono implementare costruttori compatti che eseguono la validazione dei dati tramite `ValidationUtils` o logiche specifiche (es. controllo lunghezza CF, età minima).
+
+**Razionale Tecnico**:
+*   **Integrità Atomica**: Un DTO non valido non può esistere. Se i dati non superano il controllo, l'eccezione viene lanciata immediatamente all'istante della creazione.
+*   **Riduzione del Boilerplate nei DAO**: I DAO possono assumere che i dati ricevuti tramite DTO siano già formalmente corretti, concentrandosi solo sulla persistenza.
+*   **Feedback Immediato**: Permette al sistema di segnalare errori di input il più vicino possibile alla fonte (UI), prima di impegnare risorse del DB o del network.
+
+---
+
+## 4. Pattern di Selezione Guidata (Guided Selection UI)
+
+**Data della decisione**: 30/04/2026
+
+**Contesto**: Evitare che l'utente debba conoscere o inserire manualmente ID tecnici (es. ID Macchinario, ID PT) durante le operazioni di inserimento/assegnazione.
+
+**Decisione**: Ogni operazione UI che richiede un ID esterno deve essere preceduta dalla visualizzazione dell'elenco degli elementi disponibili recuperati dal database.
+
+**Razionale Tecnico**:
+*   **UX (User Experience)**: Riduce il carico cognitivo dell'utente e previene errori di inserimento di ID inesistenti.
+*   **Integrità Referenziale**: Minimizza i fallimenti lato DB dovuti a violazioni di chiavi esterne, catturando l'intento dell'utente in modo guidato.
+*   **Coordinamento Logic-UI**: Il LogicController ha la responsabilità di recuperare i dati necessari e passarli alla UI per la visualizzazione prima di richiedere l'input.
+
+---

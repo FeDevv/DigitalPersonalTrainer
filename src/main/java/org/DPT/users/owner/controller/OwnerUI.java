@@ -25,7 +25,7 @@ public interface OwnerUI {
     
     // Metodi di Input aggregati tramite DTO
     MachineCreationDTO askForMachineData();
-    ExerciseCreationDTO askForExerciseData();
+    ExerciseCreationDTO askForExerciseData(List<Machine> availableMachines);
     UserCreationDTO askForStaffData();
 
     // Toggle stato

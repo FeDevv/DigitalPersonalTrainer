@@ -101,7 +101,7 @@ public class OwnerLogicController {
                 switch (choice) {
                     case 1 -> ui.showEsercizi(exerciseDAO.getAll());
                     case 2 -> {
-                        ExerciseCreationDTO data = ui.askForExerciseData();
+                        ExerciseCreationDTO data = ui.askForExerciseData(machineDAO.findAll(true));
                         exerciseDAO.insert(data, profile.getId());
                         ui.reportSuccess("Esercizio inserito.");
                     }

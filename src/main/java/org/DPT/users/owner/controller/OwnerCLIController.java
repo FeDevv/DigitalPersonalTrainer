@@ -56,13 +56,19 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     }
 
     @Override
-    public ExerciseCreationDTO askForExerciseData() {
+    public ExerciseCreationDTO askForExerciseData(List<Machine> availableMachines) {
         String nome = readString("Nome Esercizio");
         String desc = readString("Descrizione");
         boolean corpoLibero = readString("È a corpo libero? (s/n)").equalsIgnoreCase("s");
         Integer machineId = null;
         if (!corpoLibero) {
-            machineId = readInt("Inserisci ID Macchinario associato");
+            if (availableMachines.isEmpty()) {
+                ownerView.displayError("Non ci sono macchinari disponibili. L'esercizio verrà creato come corpo libero.");
+                corpoLibero = true;
+            } else {
+                ownerView.displayMacchinari(availableMachines);
+                machineId = readInt("Inserisci ID Macchinario associato");
+            }
         }
         return new ExerciseCreationDTO(nome, desc, corpoLibero, machineId);
     }
