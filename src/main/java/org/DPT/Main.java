@@ -1,7 +1,5 @@
 package org.DPT;
 
-import org.DPT.dirty.Orchestrator;
-
 /**
  * Punto di ingresso principale dell'applicazione Digital Personal Trainer.
  */
