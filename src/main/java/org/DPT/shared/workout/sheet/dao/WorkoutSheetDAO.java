@@ -2,6 +2,7 @@ package org.DPT.shared.workout.sheet.dao;
 
 import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 
 import java.sql.*;
@@ -14,6 +15,49 @@ import java.util.Optional;
  * Utilizza stored procedure per la creazione per garantire la coerenza della logica di business.
  */
 public class WorkoutSheetDAO {
+
+    /**
+     * Recupera la routine dettagliata della scheda attualmente attiva per un cliente.
+     * Interroga la vista 'vw_scheda_attiva_cliente'.
+     */
+    public List<ActiveSheetItem> getActiveRoutine(int clientId) {
+        List<ActiveSheetItem> routine = new ArrayList<>();
+        String sql = "SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clientId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    routine.add(mapResultSetToActiveItem(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore di recupero della routine attiva per il cliente: " + clientId, e);
+        }
+        return routine;
+    }
+
+    /**
+     * Recupera tutte le schede (attive e archiviate) di un cliente.
+     */
+    public List<WorkoutSheet> findAllByClientId(int clientId) {
+        List<WorkoutSheet> history = new ArrayList<>();
+        String sql = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? ORDER BY Data_Creazione DESC";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clientId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    history.add(mapResultSetToSheet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore di recupero dello storico schede per il cliente: " + clientId, e);
+        }
+        return history;
+    }
 
     /**
      * Recupera la scheda attualmente attiva per un cliente.
@@ -106,6 +150,21 @@ public class WorkoutSheetDAO {
                 rs.getString("Titolo"),
                 rs.getBoolean("Scheda_Attiva"),
                 rs.getInt("Totale_Serie_Previste")
+        );
+    }
+
+    private ActiveSheetItem mapResultSetToActiveItem(ResultSet rs) throws SQLException {
+        return new ActiveSheetItem(
+                rs.getInt("ID_Cliente"),
+                rs.getInt("ID_Scheda"),
+                rs.getString("Nome_Scheda"),
+                rs.getInt("Codice_Esercizio"),
+                rs.getString("Nome_Esercizio"),
+                rs.getInt("Serie_Previste"),
+                rs.getInt("Ripetizioni_Previste"),
+                rs.getInt("Recupero"),
+                rs.getString("Note_Esecuzione"),
+                rs.getBoolean("Corpo_Libero")
         );
     }
 }

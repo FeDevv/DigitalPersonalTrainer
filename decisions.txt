@@ -65,3 +65,21 @@ In questo file sono documentate le scelte architetturali non banali che richiedo
 *   **Coordinamento Logic-UI**: Il LogicController ha la responsabilità di recuperare i dati necessari e passarli alla UI per la visualizzazione prima di richiedere l'input.
 
 ---
+
+## 5. Separazione tra Modelli di Scrittura (SheetItem) e Lettura (ActiveSheetItem)
+
+**Data della decisione**: 04/05/2026
+
+**Contesto**: Necessità di visualizzare informazioni dettagliate (nomi esercizi, macchinari) durante l'allenamento dell'atleta, mentre in fase di creazione scheda (PT) sono necessari solo gli ID tecnici.
+
+**Decisione**: Si è adottato un approccio ispirato al pattern **CQRS (Command Query Responsibility Segregation)**, creando due oggetti distinti:
+1.  **SheetItem**: Mappa la tabella `COMPOSTA`. Contiene solo ID e parametri tecnici. Usato per la *scrittura* (PT).
+2.  **ActiveSheetItem**: Mappa la vista `vw_scheda_attiva_cliente`. Include campi testuali denormalizzati (nome esercizio, ecc.). Usato per la *lettura* (Atleta).
+
+**Razionale Tecnico**:
+*   **Single Responsibility Principle**: Evita di "inquinare" l'entità di persistenza con campi che non le appartengono direttamente, mantenendo il modello di dominio pulito.
+*   **Efficienza di Rete/DB**: Permette di recuperare tutte le informazioni necessarie all'UI in un'unica query sulla vista, evitando join manuali o query multiple in Java.
+*   **User Experience**: Garantisce che l'atleta riceva sempre descrizioni testuali chiare ("Squat") invece di ID numerici, senza appesantire il processo di creazione del PT.
+*   **Evoluzione Indipendente**: Se in futuro la vista dovesse includere nuovi dati (es. immagini o video tutorial), basterà aggiornare il Read-Model senza impattare sulla logica di creazione delle schede.
+
+---
