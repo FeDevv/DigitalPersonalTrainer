@@ -64,11 +64,11 @@ INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Eserci
 -- ==============================================================================
 
 -- 3.1 Inserimento record tabella ASSEGNA (Relazioni PT - Cliente - Segreteria)
-INSERT INTO ASSEGNA (ID_PT, ID_Cliente, ID_Addetto) VALUES
-                                                        (1, 1, 1), (1, 2, 1),
-                                                        (2, 3, 2), (2, 4, 2),
-                                                        (3, 5, 1), (4, 6, 2),
-                                                        (5, 7, 3), (5, 8, 3);
+INSERT INTO ASSEGNA (ID_PT, ID_Cliente, ID_Addetto, Assegnazione_Attiva) VALUES
+                                                        (1, 1, 1, 1), (1, 2, 1, 1),
+                                                        (2, 3, 2, 1), (2, 4, 2, 1),
+                                                        (3, 5, 1, 1), (4, 6, 2, 1),
+                                                        (5, 7, 3, 1), (5, 8, 3, 1);
 
 -- ==============================================================================
 -- 4. CREAZIONE SCHEDE DI ALLENAMENTO

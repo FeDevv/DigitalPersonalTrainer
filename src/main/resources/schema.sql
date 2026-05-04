@@ -43,6 +43,7 @@ DROP VIEW IF EXISTS vw_scheda_attiva_cliente;
 DROP EVENT IF EXISTS evt_chiusura_sessioni_timeout;
 DROP PROCEDURE IF EXISTS sp_disattiva_cliente;
 DROP PROCEDURE IF EXISTS sp_crea_nuova_scheda;
+DROP PROCEDURE IF EXISTS sp_assegna_pt;
 
 DROP TABLE IF EXISTS SERIE_ESEGUITA;
 DROP TABLE IF EXISTS SESSIONE;
@@ -435,19 +436,6 @@ BEGIN
     CLOSE cur_esercizi;
 END //
 
-CREATE TRIGGER trg_disattiva_assegnazione_precedente
-    BEFORE INSERT ON ASSEGNA
-    FOR EACH ROW
-BEGIN
-    -- Disattiva l'eventuale assegnazione precedente per lo stesso cliente
-    UPDATE ASSEGNA
-    SET Assegnazione_Attiva = 0
-    WHERE ID_Cliente = NEW.ID_Cliente AND Assegnazione_Attiva = 1;
-
-    -- Attiva automaticamente la nuova assegnazione
-    SET NEW.Assegnazione_Attiva = 1;
-END //
-
 CREATE TRIGGER trg_check_pt_cliente_assegnati_insert
     BEFORE INSERT ON SCHEDA
     FOR EACH ROW
@@ -580,6 +568,32 @@ BEGIN
     COMMIT;
 END //
 
+CREATE PROCEDURE sp_assegna_pt(
+    IN p_ID_PT SMALLINT UNSIGNED,
+    IN p_ID_Cliente MEDIUMINT UNSIGNED,
+    IN p_ID_Addetto TINYINT UNSIGNED
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            ROLLBACK;
+            RESIGNAL;
+        END;
+
+    START TRANSACTION;
+
+    -- Disattiva l'eventuale assegnazione precedente per lo stesso cliente
+    UPDATE ASSEGNA
+    SET Assegnazione_Attiva = 0
+    WHERE ID_Cliente = p_ID_Cliente AND Assegnazione_Attiva = 1;
+
+    -- Inserisce la nuova assegnazione come attiva
+    INSERT INTO ASSEGNA (ID_PT, ID_Cliente, ID_Addetto, Assegnazione_Attiva)
+    VALUES (p_ID_PT, p_ID_Cliente, p_ID_Addetto, 1);
+
+    COMMIT;
+END //
+
 DELIMITER ;
 
 -- ==============================================================================
@@ -620,6 +634,7 @@ GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_segreteria'@
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_segreteria'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ASSEGNA TO 'dpt_segreteria'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_segreteria'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_assegna_pt TO 'dpt_segreteria'@'localhost';
 
 -- [CLIENT]: Operatività limitata al proprio allenamento
 GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_cliente'@'localhost';
