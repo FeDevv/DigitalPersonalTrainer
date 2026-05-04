@@ -1,0 +1,21 @@
+Personal trainer digitale
+Si vuole realizzare un’applicazione per consentire la gestione degli allenamenti in una palestra. Gli attori del sistema sono: Proprietario, membri della Segreteria, Personal Trainer (PT) e Clienti (Atleti). Tutti gli utenti, inclusi i membri della segreteria, accedono al sistema tramite proprie credenziali personali univoche.
+
+Il Proprietario definisce e popola a sistema un catalogo chiuso di macchinari e di esercizi (i PT non possono creare nuovi esercizi autonomamente). All'interno del catalogo, ogni esercizio è rigidamente associato a uno specifico macchinario (o contrassegnato come a corpo libero). Nel caso in cui un movimento sia eseguibile con attrezzature diverse, il proprietario provvederà a inserire nel catalogo record duplicati e distinti (es. "Squat al Multipower" legato alla macchina Multipower, e "Squat libero" legato al Rack).
+
+La Segreteria si occupa di gestire e aggiornare a sistema l'associazione tra ciascun cliente della palestra e un personal trainer di riferimento (assumendo che le richieste di assegnazione/cambio avvengano esternamente all'applicazione). Questa associazione può cambiare nel tempo.
+
+Il PT di riferimento redige una scheda di allenamento personalizzata per il cliente, scegliendo gli esercizi (già pre-configurati con i relativi macchinari) dal catalogo. La scheda consiste in una singola routine (non è divisa in giornate). Per ciascun esercizio nella scheda, il PT indica numero di serie e ripetizioni. Un cliente ha una sola scheda attiva in un dato momento. Quando il PT redige una nuova scheda, la precedente viene archiviata automaticamente. Il PT può sempre visionare lo storico di tutte (e solo) le schede che lui stesso ha redatto nel tempo, perdendo visibilità su quelle redatte da eventuali PT precedenti o successivi.
+
+I clienti accedono all'app per visualizzare la scheda attiva e avviare una sessione di allenamento, che traccerà data, ora di inizio e ora di fine.
+Il sistema mostra l'esercizio e la serie corrente.
+Per permettere un calcolo preciso, il cliente conferma il completamento man mano per ogni singola serie.
+Un cliente può quindi:
+Contrassegnare le singole serie di un esercizio come completate.
+Saltare un esercizio del tutto.
+Iniziare un esercizio ma saltare le serie successive (completamento parziale). Le schede archiviate sono consultabili dal cliente in sola lettura.
+
+Infine, i PT possono generare un report sui clienti a loro attualmente assegnati. Il sistema includerà nel calcolo esclusivamente gli allenamenti svolti sotto la supervisione del PT richiedente, ignorando i dati generati durante le assegnazioni a PT precedenti. Il report mostrerà in un dato intervallo temporale:
+Numero di allenamenti sostenuti.
+Durata di ciascun allenamento.
+Percentuale di completamento per ogni sessione (calcolata tenendo conto proporzionalmente degli esercizi saltati totalmente o delle singole serie completate solo parzialmente).

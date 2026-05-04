@@ -234,7 +234,8 @@ SELECT
 FROM ASSEGNA a
          JOIN CLIENTE c ON a.ID_Cliente = c.ID_Cliente
          JOIN SCHEDA sch ON c.ID_Cliente = sch.ID_Cliente AND a.ID_PT = sch.ID_PT
-         JOIN SESSIONE sess ON sch.ID_Scheda = sess.ID_Scheda;
+         JOIN SESSIONE sess ON sch.ID_Scheda = sess.ID_Scheda
+WHERE a.Assegnazione_Attiva = 1;
 
 CREATE VIEW vw_scheda_attiva_cliente AS
 SELECT

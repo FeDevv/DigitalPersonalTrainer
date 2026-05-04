@@ -5,16 +5,18 @@ import org.DPT.exception.DatabaseException;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
- * DAO for Workout Sheets.
- * Uses stored procedures for creation to ensure business logic consistency.
+ * DAO per le Schede di Allenamento.
+ * Utilizza stored procedure per la creazione per garantire la coerenza della logica di business.
  */
 public class WorkoutSheetDAO {
 
     /**
-     * Retrieves the currently active sheet for a client.
+     * Recupera la scheda attualmente attiva per un cliente.
      */
     public Optional<WorkoutSheet> findActiveByClientId(int clientId) {
         String sql = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? AND Scheda_Attiva = 1";
@@ -34,8 +36,8 @@ public class WorkoutSheetDAO {
     }
 
     /**
-     * Creates a new sheet using the database stored procedure.
-     * This procedure automatically deactivates the previous active sheet.
+     * Crea una nuova scheda utilizzando la stored procedure del database.
+     * Questa procedura disattiva automaticamente la scheda attiva precedente.
      */
     public void createNewSheet(int ptId, int clientId, String title, int totalSets) {
         String sql = "{CALL sp_crea_nuova_scheda(?, ?, ?, ?)}";
@@ -54,7 +56,7 @@ public class WorkoutSheetDAO {
     }
 
     /**
-     * Adds an exercise to a sheet (COMPOSTA table).
+     * Aggiunge un esercizio a una scheda (tabella COMPOSTA).
      */
     public void addExerciseToSheet(int sheetId, int exerciseId, int rest, String notes, int sets, int reps) {
         String sql = "INSERT INTO COMPOSTA (ID_Scheda, Codice_Esercizio, Recupero, Note_Esecuzione, Serie_Previste, Ripetizioni_Previste) VALUES (?, ?, ?, ?, ?, ?)";
@@ -72,6 +74,27 @@ public class WorkoutSheetDAO {
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiunta dell'esercizio alla scheda: " + sheetId, e);
         }
+    }
+
+    /**
+     * Recupera tutte le schede redatte da uno specifico PT.
+     */
+    public List<WorkoutSheet> findByPTId(int ptId) {
+        List<WorkoutSheet> sheets = new ArrayList<>();
+        String sql = "SELECT * FROM SCHEDA WHERE ID_PT = ? ORDER BY Data_Creazione DESC";
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, ptId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    sheets.add(mapResultSetToSheet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore di recupero dello storico schede per il PT: " + ptId, e);
+        }
+        return sheets;
     }
 
     private WorkoutSheet mapResultSetToSheet(ResultSet rs) throws SQLException {

@@ -97,4 +97,35 @@ public class PTDAO {
             throw new DatabaseException("Errore di aggiornamento dello stato del PT", e);
         }
     }
+
+    public List<org.DPT.users.pt.controller.PTUI.PerformanceRecord> getPerformanceReport(int ptId, java.time.LocalDate start, java.time.LocalDate end) {
+        List<org.DPT.users.pt.controller.PTUI.PerformanceRecord> report = new ArrayList<>();
+        String sql = """
+                SELECT Nominativo_Cliente, Data, Durata_Minuti, Percentuale_Completamento 
+                FROM vw_prestazioni_pt 
+                WHERE ID_PT = ? AND Data BETWEEN ? AND ?
+                ORDER BY Data DESC
+                """;
+        Connection conn = DBConnectionManager.getInstance().getConnection();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, ptId);
+            pstmt.setDate(2, java.sql.Date.valueOf(start));
+            pstmt.setDate(3, java.sql.Date.valueOf(end));
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    report.add(new org.DPT.users.pt.controller.PTUI.PerformanceRecord(
+                            rs.getString("Nominativo_Cliente"),
+                            rs.getDate("Data").toLocalDate(),
+                            rs.getInt("Durata_Minuti"),
+                            rs.getInt("Percentuale_Completamento")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Errore durante la generazione del report prestazioni", e);
+        }
+        return report;
+    }
 }
