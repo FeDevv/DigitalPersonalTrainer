@@ -48,8 +48,8 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     @Override
     public ClientCreationDTO askForClientData() {
         UserCreationDTO base = askForStaffData();
-        String cf = readString("Codice Fiscale");
-        String ind = readString("Indirizzo");
+        String cf = readString("Codice Fiscale: ");
+        String ind = readString("Indirizzo: ");
         LocalDate data = null;
         while (data == null) {
             try {
@@ -62,7 +62,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare"); }
+    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare: "); }
 
     @Override
     public boolean askForNewStatus() {
@@ -71,10 +71,10 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     }
 
     @Override
-    public int askForPTId() { return readInt("ID del Personal Trainer da assegnare"); }
+    public int askForPTId() { return readInt("ID del Personal Trainer da assegnare: "); }
 
     @Override
-    public int askForClientId() { return readInt("ID del Cliente"); }
+    public int askForClientId() { return readInt("ID del Cliente: "); }
 
     @Override
     public void showUtenti(List<? extends User> lista, String titolo) { recView.displayUtenti(lista, titolo); }

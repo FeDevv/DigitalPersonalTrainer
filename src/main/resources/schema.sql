@@ -637,6 +637,8 @@ GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_assegna_pt TO 'dpt_segreteria'@'localhost';
 
 -- [CLIENT]: Operatività limitata al proprio allenamento
+GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_cliente'@'localhost';
+GRANT SELECT ON digital_personal_trainer.SCHEDA TO 'dpt_cliente'@'localhost';
 GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_cliente'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SESSIONE TO 'dpt_cliente'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_cliente'@'localhost';

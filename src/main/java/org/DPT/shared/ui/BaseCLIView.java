@@ -17,7 +17,7 @@ public class BaseCLIView {
     }
 
     public void displayLabel(String label) {
-        System.out.print(label + ": ");
+        System.out.print(label);
     }
 
     public void displayInputPrompt(String prompt) {

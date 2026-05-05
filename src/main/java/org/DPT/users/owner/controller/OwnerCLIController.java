@@ -67,7 +67,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
                 corpoLibero = true;
             } else {
                 ownerView.displayMacchinari(availableMachines);
-                machineId = readInt("Inserisci ID Macchinario associato");
+                machineId = readInt("Inserisci ID Macchinario associato: ");
             }
         }
         return new ExerciseCreationDTO(nome, desc, corpoLibero, machineId);
@@ -85,13 +85,13 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     // --- TOGGLE & STATO ---
 
     @Override
-    public int askForIDMacchinarioDaToggle() { return readInt("ID Macchinario da attivare/disattivare"); }
+    public int askForIDMacchinarioDaToggle() { return readInt("ID Macchinario da attivare/disattivare: "); }
 
     @Override
-    public int askForIDEsercizioDaToggle() { return readInt("ID Esercizio da attivare/disattivare"); }
+    public int askForIDEsercizioDaToggle() { return readInt("ID Esercizio da attivare/disattivare: "); }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare"); }
+    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare: "); }
 
     @Override
     public boolean askForNewStatus() {

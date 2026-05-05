@@ -11,3 +11,7 @@ public class Main {
     }
 
 }
+
+// enum role in shared.auth necessitava dei nomi in italiano per rispecchiare quelli in db.properties
+// l'utente client in schema.sql non aveva i permessi di select e lettura delle tabelle per l'accesso
+// pensare al logging (aggiungere un logger)

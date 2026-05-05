@@ -6,18 +6,20 @@ package org.DPT.shared.auth;
  * e le configurazioni nel file db.properties.
  */
 public enum Role {
-    LOGIN(0, "Autenticazione di Sistema (Tecnico)"),
-    OWNER(1, "Proprietario"),
-    PT(2, "Personal Trainer"),
-    RECEPTIONIST(3, "Segreteria"),
-    CLIENT(4, "Cliente");
+    LOGIN(0, "Autenticazione di Sistema (Tecnico)", "LOGIN"),
+    OWNER(1, "Proprietario", "PROPRIETARIO"),
+    PT(2, "Personal Trainer", "PT"),
+    RECEPTIONIST(3, "Segreteria", "SEGRETERIA"),
+    CLIENT(4, "Cliente", "CLIENTE");
 
     private final int id;
     private final String description;
+    private final String configKey;
 
-    Role(int id, String description) {
+    Role(int id, String description, String configKey) {
         this.id = id;
         this.description = description;
+        this.configKey = configKey;
     }
 
     public int getId() {
@@ -30,10 +32,10 @@ public enum Role {
 
     /**
      * Restituisce il prefisso per le chiavi nel file db.properties.
-     * Es: Role.PT -> "db.PT"
+     * Es: Role.OWNER -> "db.PROPRIETARIO"
      */
     public String getPropertyKey() {
-        return "db." + this.name();
+        return "db." + this.configKey;
     }
 
     /**

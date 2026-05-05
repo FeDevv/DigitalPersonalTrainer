@@ -80,7 +80,6 @@ public class ClientCLIView extends BaseCLIView {
 
     public void displayRestTimer(int seconds) {
         displayLine("\n>>> RECUPERO: " + seconds + "s <<<");
-        displayLine("(In una GUI qui vedresti un countdown...)");
         displayLine("Premi invio quando sei pronto per la prossima serie.");
     }
 

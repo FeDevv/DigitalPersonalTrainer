@@ -37,12 +37,12 @@ public class PTCLIController extends BaseCLIController implements PTUI {
     @Override
     public int askForClientId(List<Client> availableClients) {
         showAssignedClients(availableClients);
-        return readInt("Inserisci ID Cliente per cui redigere la scheda");
+        return readInt("Inserisci ID Cliente per cui redigere la scheda: ");
     }
 
     @Override
     public String askForSheetTitle() {
-        return readString("Titolo della Scheda (es. Forza Invernale)");
+        return readString("Titolo della Scheda (es. Forza Invernale): ");
     }
 
     @Override
