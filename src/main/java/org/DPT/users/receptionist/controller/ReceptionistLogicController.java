@@ -84,10 +84,21 @@ public class ReceptionistLogicController {
                 switch (choice) {
                     case 1 -> {
                         if (tipo.equals("PT")) ui.showUtenti(ptDAO.getAll(), "PT");
-                        else if (tipo.equals("ADDETTO")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI");
+                        else if (tipo.equals("ADDETTO SEGRETERIA")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA");
                         else ui.showUtenti(clientDAO.getAll(), "CLIENTI");
                     }
                     case 2 -> {
+                        int id = ui.askForIDUtente();
+                        boolean status = ui.askForNewStatus();
+                        if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
+                        else if (tipo.equals("ADDETTO SEGRETERIA")) receptionistDAO.updateStatus(id, status);
+                        else {
+                            if (status) clientDAO.activate(id);
+                            else clientDAO.deactivate(id);
+                        }
+                        ui.reportSuccess("Stato aggiornato con successo.");
+                    }
+                    case 3 -> {
                         if (tipo.equals("CLIENTE")) {
                             ClientCreationDTO data = ui.askForClientData();
                             clientDAO.insert(data);
@@ -98,18 +109,8 @@ public class ReceptionistLogicController {
                         }
                         ui.reportSuccess(tipo + " inserito correttamente.");
                     }
-                    case 3 -> {
-                        int id = ui.askForIDUtente();
-                        boolean status = ui.askForNewStatus();
-                        if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
-                        else if (tipo.equals("ADDETTO")) receptionistDAO.updateStatus(id, status);
-                        else {
-                            if (status) clientDAO.activate(id);
-                            else clientDAO.deactivate(id);
-                        }
-                        ui.reportSuccess("Stato aggiornato con successo.");
-                    }
                     case 0 -> back = true;
+                    default -> ui.reportError("Scelta non valida.");
                 }
             } catch (Exception e) {
                 ui.reportError(e.getMessage());
@@ -127,5 +128,11 @@ public class ReceptionistLogicController {
         } catch (Exception e) {
             ui.reportError("Impossibile completare l'assegnazione: " + e.getMessage());
         }
+    }
+}
+e.getMessage());
+        }
+    }
+}
     }
 }

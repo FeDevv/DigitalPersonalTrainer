@@ -35,15 +35,22 @@ public abstract class BaseCLIController {
      * Legge una stringa non vuota.
      */
     protected String readString(String label) {
-        String prompt = label.endsWith(": ") ? label : label + ": ";
-        view.displayLabel(prompt);
+        view.displayLabel(label);
         String input = scanner.nextLine().trim();
         while (input.isEmpty()) {
             view.displayError("Il campo non può essere vuoto.");
-            view.displayLabel(prompt);
+            view.displayLabel(label);
             input = scanner.nextLine().trim();
         }
         return input;
+    }
+
+    /**
+     * Legge una stringa che può essere vuota.
+     */
+    protected String readOptionalString(String label) {
+        view.displayLabel(label);
+        return scanner.nextLine().trim();
     }
 
     public void reportError(String message) {

@@ -53,7 +53,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
         LocalDate data = null;
         while (data == null) {
             try {
-                data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG)"));
+                data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG): "));
             } catch (DateTimeParseException e) {
                 recView.displayError("Formato data non valido.");
             }
@@ -66,7 +66,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
 
     @Override
     public boolean askForNewStatus() {
-        String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo");
+        String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
         return choice.equals("1");
     }
 

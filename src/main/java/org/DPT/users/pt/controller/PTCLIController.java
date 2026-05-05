@@ -51,21 +51,21 @@ public class PTCLIController extends BaseCLIController implements PTUI {
     @Override
     public int askForExerciseId(List<Exercise> availableExercises) {
         showExerciseCatalog(availableExercises);
-        return readInt("Inserisci ID Esercizio da aggiungere");
+        return readInt("Inserisci ID Esercizio da aggiungere: ");
     }
 
     @Override
     public SheetItem askForExerciseDetails(int sheetId, int exerciseId) {
-        int sets = readInt("Numero di Serie");
-        int reps = readInt("Numero di Ripetizioni");
-        int rest = readInt("Recupero (in secondi)");
-        String notes = readString("Note di esecuzione (opzionale, premi invio per saltare)");
+        int sets = readInt("Numero di Serie: ");
+        int reps = readInt("Numero di Ripetizioni: ");
+        int rest = readInt("Recupero (in secondi): ");
+        String notes = readOptionalString("Note di esecuzione [premi invio per saltare]: ");
         return new SheetItem(sheetId, exerciseId, rest, notes, sets, reps);
     }
 
     @Override
     public boolean askIfAddAnotherExercise() {
-        return readString("Vuoi aggiungere un altro esercizio? (s/n)").equalsIgnoreCase("s");
+        return readString("Vuoi aggiungere un altro esercizio? (s/n): ").equalsIgnoreCase("s");
     }
 
     @Override
@@ -78,12 +78,12 @@ public class PTCLIController extends BaseCLIController implements PTUI {
 
     @Override
     public LocalDate askForStartDate() {
-        return askForDate("Data Inizio Report (AAAA-MM-GG)");
+        return askForDate("Data Inizio Report (AAAA-MM-GG): ");
     }
 
     @Override
     public LocalDate askForEndDate() {
-        return askForDate("Data Fine Report (AAAA-MM-GG)");
+        return askForDate("Data Fine Report (AAAA-MM-GG): ");
     }
 
     private LocalDate askForDate(String prompt) {

@@ -9,7 +9,7 @@ import java.util.List;
 public class ClientCLIView extends BaseCLIView {
 
     public void displayClientHeader(String name) {
-        displayHeader("Area Atleta - Benvenuto " + name);
+        displayHeader("Area Atleta - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {

@@ -10,7 +10,7 @@ import java.util.List;
 public class OwnerCLIView extends BaseCLIView {
 
     public void displayOwnerHeader(String name) {
-        displayHeader("Pannello Proprietario - Benvenuto " + name);
+        displayHeader("Pannello Proprietario - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {
@@ -24,23 +24,23 @@ public class OwnerCLIView extends BaseCLIView {
     public void displayMacchinariMenu() {
         displaySectionTitle("Gestione Macchinari");
         displayLine("1. Visualizza tutti i macchinari");
-        displayLine("2. Inserisci nuovo macchinario");
-        displayLine("3. Attiva/Disattiva macchinario");
+        displayLine("2. Attiva/Disattiva macchinario");
+        displayLine("3. Inserisci nuovo macchinario");
         displayLine("0. Torna indietro");
     }
 
     public void displayEserciziMenu() {
         displaySectionTitle("Gestione Esercizi");
         displayLine("1. Visualizza tutti gli esercizi");
-        displayLine("2. Inserisci nuovo esercizio");
-        displayLine("3. Attiva/Disattiva esercizio");
+        displayLine("2. Attiva/Disattiva esercizio");
+        displayLine("3. Inserisci nuovo esercizio");
         displayLine("0. Torna indietro");
     }
 
     public void displayUtenzeMenu() {
         displaySectionTitle("Gestione Utenze");
         displayLine("1. Gestione Personal Trainer");
-        displayLine("2. Gestione Addetti Segreteria");
+        displayLine("2. Gestione ADDETTI SEGRETERIA");
         displayLine("3. Gestione Clienti");
         displayLine("0. Torna indietro");
     }
@@ -48,10 +48,10 @@ public class OwnerCLIView extends BaseCLIView {
     public void displayUtenzaActionMenu(String tipo) {
         displaySectionTitle("Azioni " + tipo);
         displayLine("1. Visualizza lista " + tipo);
+        displayLine("2. Attiva/Disattiva " + tipo);
         if (!tipo.equals("CLIENTE")) {
-            displayLine("2. Inserisci nuovo " + tipo);
+            displayLine("3. Inserisci nuovo " + tipo);
         }
-        displayLine("3. Attiva/Disattiva " + tipo);
         displayLine("0. Torna indietro");
     }
 

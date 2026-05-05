@@ -94,7 +94,10 @@ public class ReceptionistDAO {
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException("Errore d'aggiornamento dello stato dell'addetto di segreteria", e);
+            throw new DatabaseException("Errore d'aggiornamento dello stato dell'ADDETTO SEGRETERIA", e);
         }
+    }
+}
+    }
     }
 }

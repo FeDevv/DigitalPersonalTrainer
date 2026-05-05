@@ -35,12 +35,12 @@ public class LoginCLIController extends BaseCLIController implements LoginUI {
 
     @Override
     public String askForEmail() {
-        return readString("Email");
+        return readString("Email: ");
     }
 
     @Override
     public String askForPassword() {
-        return readString("Password");
+        return readString("Password: ");
     }
 
     @Override

@@ -50,16 +50,16 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public MachineCreationDTO askForMachineData() {
-        String nome = readString("Nome Macchinario");
-        String desc = readString("Descrizione");
+        String nome = readString("Nome Macchinario: ");
+        String desc = readString("Descrizione: ");
         return new MachineCreationDTO(nome, desc);
     }
 
     @Override
     public ExerciseCreationDTO askForExerciseData(List<Machine> availableMachines) {
-        String nome = readString("Nome Esercizio");
-        String desc = readString("Descrizione");
-        boolean corpoLibero = readString("È a corpo libero? (s/n)").equalsIgnoreCase("s");
+        String nome = readString("Nome Esercizio: ");
+        String desc = readString("Descrizione: ");
+        boolean corpoLibero = readString("È a corpo libero? (s/n): ").equalsIgnoreCase("s");
         Integer machineId = null;
         if (!corpoLibero) {
             if (availableMachines.isEmpty()) {
@@ -75,10 +75,10 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public UserCreationDTO askForStaffData() {
-        String nome = readString("Nome");
-        String cognome = readString("Cognome");
-        String email = ValidationUtils.validateEmail(readString("Email"));
-        String pass = readString("Password");
+        String nome = readString("Nome: ");
+        String cognome = readString("Cognome: ");
+        String email = ValidationUtils.validateEmail(readString("Email: "));
+        String pass = readString("Password: ");
         return new UserCreationDTO(nome, cognome, email, pass);
     }
 
@@ -95,7 +95,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public boolean askForNewStatus() {
-        String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo");
+        String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
         return choice.equals("1");
     }
 

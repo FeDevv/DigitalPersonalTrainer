@@ -12,7 +12,7 @@ import java.util.List;
 public class PTCLIView extends BaseCLIView {
 
     public void displayPTHeader(String name) {
-        displayHeader("Pannello Personal Trainer - PT: " + name);
+        displayHeader("Pannello Personal Trainer - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {

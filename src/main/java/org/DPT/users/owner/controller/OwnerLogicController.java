@@ -74,17 +74,18 @@ public class OwnerLogicController {
                 switch (choice) {
                     case 1 -> ui.showMacchinari(machineDAO.getAll());
                     case 2 -> {
-                        MachineCreationDTO data = ui.askForMachineData();
-                        machineDAO.insert(data, profile.getId());
-                        ui.reportSuccess("Macchinario inserito.");
-                    }
-                    case 3 -> {
                         int id = ui.askForIDMacchinarioDaToggle();
                         boolean status = ui.askForNewStatus();
                         machineDAO.updateStatus(id, status);
                         ui.reportSuccess("Stato aggiornato.");
                     }
+                    case 3 -> {
+                        MachineCreationDTO data = ui.askForMachineData();
+                        machineDAO.insert(data, profile.getId());
+                        ui.reportSuccess("Macchinario inserito.");
+                    }
                     case 0 -> back = true;
+                    default -> ui.reportError("Scelta non valida.");
                 }
             } catch (DatabaseException e) {
                 ui.reportError(e.getMessage());
@@ -101,17 +102,18 @@ public class OwnerLogicController {
                 switch (choice) {
                     case 1 -> ui.showEsercizi(exerciseDAO.getAll());
                     case 2 -> {
-                        ExerciseCreationDTO data = ui.askForExerciseData(machineDAO.findAll(true));
-                        exerciseDAO.insert(data, profile.getId());
-                        ui.reportSuccess("Esercizio inserito.");
-                    }
-                    case 3 -> {
                         int id = ui.askForIDEsercizioDaToggle();
                         boolean status = ui.askForNewStatus();
                         exerciseDAO.updateStatus(id, status);
                         ui.reportSuccess("Stato aggiornato.");
                     }
+                    case 3 -> {
+                        ExerciseCreationDTO data = ui.askForExerciseData(machineDAO.findAll(true));
+                        exerciseDAO.insert(data, profile.getId());
+                        ui.reportSuccess("Esercizio inserito.");
+                    }
                     case 0 -> back = true;
+                    default -> ui.reportError("Scelta non valida.");
                 }
             } catch (DatabaseException e) {
                 ui.reportError(e.getMessage());
@@ -126,9 +128,10 @@ public class OwnerLogicController {
             int choice = ui.askForChoice();
             switch (choice) {
                 case 1 -> manageUtenzaSpecifica("PT");
-                case 2 -> manageUtenzaSpecifica("ADDETTO");
+                case 2 -> manageUtenzaSpecifica("ADDETTO SEGRETERIA");
                 case 3 -> manageUtenzaSpecifica("CLIENTE");
                 case 0 -> back = true;
+                default -> ui.reportError("Scelta non valida.");
             }
         }
     }
@@ -142,12 +145,23 @@ public class OwnerLogicController {
                 switch (choice) {
                     case 1 -> {
                         if (tipo.equals("PT")) ui.showUtenti(ptDAO.getAll(), "PT");
-                        else if (tipo.equals("ADDETTO")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI");
+                        else if (tipo.equals("ADDETTO SEGRETERIA")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA");
                         else ui.showUtenti(clientDAO.getAll(), "CLIENTI");
                     }
                     case 2 -> {
+                        int id = ui.askForIDUtente();
+                        boolean status = ui.askForNewStatus();
+                        if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
+                        else if (tipo.equals("ADDETTO SEGRETERIA")) receptionistDAO.updateStatus(id, status);
+                        else {
+                            if (status) clientDAO.activate(id);
+                            else clientDAO.deactivate(id);
+                        }
+                        ui.reportSuccess("Stato aggiornato.");
+                    }
+                    case 3 -> {
                         if (tipo.equals("CLIENTE")) {
-                            ui.reportError("L'inserimento clienti è riservato alla Segreteria.");
+                            ui.reportError("Scelta non valida.");
                         } else {
                             UserCreationDTO data = ui.askForStaffData();
                             if (tipo.equals("PT")) ptDAO.insert(data);
@@ -155,18 +169,8 @@ public class OwnerLogicController {
                             ui.reportSuccess(tipo + " inserito.");
                         }
                     }
-                    case 3 -> {
-                        int id = ui.askForIDUtente();
-                        boolean status = ui.askForNewStatus();
-                        if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
-                        else if (tipo.equals("ADDETTO")) receptionistDAO.updateStatus(id, status);
-                        else {
-                            if (status) clientDAO.activate(id);
-                            else clientDAO.deactivate(id);
-                        }
-                        ui.reportSuccess("Stato aggiornato.");
-                    }
                     case 0 -> back = true;
+                    default -> ui.reportError("Scelta non valida.");
                 }
             } catch (Exception e) {
                 ui.reportError(e.getMessage());

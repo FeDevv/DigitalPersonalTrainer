@@ -8,7 +8,7 @@ import java.util.List;
 public class ReceptionistCLIView extends BaseCLIView {
 
     public void displayReceptionistHeader(String name) {
-        displayHeader("Pannello Segreteria - Benvenuto " + name);
+        displayHeader("Pannello Segreteria - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {
@@ -21,7 +21,7 @@ public class ReceptionistCLIView extends BaseCLIView {
     public void displayUtenzeMenu() {
         displaySectionTitle("Gestione Utenze");
         displayLine("1. Gestione Personal Trainer");
-        displayLine("2. Gestione Addetti Segreteria");
+        displayLine("2. Gestione ADDETTI SEGRETERIA");
         displayLine("3. Gestione Clienti");
         displayLine("0. Torna indietro");
     }
@@ -29,8 +29,8 @@ public class ReceptionistCLIView extends BaseCLIView {
     public void displayUtenzaActionMenu(String tipo) {
         displaySectionTitle("Azioni " + tipo);
         displayLine("1. Visualizza lista " + tipo);
-        displayLine("2. Inserisci nuovo " + tipo);
-        displayLine("3. Attiva/Disattiva " + tipo);
+        displayLine("2. Attiva/Disattiva " + tipo);
+        displayLine("3. Inserisci nuovo " + tipo);
         displayLine("0. Torna indietro");
     }
 
