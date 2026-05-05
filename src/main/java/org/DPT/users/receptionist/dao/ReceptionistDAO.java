@@ -31,11 +31,11 @@ public class ReceptionistDAO {
     }
 
     public List<Receptionist> getAll() {
-        return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA ORDER BY Cognome, Nome", (Object[]) null);
+        return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA ORDER BY ID_Addetto", (Object[]) null);
     }
 
     public List<Receptionist> findAll(boolean active) {
-        return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA WHERE Addetto_Attivo = ? ORDER BY Cognome, Nome", active);
+        return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA WHERE Addetto_Attivo = ? ORDER BY ID_Addetto", active);
     }
 
     private List<Receptionist> findByQuery(String sql, Object... params) {
@@ -96,8 +96,5 @@ public class ReceptionistDAO {
         } catch (SQLException e) {
             throw new DatabaseException("Errore d'aggiornamento dello stato dell'ADDETTO SEGRETERIA", e);
         }
-    }
-}
-    }
     }
 }

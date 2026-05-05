@@ -95,8 +95,12 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public boolean askForNewStatus() {
-        String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
-        return choice.equals("1");
+        while (true) {
+            String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
+            if (choice.equals("1")) return true;
+            if (choice.equals("0")) return false;
+            ownerView.displayError("Inserisci solo '1' per Attivo o '0' per Disattivo.\n");
+        }
     }
 
     @Override

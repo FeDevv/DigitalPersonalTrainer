@@ -17,10 +17,10 @@ public class PTCLIView extends BaseCLIView {
 
     public void displayMainMenu() {
         displaySectionTitle("Menu Principale");
-        displayLine("1. Crea Nuova Scheda Cliente");
-        displayLine("2. Visualizza Storico Schede Redatte");
-        displayLine("3. Genera Report Prestazioni Clienti");
-        displayLine("4. Consulta Catalogo (Macchinari ed Esercizi)");
+        displayLine("1. Crea Nuova SCHEDA CLIENTE");
+        displayLine("2. Visualizza STORICO SCHEDE Redatte");
+        displayLine("3. Genera REPORT PRESTAZIONI Clienti");
+        displayLine("4. Consulta CATALOGO (Macchinari ed Esercizi)");
         displayLine("0. Logout");
     }
 

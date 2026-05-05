@@ -29,11 +29,11 @@ public class ClientDAO {
     }
 
     public List<Client> getAll() {
-        return findByQuery("SELECT * FROM CLIENTE ORDER BY Cognome, Nome", (Object[]) null);
+        return findByQuery("SELECT * FROM CLIENTE ORDER BY ID_Cliente", (Object[]) null);
     }
 
     public List<Client> findAll(boolean active) {
-        return findByQuery("SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY Cognome, Nome", active);
+        return findByQuery("SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente", active);
     }
 
     public List<Client> findAssignedToPT(int ptId) {
@@ -42,7 +42,7 @@ public class ClientDAO {
                 FROM CLIENTE c 
                 JOIN ASSEGNA a ON c.ID_Cliente = a.ID_Cliente 
                 WHERE a.ID_PT = ? AND a.Assegnazione_Attiva = 1 AND c.Cliente_Attivo = 1
-                ORDER BY c.Cognome, c.Nome
+                ORDER BY c.ID_Cliente
                 """;
         return findByQuery(sql, ptId);
     }

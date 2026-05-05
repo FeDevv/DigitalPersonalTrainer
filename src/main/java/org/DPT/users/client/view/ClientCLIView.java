@@ -14,9 +14,9 @@ public class ClientCLIView extends BaseCLIView {
 
     public void displayMainMenu() {
         displaySectionTitle("Dashboard");
-        displayLine("1. Inizia Allenamento (Scheda Attiva)");
-        displayLine("2. Visualizza Routine Scheda Attiva");
-        displayLine("3. Visualizza Storico Schede");
+        displayLine("1. Inizia ALLENAMENTO (Scheda Attiva)");
+        displayLine("2. Visualizza ROUTINE Scheda Attiva");
+        displayLine("3. Visualizza STORICO SCHEDE");
         displayLine("0. Logout");
     }
 

@@ -13,16 +13,16 @@ public class ReceptionistCLIView extends BaseCLIView {
 
     public void displayMainMenu() {
         displaySectionTitle("Menu Principale");
-        displayLine("1. Gestione Utenze (Staff/Clienti)");
-        displayLine("2. Nuova Assegnazione PT-Cliente");
+        displayLine("1. Gestione UTENZE (Staff/Clienti)");
+        displayLine("2. Nuova Assegnazione PT-CLIENTE");
         displayLine("0. Logout");
     }
 
     public void displayUtenzeMenu() {
-        displaySectionTitle("Gestione Utenze");
-        displayLine("1. Gestione Personal Trainer");
+        displaySectionTitle("Gestione UTENZE");
+        displayLine("1. Gestione PERSONAL TRAINER");
         displayLine("2. Gestione ADDETTI SEGRETERIA");
-        displayLine("3. Gestione Clienti");
+        displayLine("3. Gestione CLIENTI");
         displayLine("0. Torna indietro");
     }
 

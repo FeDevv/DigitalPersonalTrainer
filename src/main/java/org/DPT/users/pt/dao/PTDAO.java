@@ -31,11 +31,11 @@ public class PTDAO {
     }
 
     public List<PT> getAll() {
-        return findByQuery("SELECT * FROM PT ORDER BY Cognome, Nome", (Object[]) null);
+        return findByQuery("SELECT * FROM PT ORDER BY ID_PT", (Object[]) null);
     }
 
     public List<PT> findAll(boolean active) {
-        return findByQuery("SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY Cognome, Nome", active);
+        return findByQuery("SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT", active);
     }
 
     private List<PT> findByQuery(String sql, Object... params) {

@@ -32,11 +32,11 @@ public class ExerciseDAO {
     }
 
     public List<Exercise> getAll() {
-        return findByQuery("SELECT * FROM ESERCIZIO ORDER BY Nome", (Object[]) null);
+        return findByQuery("SELECT * FROM ESERCIZIO ORDER BY Codice_Esercizio", (Object[]) null);
     }
 
     public List<Exercise> findAll(boolean active) {
-        return findByQuery("SELECT * FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Nome", active);
+        return findByQuery("SELECT * FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Codice_Esercizio", active);
     }
 
     private List<Exercise> findByQuery(String sql, Object... params) {

@@ -130,9 +130,3 @@ public class ReceptionistLogicController {
         }
     }
 }
-e.getMessage());
-        }
-    }
-}
-    }
-}

@@ -32,11 +32,11 @@ public class MachineDAO {
     }
 
     public List<Machine> getAll() {
-        return findByQuery("SELECT * FROM MACCHINARIO ORDER BY Nome", (Object[]) null);
+        return findByQuery("SELECT * FROM MACCHINARIO ORDER BY ID_Macchinario", (Object[]) null);
     }
 
     public List<Machine> findAll(boolean active) {
-        return findByQuery("SELECT * FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY Nome", active);
+        return findByQuery("SELECT * FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario", active);
     }
 
     private List<Machine> findByQuery(String sql, Object... params) {

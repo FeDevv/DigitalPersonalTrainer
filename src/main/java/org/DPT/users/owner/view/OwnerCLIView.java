@@ -15,33 +15,33 @@ public class OwnerCLIView extends BaseCLIView {
 
     public void displayMainMenu() {
         displaySectionTitle("Menu Principale");
-        displayLine("1. Gestione Macchinari");
-        displayLine("2. Gestione Esercizi");
-        displayLine("3. Gestione Utenze (Staff/Clienti)");
+        displayLine("1. Gestione MACCHINARI");
+        displayLine("2. Gestione ESERCIZI");
+        displayLine("3. Gestione UTENZE (Staff/Clienti)");
         displayLine("0. Logout");
     }
 
     public void displayMacchinariMenu() {
-        displaySectionTitle("Gestione Macchinari");
-        displayLine("1. Visualizza tutti i macchinari");
-        displayLine("2. Attiva/Disattiva macchinario");
-        displayLine("3. Inserisci nuovo macchinario");
+        displaySectionTitle("Gestione MACCHINARI");
+        displayLine("1. Visualizza tutti i MACCHINARI");
+        displayLine("2. Attiva/Disattiva MACCHINARIO");
+        displayLine("3. Inserisci nuovo MACCHINARIO");
         displayLine("0. Torna indietro");
     }
 
     public void displayEserciziMenu() {
-        displaySectionTitle("Gestione Esercizi");
-        displayLine("1. Visualizza tutti gli esercizi");
-        displayLine("2. Attiva/Disattiva esercizio");
-        displayLine("3. Inserisci nuovo esercizio");
+        displaySectionTitle("Gestione ESERCIZI");
+        displayLine("1. Visualizza tutti gli ESERCIZI");
+        displayLine("2. Attiva/Disattiva ESERCIZIO");
+        displayLine("3. Inserisci nuovo ESERCIZIO");
         displayLine("0. Torna indietro");
     }
 
     public void displayUtenzeMenu() {
-        displaySectionTitle("Gestione Utenze");
-        displayLine("1. Gestione Personal Trainer");
+        displaySectionTitle("Gestione UTENZE");
+        displayLine("1. Gestione PERSONAL TRAINER");
         displayLine("2. Gestione ADDETTI SEGRETERIA");
-        displayLine("3. Gestione Clienti");
+        displayLine("3. Gestione CLIENTI");
         displayLine("0. Torna indietro");
     }
 
