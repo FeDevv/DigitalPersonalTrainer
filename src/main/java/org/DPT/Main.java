@@ -14,3 +14,5 @@ public class Main {
 
 // rivedere l'orchestrator
 
+// To resume this session: gemini --resume 859b85b4-6500-488d-a58b-18d3dc4cada6
+
