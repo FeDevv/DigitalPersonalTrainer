@@ -24,7 +24,7 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     public void showMainMenu() { clientView.displayMainMenu(); }
 
     @Override
-    public int askForChoice() { return readInt("\n>> "); }
+    public int askForChoice() { return readInt(""); }
 
     @Override
     public void showActiveSheetHeader(String sheetName) { clientView.displaySectionTitle("Scheda Attiva: " + sheetName); }
@@ -51,10 +51,10 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     @Override
     public int askSetAction() {
         clientView.displaySetMenu();
-        int choice = readInt(">> ");
+        int choice = readInt("");
         while (choice < 0 || choice > 3) {
             clientView.displayError("Scelta non valida.");
-            choice = readInt(">> ");
+            choice = readInt("");
         }
         return choice;
     }

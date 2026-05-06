@@ -27,6 +27,6 @@ public class BootCLIController extends BaseCLIController {
     }
 
     public int askForChoice() {
-        return readInt("\n>> ");
+        return readInt("");
     }
 }

@@ -30,12 +30,12 @@ public class LoginCLIController extends BaseCLIController implements LoginUI {
 
     @Override
     public int askForChoice() {
-        return readInt("\n>> ");
+        return readInt("");
     }
 
     @Override
     public String askForEmail() {
-        return readString("Email: ");
+        return readString("\nEmail: ");
     }
 
     @Override

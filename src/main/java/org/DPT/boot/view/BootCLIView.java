@@ -3,20 +3,32 @@ package org.DPT.boot.view;
 import org.DPT.boot.model.UIMode;
 import org.DPT.shared.ui.BaseCLIView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Gestisce ESCLUSIVAMENTE l'output a schermo per il boot.
  */
 public class BootCLIView extends BaseCLIView {
 
     public void displayWelcome() {
-        displayLine("=== DIGITAL PERSONAL TRAINER ===");
-        displayLine("Inizializzazione sistema...\n");
+        displayWelcomeBanner();
+        displayLine("Inizializzazione sistema in corso...");
     }
 
     public void displayMenu(UIMode[] modes) {
-        displayLine("Seleziona la modalità di interfaccia:");
+        displaySectionTitle("Configurazione Interfaccia");
+        
+        String[] headers = {"ID", "MODALITÀ", "DESCRIZIONE"};
+        List<String[]> rows = new ArrayList<>();
         for (UIMode mode : modes) {
-            displayLine(mode.getId() + ") " + mode.getDescription());
+            rows.add(new String[]{
+                String.valueOf(mode.getId()),
+                mode.name(),
+                mode.getDescription()
+            });
         }
+        
+        renderTable(headers, rows, new int[]{3, 10, 30});
     }
 }

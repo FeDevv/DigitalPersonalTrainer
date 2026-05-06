@@ -35,11 +35,11 @@ public abstract class BaseCLIController {
      * Legge una stringa non vuota.
      */
     protected String readString(String label) {
-        view.displayLabel(label);
+        view.displayInputPrompt(label);
         String input = scanner.nextLine().trim();
         while (input.isEmpty()) {
             view.displayError("Il campo non può essere vuoto.");
-            view.displayLabel(label);
+            view.displayInputPrompt(label);
             input = scanner.nextLine().trim();
         }
         return input;
@@ -49,7 +49,7 @@ public abstract class BaseCLIController {
      * Legge una stringa che può essere vuota.
      */
     protected String readOptionalString(String label) {
-        view.displayLabel(label);
+        view.displayInputPrompt(label);
         return scanner.nextLine().trim();
     }
 

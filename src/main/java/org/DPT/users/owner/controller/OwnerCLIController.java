@@ -44,7 +44,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     public void showUtenzaActionMenu(String tipo) { ownerView.displayUtenzaActionMenu(tipo); }
 
     @Override
-    public int askForChoice() { return readInt("\n>> "); }
+    public int askForChoice() { return readInt(""); }
 
     // --- IMPLEMENTAZIONE INPUT AGGREGATI ---
 
@@ -96,9 +96,9 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     @Override
     public boolean askForNewStatus() {
         while (true) {
-            String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
-            if (choice.equals("1")) return true;
-            if (choice.equals("0")) return false;
+            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo: ");
+            if (choice == 1) return true;
+            if (choice == 0) return false;
             ownerView.displayError("Inserisci solo '1' per Attivo o '0' per Disattivo.\n");
         }
     }

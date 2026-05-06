@@ -29,7 +29,7 @@ public class PTCLIController extends BaseCLIController implements PTUI {
     public void showMainMenu() { ptView.displayMainMenu(); }
 
     @Override
-    public int askForChoice() { return readInt("\n>> "); }
+    public int askForChoice() { return readInt(""); }
 
     @Override
     public void showAssignedClients(List<Client> clients) { ptView.displayClients(clients); }

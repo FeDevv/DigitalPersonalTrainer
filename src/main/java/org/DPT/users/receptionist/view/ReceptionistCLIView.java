@@ -3,12 +3,13 @@ package org.DPT.users.receptionist.view;
 import org.DPT.shared.ui.BaseCLIView;
 import org.DPT.users.common.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReceptionistCLIView extends BaseCLIView {
 
     public void displayReceptionistHeader(String name) {
-        displayHeader("Pannello Segreteria - Benvenuto/a " + name);
+        displayHeader("PANNELLO SEGRETERIA - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {
@@ -36,18 +37,21 @@ public class ReceptionistCLIView extends BaseCLIView {
 
     public void displayUtenti(List<? extends User> lista, String titolo) {
         displaySectionTitle("Elenco " + titolo);
-        if (lista.isEmpty()) {
-            displayLine("Nessun utente presente in questa categoria.");
-            return;
-        }
-        System.out.printf("%-5s | %-25s | %-10s%n", "ID", "Nome Completo", "Stato");
-        displayLine("--------------------------------------------------");
+        
+        String[] headers = {"ID", "NOMINATIVO COMPLETO", "STATO"};
+        List<String[]> rows = new ArrayList<>();
         for (User u : lista) {
-            System.out.printf("%-5d | %-25s | %-10s%n", u.getId(), u.getFirstName() + " " + u.getLastName(), u.isActive() ? "ATTIVO" : "DISATTIVO");
+            rows.add(new String[]{
+                String.valueOf(u.getId()),
+                u.getFirstName() + " " + u.getLastName(),
+                u.isActive() ? "ATTIVO" : "DISATTIVO"
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 30, 10});
     }
 
     public void displayGoodbye() {
-        displayLine("\nLogout effettuato. Arrivederci!");
+        displayLine("\n Logout effettuato. Arrivederci!");
     }
 }

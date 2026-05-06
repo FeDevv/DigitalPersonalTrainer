@@ -5,12 +5,13 @@ import org.DPT.shared.catalog.macchinari.model.Machine;
 import org.DPT.shared.ui.BaseCLIView;
 import org.DPT.users.common.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OwnerCLIView extends BaseCLIView {
 
     public void displayOwnerHeader(String name) {
-        displayHeader("Pannello Proprietario - Benvenuto/a " + name);
+        displayHeader("PANNELLO PROPRIETARIO - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {
@@ -57,45 +58,55 @@ public class OwnerCLIView extends BaseCLIView {
 
     public void displayMacchinari(List<Machine> lista) {
         displaySectionTitle("Elenco Macchinari");
-        if (lista.isEmpty()) {
-            displayLine("Nessun macchinario presente.");
-            return;
-        }
-        System.out.printf("%-5s | %-20s | %-10s%n", "ID", "Nome", "Stato");
-        displayLine("----------------------------------------");
+        
+        String[] headers = {"ID", "NOME MACCHINARIO", "STATO"};
+        List<String[]> rows = new ArrayList<>();
         for (Machine m : lista) {
-            System.out.printf("%-5d | %-20s | %-10s%n", m.id(), m.name(), m.active() ? "ATTIVO" : "DISATTIVO");
+            rows.add(new String[]{
+                String.valueOf(m.id()),
+                m.name(),
+                m.active() ? "ATTIVO" : "DISATTIVO"
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 30, 10});
     }
 
     public void displayEsercizi(List<Exercise> lista) {
         displaySectionTitle("Elenco Esercizi");
-        if (lista.isEmpty()) {
-            displayLine("Nessun esercizio presente.");
-            return;
-        }
-        System.out.printf("%-5s | %-20s | %-10s | %-15s%n", "ID", "Nome", "Stato", "Tipo");
-        displayLine("------------------------------------------------------------");
+        
+        String[] headers = {"ID", "NOME ESERCIZIO", "STATO", "TIPO/MACCHINA"};
+        List<String[]> rows = new ArrayList<>();
         for (Exercise e : lista) {
-            String tipo = e.bodyweight() ? "Corpo Libero" : "Macchinario (" + e.machineId() + ")";
-            System.out.printf("%-5d | %-20s | %-10s | %-15s%n", e.id(), e.name(), e.active() ? "ATTIVO" : "DISATTIVO", tipo);
+            String tipo = e.bodyweight() ? "Corpo Libero" : "Macch. ID: " + e.machineId();
+            rows.add(new String[]{
+                String.valueOf(e.id()),
+                e.name(),
+                e.active() ? "ATTIVO" : "DISATTIVO",
+                tipo
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 25, 10, 20});
     }
 
     public void displayUtenti(List<? extends User> lista, String titolo) {
         displaySectionTitle("Elenco " + titolo);
-        if (lista.isEmpty()) {
-            displayLine("Nessun utente presente in questa categoria.");
-            return;
-        }
-        System.out.printf("%-5s | %-25s | %-10s%n", "ID", "Nome Completo", "Stato");
-        displayLine("--------------------------------------------------");
+        
+        String[] headers = {"ID", "NOMINATIVO", "STATO"};
+        List<String[]> rows = new ArrayList<>();
         for (User u : lista) {
-            System.out.printf("%-5d | %-25s | %-10s%n", u.getId(), u.getFirstName() + " " + u.getLastName(), u.isActive() ? "ATTIVO" : "DISATTIVO");
+            rows.add(new String[]{
+                String.valueOf(u.getId()),
+                u.getFirstName() + " " + u.getLastName(),
+                u.isActive() ? "ATTIVO" : "DISATTIVO"
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 30, 10});
     }
 
     public void displayGoodbye() {
-        displayLine("\nLogout effettuato. Arrivederci!");
+        displayLine("\n Logout effettuato. Arrivederci!");
     }
 }

@@ -7,12 +7,13 @@ import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
 import org.DPT.users.pt.controller.PTUI;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PTCLIView extends BaseCLIView {
 
     public void displayPTHeader(String name) {
-        displayHeader("Pannello Personal Trainer - Benvenuto/a " + name);
+        displayHeader("PANNELLO PERSONAL TRAINER - Benvenuto/a " + name);
     }
 
     public void displayMainMenu() {
@@ -26,81 +27,102 @@ public class PTCLIView extends BaseCLIView {
 
     public void displayClients(List<Client> clients) {
         displaySectionTitle("Clienti Assegnati");
-        if (clients.isEmpty()) {
-            displayLine("Nessun cliente assegnato attualmente.");
-            return;
-        }
-        System.out.printf("%-5s | %-25s | %-20s%n", "ID", "Nominativo", "Codice Fiscale");
-        displayLine("------------------------------------------------------------");
+        
+        String[] headers = {"ID", "NOMINATIVO", "CODICE FISCALE"};
+        List<String[]> rows = new ArrayList<>();
         for (Client c : clients) {
-            System.out.printf("%-5d | %-25s | %-20s%n", c.getId(), c.getFullName(), c.getFiscalCode());
+            rows.add(new String[]{
+                String.valueOf(c.getId()),
+                c.getFullName(),
+                c.getFiscalCode()
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 25, 20});
     }
 
     public void displayExerciseCatalog(List<Exercise> exercises) {
         displaySectionTitle("Catalogo Esercizi");
-        if (exercises.isEmpty()) {
-            displayLine("Catalogo vuoto.");
-            return;
-        }
-        System.out.printf("%-5s | %-25s | %-20s%n", "ID", "Nome Esercizio", "Tipo");
-        displayLine("------------------------------------------------------------");
+        
+        String[] headers = {"ID", "NOME ESERCIZIO", "TIPO/MACCHINA"};
+        List<String[]> rows = new ArrayList<>();
         for (Exercise e : exercises) {
-            String tipo = e.bodyweight() ? "Corpo Libero" : "Macchinario (ID: " + e.machineId() + ")";
-            System.out.printf("%-5d | %-25s | %-20s%n", e.id(), e.name(), tipo);
+            String tipo = e.bodyweight() ? "Corpo Libero" : "Macchina ID: " + e.machineId();
+            rows.add(new String[]{
+                String.valueOf(e.id()),
+                e.name(),
+                tipo
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 25, 20});
     }
 
     public void displaySheetHistory(List<WorkoutSheet> sheets) {
         displaySectionTitle("Storico Schede Redatte");
-        if (sheets.isEmpty()) {
-            displayLine("Nessuna scheda trovata nel tuo storico.");
-            return;
-        }
-        System.out.printf("%-5s | %-10s | %-20s | %-10s | %-10s%n", "ID", "Cliente", "Titolo", "Data", "Stato");
-        displayLine("---------------------------------------------------------------------------");
+        
+        String[] headers = {"ID", "CLI ID", "TITOLO SCHEDA", "DATA", "STATO"};
+        List<String[]> rows = new ArrayList<>();
         for (WorkoutSheet s : sheets) {
-            System.out.printf("%-5d | %-10d | %-20s | %-10s | %-10s%n", 
-                    s.id(), s.clientId(), s.title(), s.creationDate(), s.active() ? "ATTIVA" : "ARCHIVIATA");
+            rows.add(new String[]{
+                String.valueOf(s.id()),
+                String.valueOf(s.clientId()),
+                s.title(),
+                s.creationDate().toString(),
+                s.active() ? "ATTIVA" : "ARCHIVIATA"
+            });
         }
+        
+        renderTable(headers, rows, new int[]{5, 6, 25, 12, 12});
     }
 
     public void displayPerformanceReport(List<PTUI.PerformanceRecord> report) {
         displaySectionTitle("Report Prestazioni Clienti");
-        if (report.isEmpty()) {
-            displayLine("Nessun dato trovato per l'intervallo specificato.");
-            return;
-        }
-        System.out.printf("%-20s | %-12s | %-10s | %-10s%n", "Cliente", "Data", "Durata(m)", "Completamento");
-        displayLine("---------------------------------------------------------------------------");
+        
+        String[] headers = {"CLIENTE", "DATA", "DURATA(m)", "COMPLETAMENTO"};
+        List<String[]> rows = new ArrayList<>();
         for (PTUI.PerformanceRecord r : report) {
-            System.out.printf("%-20s | %-12s | %-10d | %-10s%n", 
-                    r.clientName(), r.date(), r.duration(), r.completionPercentage() + "%");
+            rows.add(new String[]{
+                r.clientName(),
+                r.date().toString(),
+                String.valueOf(r.duration()),
+                r.completionPercentage() + "%"
+            });
         }
+        
+        renderTable(headers, rows, new int[]{20, 12, 10, 15});
     }
 
     public void displayCatalog(List<Machine> machines, List<Exercise> exercises) {
         displaySectionTitle("Consultazione Catalogo");
         
         displaySectionTitle("Macchinari Disponibili");
-        if (machines.isEmpty()) displayLine("Nessun macchinario.");
-        else {
-            for (Machine m : machines) {
-                System.out.printf("[%d] %s - %s%n", m.id(), m.name(), m.description());
-            }
+        String[] mHeaders = {"ID", "NOME MACCHINARIO", "DESCRIZIONE"};
+        List<String[]> mRows = new ArrayList<>();
+        for (Machine m : machines) {
+            mRows.add(new String[]{
+                String.valueOf(m.id()),
+                m.name(),
+                m.description() != null ? m.description() : "-"
+            });
         }
+        renderTable(mHeaders, mRows, new int[]{5, 25, 40});
 
         displaySectionTitle("Esercizi Disponibili");
-        if (exercises.isEmpty()) displayLine("Nessun esercizio.");
-        else {
-            for (Exercise e : exercises) {
-                String tipo = e.bodyweight() ? "Corpo Libero" : "Macchina ID: " + e.machineId();
-                System.out.printf("[%d] %s (%s)%n", e.id(), e.name(), tipo);
-            }
+        String[] eHeaders = {"ID", "NOME ESERCIZIO", "TIPO/MACCHINA"};
+        List<String[]> eRows = new ArrayList<>();
+        for (Exercise e : exercises) {
+            String tipo = e.bodyweight() ? "Corpo Libero" : "Macchina ID: " + e.machineId();
+            eRows.add(new String[]{
+                String.valueOf(e.id()),
+                e.name(),
+                tipo
+            });
         }
+        renderTable(eHeaders, eRows, new int[]{5, 25, 25});
     }
 
     public void displayGoodbye() {
-        displayLine("\nLogout effettuato. Buon lavoro, Coach!");
+        displayLine("\n Logout effettuato. Buon lavoro, Coach!");
     }
 }

@@ -34,14 +34,14 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     public void showUtenzaActionMenu(String tipo) { recView.displayUtenzaActionMenu(tipo); }
 
     @Override
-    public int askForChoice() { return readInt("\n>> "); }
+    public int askForChoice() { return readInt(""); }
 
     @Override
     public UserCreationDTO askForStaffData() {
-        String nome = readString("Nome");
-        String cognome = readString("Cognome");
-        String email = ValidationUtils.validateEmail(readString("Email"));
-        String pass = readString("Password");
+        String nome = readString("Nome: ");
+        String cognome = readString("Cognome: ");
+        String email = ValidationUtils.validateEmail(readString("Email: "));
+        String pass = readString("Password: ");
         return new UserCreationDTO(nome, cognome, email, pass);
     }
 
@@ -67,9 +67,9 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     @Override
     public boolean askForNewStatus() {
         while (true) {
-            String choice = readString("Nuovo stato: (1) Attivo, (0) Disattivo: ");
-            if (choice.equals("1")) return true;
-            if (choice.equals("0")) return false;
+            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo: ");
+            if (choice == 1) return true;
+            if (choice == 0) return false;
             recView.displayError("Inserisci solo '1' per Attivo o '0' per Disattivo.\n");
         }
     }
