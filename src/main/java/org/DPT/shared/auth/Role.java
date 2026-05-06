@@ -7,25 +7,25 @@ package org.DPT.shared.auth;
  */
 public enum Role {
     LOGIN(0, "Autenticazione di Sistema"),
-    OWNER(1, "Proprietario"),
-    PT(2, "Personal Trainer"),
-    RECEPTIONIST(3, "Segreteria"),
-    CLIENT(4, "Cliente");
+    OWNER(1, "PROPRIETARIO"),
+    PT(2, "PERSONAL TRAINER"),
+    RECEPTIONIST(3, "SEGRETERIA"),
+    CLIENT(4, "CLIENTE");
 
     private final int id;
-    private final String description;
+    private final String translation;
 
-    Role(int id, String description) {
+    Role(int id, String translation) {
         this.id = id;
-        this.description = description;
+        this.translation = translation;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTranslation() {
+        return translation;
     }
 
     /**

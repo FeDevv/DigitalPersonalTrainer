@@ -1,53 +1,21 @@
-testing PROPRIETARIO
-- accesso funzionante, nessun errore riscontrato
-- gestione errori funzionante nel menù principale
+testing dei moduli
+┌──────────────────────────────────────────────────────┐
+│                testing modulo boot                   │
+└──────────────────────────────────────────────────────┘
+- gestione errore corretta e funzionante nel menù
 
-- gestione errori funzionante nel menù macchinari
-- visualizzazione macchinari funzionante
-- aggiornamento stato macchinario accetta valori corretti
-- aggiunta macchinario funzionante
-- ID macchinari in ordine
+┌──────────────────────────────────────────────────────┐
+│                testing modulo login                  │
+└──────────────────────────────────────────────────────┘
+- gestione errore corretta e funzionante nel menù
+- corretta gestione di email invalida
+- accesso come 'owner' corretto e funzionante
+- accesso come 'pt' corretto e funzionante
+- accesso come 'addetto segreteria' corretto e funzionante
+- accesso come 'cliente' corretto e funzionante
+- tutto il modulo ha output in italiano
 
-- gestione errori funzionante nel menù esercizi
-- visualizzazione esercizi funzionante
-- aggiornamento stato esercizio accetta accetta valori corretti
-- aggiunta esercizio funzionante
-- ID esercizi in ordine
-
-- gestione errori funzionante nel menù utenze
-
-- gestione errori funzionante nel menù pt
-- visualizzazione pt funzionante
-- aggiornamento stato pt accetta valori corretti
-- aggiunta pt funzionante
-- ID pt in ordine
-
-- gestione errori funzionante nel menù receptionist
-- visualizzazione addetti di segreteria funzionante
-- aggiornamento stato addetto segreteria accetta valori corretti
-- aggiunta addetto di segreteria funzionante
-- ID addetti segreteria in ordine
-
-- gestione errori funzionante nel menù clienti
-- visualizzazione clienti funzionante
-- aggiornamento stato cliente accetta valori corretti
-- ID clienti in ordine
-
-------------------------------------------------------------------------------------
-SCELTE STILISTICHE E UX
-- Prompt di Input: sempre terminanti con ": " (es. "Email: ")
-- Formattazione Menù: Standard "Azione ENTITÀ" (es. "1. Gestione MACCHINARI")
-- Linguaggio Inclusivo: "Benvenuto/a" nell'header di sessione
-- Ordinamento Dati: Liste sempre ordinate per ID numerico crescente
-- Terminologia: Utilizzo di "ADDETTO SEGRETERIA" (tutto maiuscolo) per il personale di segreteria
-- Feedback Errori: Spaziatura extra (\n) dopo i messaggi di errore di validazione stato per migliorare la leggibilità
-- Campi Opzionali: Gestione tramite Invio (stringa vuota) per note e carichi, senza blocco di validazione
-------------------------------------------------------------------------------------
-UI PRESENTI DA MODIFICARE
-- pacchetto BOOT
-- pacchetto shared.UI
-- pacchetto users.LOGIN
-- pacchetto users.OWNER
-- pacchetto users.RECEPTIONIST
-- pacchetto users.PT
-- pacchetto users.CLIENT
+┌──────────────────────────────────────────────────────┐
+│              testing modulo proprietario             │
+└──────────────────────────────────────────────────────┘
+-

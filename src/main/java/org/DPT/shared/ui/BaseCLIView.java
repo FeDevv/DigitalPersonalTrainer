@@ -34,7 +34,7 @@ public class BaseCLIView {
     }
 
     public void displayHeader(String title) {
-        String content = " DIGITAL PERSONAL TRAINER - " + title.toUpperCase() + " ";
+        String content = " DPT - " + title.toUpperCase() + " ";
         int width = content.length() + 2;
         
         System.out.println("\n" + TL + H.repeat(width) + TR);

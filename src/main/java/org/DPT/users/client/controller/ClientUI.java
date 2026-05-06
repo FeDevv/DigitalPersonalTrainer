@@ -6,7 +6,7 @@ import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import java.util.List;
 
 /**
- * Contratto per l'interfaccia utente del modulo Cliente (Atleta).
+ * Contratto per l'interfaccia utente del modulo Cliente.
  */
 public interface ClientUI {
     void showHeader(String clientName);

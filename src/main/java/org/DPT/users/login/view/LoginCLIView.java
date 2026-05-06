@@ -22,22 +22,21 @@ public class LoginCLIView extends BaseCLIView {
     public void displayRoleMenu(Role[] roles) {
         displaySectionTitle("Seleziona il tipo di utenza");
 
-        String[] headers = {"ID", "RUOLO", "DESCRIZIONE"};
+        String[] headers = {"ID", "RUOLO"};
         List<String[]> rows = new ArrayList<>();
         
         for (Role role : roles) {
             if (role != Role.LOGIN) {
                 rows.add(new String[]{
                     String.valueOf(role.getId()),
-                    role.name(),
-                    role.getDescription()
+                    role.getTranslation()
                 });
             }
         }
         // Aggiungiamo l'opzione di uscita
-        rows.add(new String[]{"0", "EXIT", "Chiudi applicazione"});
+        rows.add(new String[]{"0", "ESCI"});
 
-        renderTable(headers, rows, new int[]{3, 15, 35});
+        renderTable(headers, rows, new int[]{3, 20});
     }
 
     public void displayGoodbye() {

@@ -14,7 +14,7 @@ public class ClientUIFactory {
     public static ClientUI getUI(UIMode mode, Scanner scanner) {
         return switch (mode) {
             case CLI -> new ClientCLIController(scanner);
-            case GUI -> throw new UnsupportedOperationException("GUI non ancora implementata per l'Area Atleta.");
+            case GUI -> throw new UnsupportedOperationException("GUI non ancora implementata per l'Area Cliente.");
         };
     }
 }
