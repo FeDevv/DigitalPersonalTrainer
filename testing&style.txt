@@ -34,7 +34,6 @@ testing PROPRIETARIO
 - ID clienti in ordine
 
 ------------------------------------------------------------------------------------
-
 SCELTE STILISTICHE E UX
 - Prompt di Input: sempre terminanti con ": " (es. "Email: ")
 - Formattazione Menù: Standard "Azione ENTITÀ" (es. "1. Gestione MACCHINARI")
@@ -43,3 +42,12 @@ SCELTE STILISTICHE E UX
 - Terminologia: Utilizzo di "ADDETTO SEGRETERIA" (tutto maiuscolo) per il personale di segreteria
 - Feedback Errori: Spaziatura extra (\n) dopo i messaggi di errore di validazione stato per migliorare la leggibilità
 - Campi Opzionali: Gestione tramite Invio (stringa vuota) per note e carichi, senza blocco di validazione
+------------------------------------------------------------------------------------
+UI PRESENTI DA MODIFICARE
+- pacchetto BOOT
+- pacchetto shared.UI
+- pacchetto users.LOGIN
+- pacchetto users.OWNER
+- pacchetto users.RECEPTIONIST
+- pacchetto users.PT
+- pacchetto users.CLIENT

@@ -20,17 +20,17 @@ USE digital_personal_trainer;
 
 -- 1. Pulizia utenti esistenti (per rendere lo script ri-eseguibile)
 DROP USER IF EXISTS 'dpt_login'@'localhost';
-DROP USER IF EXISTS 'dpt_proprietario'@'localhost';
+DROP USER IF EXISTS 'dpt_owner'@'localhost';
 DROP USER IF EXISTS 'dpt_pt'@'localhost';
-DROP USER IF EXISTS 'dpt_segreteria'@'localhost';
-DROP USER IF EXISTS 'dpt_cliente'@'localhost';
+DROP USER IF EXISTS 'dpt_receptionist'@'localhost';
+DROP USER IF EXISTS 'dpt_client'@'localhost';
 
 -- 2. Creazione Utenti con credenziali allineate a db.properties
 CREATE USER 'dpt_login'@'localhost' IDENTIFIED BY 'dpt_login_pwd';
-CREATE USER 'dpt_proprietario'@'localhost' IDENTIFIED BY 'dpt_prop_pwd';
+CREATE USER 'dpt_owner'@'localhost' IDENTIFIED BY 'dpt_prop_pwd';
 CREATE USER 'dpt_pt'@'localhost' IDENTIFIED BY 'dpt_pt_pwd';
-CREATE USER 'dpt_segreteria'@'localhost' IDENTIFIED BY 'dpt_seg_pwd';
-CREATE USER 'dpt_cliente'@'localhost' IDENTIFIED BY 'dpt_cli_pwd';
+CREATE USER 'dpt_receptionist'@'localhost' IDENTIFIED BY 'dpt_seg_pwd';
+CREATE USER 'dpt_client'@'localhost' IDENTIFIED BY 'dpt_cli_pwd';
 
 -- ==============================================================================
 -- 3. PULIZIA DELL'AMBIENTE (DROP OBJECTS)
@@ -607,13 +607,13 @@ GRANT SELECT (ID_Addetto, Nome, Cognome, Email, Password, Addetto_Attivo) ON dig
 GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Password, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
 
 -- [OWNER]: Gestione del personale e del catalogo
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_proprietario'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PT TO 'dpt_proprietario'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_proprietario'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.CLIENTE TO 'dpt_proprietario'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.MACCHINARIO TO 'dpt_proprietario'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ESERCIZIO TO 'dpt_proprietario'@'localhost';
-GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_proprietario'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PT TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.CLIENTE TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.MACCHINARIO TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ESERCIZIO TO 'dpt_owner'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_owner'@'localhost';
 
 -- [PT]: Gestione schede e monitoraggio
 GRANT SELECT ON digital_personal_trainer.CLIENTE TO 'dpt_pt'@'localhost';
@@ -629,18 +629,20 @@ GRANT SELECT ON digital_personal_trainer.vw_prestazioni_pt TO 'dpt_pt'@'localhos
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_crea_nuova_scheda TO 'dpt_pt'@'localhost';
 
 -- [RECEPTIONIST]: Gestione anagrafiche e assegnazioni
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.CLIENTE TO 'dpt_segreteria'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_segreteria'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_segreteria'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ASSEGNA TO 'dpt_segreteria'@'localhost';
-GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_segreteria'@'localhost';
-GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_assegna_pt TO 'dpt_segreteria'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.CLIENTE TO 'dpt_receptionist'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_receptionist'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_receptionist'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ASSEGNA TO 'dpt_receptionist'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_receptionist'@'localhost';
+GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_assegna_pt TO 'dpt_receptionist'@'localhost';
 
 -- [CLIENT]: Operatività limitata al proprio allenamento
-GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_cliente'@'localhost';
-GRANT SELECT ON digital_personal_trainer.SCHEDA TO 'dpt_cliente'@'localhost';
-GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_cliente'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SESSIONE TO 'dpt_cliente'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_cliente'@'localhost';
+GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_client'@'localhost';
+GRANT SELECT ON digital_personal_trainer.SCHEDA TO 'dpt_client'@'localhost';
+GRANT SELECT ON digital_personal_trainer.vw_scheda_attiva_cliente TO 'dpt_client'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SESSIONE TO 'dpt_client'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_client'@'localhost';
 
 FLUSH PRIVILEGES;
+
+
