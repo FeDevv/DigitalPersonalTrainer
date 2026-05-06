@@ -61,7 +61,7 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
 
     @Override
     public Double askForWeight() {
-        String input = readOptionalString("Carico utilizzato (kg) [premi invio per saltare]: ");
+        String input = readOptionalString("Carico utilizzato (kg) [premi invio per saltare]:");
         if (input.isEmpty()) return null;
         try {
             return Double.parseDouble(input);

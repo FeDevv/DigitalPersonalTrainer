@@ -50,16 +50,16 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public MachineCreationDTO askForMachineData() {
-        String nome = readString("Nome Macchinario: ");
-        String desc = readString("Descrizione: ");
+        String nome = readString("Nome Macchinario:");
+        String desc = readString("Descrizione:");
         return new MachineCreationDTO(nome, desc);
     }
 
     @Override
     public ExerciseCreationDTO askForExerciseData(List<Machine> availableMachines) {
-        String nome = readString("Nome Esercizio: ");
-        String desc = readString("Descrizione: ");
-        boolean corpoLibero = readString("È a corpo libero? (s/n): ").equalsIgnoreCase("s");
+        String nome = readString("Nome Esercizio:");
+        String desc = readString("Descrizione:");
+        boolean corpoLibero = readString("È a corpo libero? (s/n):").equalsIgnoreCase("s");
         Integer machineId = null;
         if (!corpoLibero) {
             if (availableMachines.isEmpty()) {
@@ -67,7 +67,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
                 corpoLibero = true;
             } else {
                 ownerView.displayMacchinari(availableMachines);
-                machineId = readInt("Inserisci ID Macchinario associato: ");
+                machineId = readInt("Inserisci ID Macchinario associato:");
             }
         }
         return new ExerciseCreationDTO(nome, desc, corpoLibero, machineId);
@@ -75,28 +75,28 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
 
     @Override
     public UserCreationDTO askForStaffData() {
-        String nome = readString("Nome: ");
-        String cognome = readString("Cognome: ");
-        String email = ValidationUtils.validateEmail(readString("Email: "));
-        String pass = readString("Password: ");
+        String nome = readString("Nome:");
+        String cognome = readString("Cognome:");
+        String email = ValidationUtils.validateEmail(readString("Email:"));
+        String pass = readString("Password:");
         return new UserCreationDTO(nome, cognome, email, pass);
     }
 
     // --- TOGGLE & STATO ---
 
     @Override
-    public int askForIDMacchinarioDaToggle() { return readInt("ID Macchinario da attivare/disattivare: "); }
+    public int askForIDMacchinarioDaToggle() { return readInt("ID Macchinario da attivare/disattivare:"); }
 
     @Override
-    public int askForIDEsercizioDaToggle() { return readInt("ID Esercizio da attivare/disattivare: "); }
+    public int askForIDEsercizioDaToggle() { return readInt("ID Esercizio da attivare/disattivare:"); }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare: "); }
+    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare:"); }
 
     @Override
     public boolean askForNewStatus() {
         while (true) {
-            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo: ");
+            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo:");
             if (choice == 1) return true;
             if (choice == 0) return false;
             ownerView.displayError("Inserisci solo '1' per Attivo o '0' per Disattivo.\n");

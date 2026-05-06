@@ -12,5 +12,5 @@ public class Main {
 
 }
 
-// pensare al logging (aggiungere un logger)
-// rivedere anche l'orchestrator
+// rivedere l'orchestrator
+

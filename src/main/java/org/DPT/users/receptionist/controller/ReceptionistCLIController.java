@@ -38,22 +38,22 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
 
     @Override
     public UserCreationDTO askForStaffData() {
-        String nome = readString("Nome: ");
-        String cognome = readString("Cognome: ");
-        String email = ValidationUtils.validateEmail(readString("Email: "));
-        String pass = readString("Password: ");
+        String nome = readString("Nome:");
+        String cognome = readString("Cognome:");
+        String email = ValidationUtils.validateEmail(readString("Email:"));
+        String pass = readString("Password:");
         return new UserCreationDTO(nome, cognome, email, pass);
     }
 
     @Override
     public ClientCreationDTO askForClientData() {
         UserCreationDTO base = askForStaffData();
-        String cf = readString("Codice Fiscale: ");
-        String ind = readString("Indirizzo: ");
+        String cf = readString("Codice Fiscale:");
+        String ind = readString("Indirizzo:");
         LocalDate data = null;
         while (data == null) {
             try {
-                data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG): "));
+                data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG):"));
             } catch (DateTimeParseException e) {
                 recView.displayError("Formato data non valido.");
             }
@@ -62,12 +62,12 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare: "); }
+    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare:"); }
 
     @Override
     public boolean askForNewStatus() {
         while (true) {
-            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo: ");
+            int choice = readInt("Nuovo stato: (1) Attivo, (0) Disattivo:");
             if (choice == 1) return true;
             if (choice == 0) return false;
             recView.displayError("Inserisci solo '1' per Attivo o '0' per Disattivo.\n");
@@ -75,10 +75,10 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     }
 
     @Override
-    public int askForPTId() { return readInt("ID del Personal Trainer da assegnare: "); }
+    public int askForPTId() { return readInt("ID del Personal Trainer da assegnare:"); }
 
     @Override
-    public int askForClientId() { return readInt("ID del Cliente: "); }
+    public int askForClientId() { return readInt("ID del Cliente:"); }
 
     @Override
     public void showUtenti(List<? extends User> lista, String titolo) { recView.displayUtenti(lista, titolo); }
