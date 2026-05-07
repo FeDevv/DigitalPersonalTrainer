@@ -5,8 +5,8 @@ import org.DPT.users.common.model.User;
 import java.time.LocalDate;
 
 /**
- * Represents a gym member (Client).
- * Extends User with personal anatomical and registration data.
+ * Rappresenta un Cliente
+ * Estende User, ha in più dati anagrafici quali codice fiscale, indirizzo e data di nascita.
  */
 public class Client extends User {
     private final String fiscalCode;
@@ -22,6 +22,7 @@ public class Client extends User {
     }
 
     public String getFiscalCode() { return fiscalCode; }
+    //metodi tenuti per completezza e futura espansione
     public String getAddress() { return address; }
     public LocalDate getBirthDate() { return birthDate; }
 }

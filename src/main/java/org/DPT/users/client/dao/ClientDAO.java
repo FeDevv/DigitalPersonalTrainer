@@ -3,6 +3,7 @@ package org.DPT.users.client.dao;
 import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
 import org.DPT.users.client.model.Client;
+import org.DPT.users.common.dto.ClientCreationDTO;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -32,6 +33,7 @@ public class ClientDAO {
         return findByQuery("SELECT * FROM CLIENTE ORDER BY ID_Cliente", (Object[]) null);
     }
 
+    // metodo tenuto per futura espansione
     public List<Client> findAll(boolean active) {
         return findByQuery("SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente", active);
     }
@@ -82,7 +84,7 @@ public class ClientDAO {
     }
 
     /**
-     * Deactivates a client and their active sheet using the stored procedure.
+     * Disattiva un cliente e la scheda ad esso legata in maniera atomica usando una stored procedure.
      */
     public void deactivate(int clientId) {
         String sql = "{CALL sp_disattiva_cliente(?)}";
@@ -97,13 +99,13 @@ public class ClientDAO {
     }
 
     /**
-     * Reactivates a client. Note: The client will need a new sheet assigned by a PT.
+     * Attiva un cliente. Non usando una sp, la precedente scheda assegnata andrà ri-creata.
      */
     public void activate(int id) {
         updateActiveStatus(id, true);
     }
 
-    public void insert(org.DPT.users.common.dto.ClientCreationDTO data) {
+    public void insert(ClientCreationDTO data) {
         String sql = "INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection conn = DBConnectionManager.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

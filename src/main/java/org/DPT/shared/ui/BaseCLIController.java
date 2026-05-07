@@ -23,7 +23,7 @@ public abstract class BaseCLIController {
         view.displayInputPrompt(prompt);
         while (!scanner.hasNextInt()) {
             view.displayError("Inserisci un formato numerico valido.");
-            scanner.nextLine(); // Pulisce il buffer
+            scanner.nextLine(); // Pulisce buffer
             view.displayInputPrompt(prompt);
         }
         int val = scanner.nextInt();

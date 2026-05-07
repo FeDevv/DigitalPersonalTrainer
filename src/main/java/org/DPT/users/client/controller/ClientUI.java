@@ -14,7 +14,6 @@ public interface ClientUI {
     int askForChoice();
 
     // Visualizzazione Schede
-    void showActiveSheetHeader(String sheetName);
     void showRoutine(String title, List<ActiveSheetItem> routine);
     void showSheetHistory(List<WorkoutSheet> history);
     int askForID(String prompt);
@@ -22,7 +21,7 @@ public interface ClientUI {
     // Flusso Allenamento
     void showWorkoutStart(String sheetName);
     void showExerciseProgress(int currentEx, int totalEx, String exName, String notes);
-    void showSetProgress(int currentSet, int totalSets, int reps, int restTime);
+    void showSetProgress(int currentSet, int totalSets, int reps);
     
     /**
      * Chiede l'esito della serie corrente.

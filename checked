@@ -1,0 +1,155 @@
+┌──────────────────────────────────────────────────────┐
+│                checking package boot                 │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+LogicController looks OK
+CLIController looks OK
+                     -- model --
+UIMode looks correct
+Configuration looks correct
+                     -- view --
+BootCLIView looks correct
+
+┌──────────────────────────────────────────────────────┐
+│             checking package connection              │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+NONE
+                     -- model --
+NONE
+                     -- view --
+NONE
+
+┌──────────────────────────────────────────────────────┐
+│              checking package exception              │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+NONE
+                     -- model --
+NONE
+                     -- view --
+NONE
+
+┌──────────────────────────────────────────────────────┐
+│                checking package shared               │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                     -- auth --
+Role looks OK
+                    -- catalog --
+esercizi.dao.ExerciseDAO looks OK
+esercizi.dto.ExerciseCreationDTO looks OK
+esercizi.model.Exercise looks OK
+macchinari.dao.MachineDAO looks OK
+macchinari.dto.MachineCreationDTO looks OK
+macchinari.dto.Machine looks OK
+                      -- ui --
+BaseCLIView looks OK
+BaseCLIController looks OK
+                     -- utils --
+ValidationUtils looks OK
+                    -- workout --
+session.dao.WorkoutSessionDAO looks OK
+session.model.WorkoutSession looks OK
+set.dao.PerformedSetDAO looks OK
+set.model.PerformedSet looks OK
+sheet.dao.WorkoutSheetDAO looks OK
+sheet.model.ActiveSheetItem looks OK
+sheet.model.SheetItem looks OK
+sheet.model.WorkoutSheet looks OK
+
+┌──────────────────────────────────────────────────────┐
+│            checking package users.client             │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+ClientCLIController OK
+ClientLogicController OK
+ClientUI OK
+                     -- model --
+Client OK
+                     -- view --
+ClientCLIView OK
+                     -- dao --
+ClientDAO OK
+                   -- factory --
+ClientUIFactory OK
+
+┌──────────────────────────────────────────────────────┐
+│            checking package users.login              │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+LoginUI OK
+LoginCLIController OK
+LoginLogicController OK
+                     -- model --
+AuthToken OK
+UserCredentials OK
+                     -- view --
+LoginCLIView OK
+                     -- dao --
+LoginDAO OK
+                   -- factory --
+LoginUIFactory OK
+
+┌──────────────────────────────────────────────────────┐
+│            checking package users.owner              │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+OwnerCLIController OK
+OwnerLogicController OK
+OwnerUI OK
+                     -- model --
+Owner OK
+                     -- view --
+OwnerCLIView OK
+                     -- dao --
+OwnerDAO
+                   -- factory --
+OwnerUIFactory OK
+
+┌──────────────────────────────────────────────────────┐
+│              checking package users.pt               │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+PTUI OK
+PTCLIController OK
+PTLogicController OK
+                     -- model --
+PT OK
+                     -- view --
+PTCLIView OK
+                     -- dao --
+PTDAO OK
+                   -- factory --
+PTUIFactory OK
+
+┌──────────────────────────────────────────────────────┐
+│         checking package users.receptionist          │✅
+└──────────────────────────────────────────────────────┘
+ENGLISH CODE, ITALIAN OUTPUT
+                   -- controller --
+ReceptionistUI OK
+ReceptionistCLIController OK
+ReceptionistLogicController OK
+                     -- model --
+Receptionist OK
+                     -- view --
+ReceptionistCLIView OK
+                     -- dao --
+AssignmentDAO OK
+ReceptionistDAO OK
+                   -- factory --
+ReceptionistUIFactory OK
+
+┌──────────────────────────────────────────────────────┐
+│                checking other files                  │✅
+└──────────────────────────────────────────────────────┘
+Main OK
+Orchestrator OK

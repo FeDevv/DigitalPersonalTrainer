@@ -18,7 +18,6 @@ public class BootLogicController {
     }
 
     public Configuration execute(String[] args) {
-        // Gestione parametri da riga di comando (priorità massima)
         if (args != null && args.length > 0) {
             for (String arg : args) {
                 if (arg.equalsIgnoreCase("--gui")) return Configuration.defaultGUI();

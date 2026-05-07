@@ -2,12 +2,15 @@ package org.DPT.users.pt.dao;
 
 import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.users.common.dto.UserCreationDTO;
+import org.DPT.users.pt.controller.PTUI;
 import org.DPT.users.pt.model.PT;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +37,7 @@ public class PTDAO {
         return findByQuery("SELECT * FROM PT ORDER BY ID_PT", (Object[]) null);
     }
 
+    // metodo tenuto per futura espansione
     public List<PT> findAll(boolean active) {
         return findByQuery("SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT", active);
     }
@@ -69,10 +73,7 @@ public class PTDAO {
         );
     }
 
-    public void activate(int id) { updateStatus(id, true); }
-    public void deactivate(int id) { updateStatus(id, false); }
-
-    public void insert(org.DPT.users.common.dto.UserCreationDTO data) {
+    public void insert(UserCreationDTO data) {
         String sql = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
         Connection conn = DBConnectionManager.getInstance().getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -101,8 +102,8 @@ public class PTDAO {
         }
     }
 
-    public List<org.DPT.users.pt.controller.PTUI.PerformanceRecord> getPerformanceReport(int ptId, java.time.LocalDate start, java.time.LocalDate end) {
-        List<org.DPT.users.pt.controller.PTUI.PerformanceRecord> report = new ArrayList<>();
+    public List<PTUI.PerformanceRecord> getPerformanceReport(int ptId, LocalDate start, LocalDate end) {
+        List<PTUI.PerformanceRecord> report = new ArrayList<>();
         String sql = """
                 SELECT Nominativo_Cliente, Data, Durata_Minuti, Percentuale_Completamento 
                 FROM vw_prestazioni_pt 
@@ -118,7 +119,7 @@ public class PTDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    report.add(new org.DPT.users.pt.controller.PTUI.PerformanceRecord(
+                    report.add(new PTUI.PerformanceRecord(
                             rs.getString("Nominativo_Cliente"),
                             rs.getDate("Data").toLocalDate(),
                             rs.getInt("Durata_Minuti"),

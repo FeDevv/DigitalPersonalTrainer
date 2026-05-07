@@ -77,7 +77,7 @@ public class ClientCLIView extends BaseCLIView {
         displayLine(BL + H.repeat(width) + BR);
     }
 
-    public void displaySetInfo(int current, int total, int reps, int rest) {
+    public void displaySetInfo(int current, int total, int reps) {
         String progressBar = renderProgressBar(current, total);
         displayLine(String.format("SERIE %d/%d %s | Obiettivo: %d reps", current, total, progressBar, reps));
     }

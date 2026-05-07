@@ -27,9 +27,6 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     public int askForChoice() { return readInt(""); }
 
     @Override
-    public void showActiveSheetHeader(String sheetName) { clientView.displaySectionTitle("Scheda Attiva: " + sheetName); }
-
-    @Override
     public void showRoutine(String title, List<ActiveSheetItem> routine) { clientView.displayActiveRoutine(title, routine); }
 
     @Override
@@ -49,8 +46,8 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     }
 
     @Override
-    public void showSetProgress(int currentSet, int totalSets, int reps, int restTime) {
-        clientView.displaySetInfo(currentSet, totalSets, reps, restTime);
+    public void showSetProgress(int currentSet, int totalSets, int reps) {
+        clientView.displaySetInfo(currentSet, totalSets, reps);
     }
 
     @Override
@@ -79,7 +76,7 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     @Override
     public void showRestTimer(int seconds) {
         clientView.displayRestTimer(seconds);
-        scanner.nextLine(); // Attende il tasto Invio per continuare
+        scanner.nextLine(); // serve per aspettare l'invio per continuare
     }
 
     @Override

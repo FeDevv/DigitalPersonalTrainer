@@ -30,8 +30,7 @@ public class WorkoutSheetDAO {
      */
     public List<ActiveSheetItem> getSheetDetails(int sheetId) {
         String sql = """
-            SELECT 
-                s.ID_Cliente, s.ID_Scheda, s.Titolo as Nome_Scheda,
+            SELECT s.ID_Cliente, s.ID_Scheda, s.Titolo as Nome_Scheda,
                 c.Codice_Esercizio, e.Nome as Nome_Esercizio,
                 c.Serie_Previste, c.Ripetizioni_Previste, c.Recupero,
                 c.Note_Esecuzione, e.Corpo_Libero

@@ -22,6 +22,8 @@ public class Main {
 // identici a quelli ora presenti, ma con i colori per CLI, l'orchestrator (o il boot) semplicemente
 // andrà ad istanziare il blocco corretto
 
-// clientLogicController linea 148
+// clientLogicController linea 148 - spiegazione
 
-// data_source_mapping.xml ??? in .idea.dataSources
+// possibilmente rimuovere da boot.model.Configuration il "Locale" in quanto mai usato
+
+// record in PTUI da spostare in model?

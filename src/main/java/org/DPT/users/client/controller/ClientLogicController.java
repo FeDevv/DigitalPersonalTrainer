@@ -73,8 +73,8 @@ public class ClientLogicController {
                 return;
             }
 
-            String sheetName = routine.get(0).sheetName();
-            int sheetId = routine.get(0).sheetId();
+            String sheetName = routine.getFirst().sheetName();
+            int sheetId = routine.getFirst().sheetId();
 
             // 2. Avvio Sessione (Il DB popola automaticamente le serie)
             WorkoutSession session = sessionDAO.startSession(sheetId);
@@ -95,7 +95,7 @@ public class ClientLogicController {
 
                 // 4. Sub-loop (Serie)
                 for (int s = 1; s <= exercise.expectedSets(); s++) {
-                    ui.showSetProgress(s, exercise.expectedSets(), exercise.expectedReps(), exercise.restTime());
+                    ui.showSetProgress(s, exercise.expectedSets(), exercise.expectedReps());
                     
                     int action = ui.askSetAction();
                     
@@ -113,7 +113,7 @@ public class ClientLogicController {
                         ui.reportInfo("Serie saltata.");
                     } else if (action == 3) { // SALTA ESERCIZIO
                         ui.reportInfo("Esercizio saltato.");
-                        break; // Esce dal loop delle serie
+                        break;
                     } else if (action == 0) { // TERMINA ALLENAMENTO
                         workoutInterrupted = true;
                         break;
@@ -145,7 +145,7 @@ public class ClientLogicController {
             if (routine.isEmpty()) {
                 ui.showRoutine("Tua Routine Corrente", routine);
             } else {
-                ui.showRoutine("Tua Routine Corrente: " + routine.get(0).sheetName(), routine);
+                ui.showRoutine("Tua Routine Corrente: " + routine.getFirst().sheetName(), routine);
             }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());

@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO for Performed Sets.
- * Manages the atomic progress of a workout session.
+ * DAO per la serie eseguito.
+ * La serie eseguita serve alla gestione del progressio di una sessione.
  */
 public class PerformedSetDAO {
 
+    // anche se non usato, questo metodo è stato lasciato per facilitare una eventuale espansione del progetto
     /**
-     * Retrieves all sets for a given session.
+     * recupera tutte le serie per una sessione.
      */
     public List<PerformedSet> findAllBySessionId(int sessionId) {
         List<PerformedSet> sets = new ArrayList<>();
@@ -39,8 +40,9 @@ public class PerformedSetDAO {
     }
 
     /**
-     * Updates a specific set performance.
-     * Note: Database trigger 'trg_aggiorna_percentuale_update' will automatically update the session percentage.
+     * Aggiorna la performance di una serie (momento in cui l'atleta completa una serie e
+     * aggiunge, a sua discrezione, il carico).
+     * Nota: Il trigger 'trg_aggiorna_percentuale_update' aggiorna automaticamente la percentuale di completamento.
      */
     public void updatePerformance(int sessionId, int exerciseId, int setNumber, Double weight, boolean completed) {
         String sql = "UPDATE SERIE_ESEGUITA SET Carico_Effettivo = ?, Completata = ? " +

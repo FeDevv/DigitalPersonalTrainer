@@ -34,6 +34,7 @@ public class ReceptionistDAO {
         return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA ORDER BY ID_Addetto", (Object[]) null);
     }
 
+    // metodo tenuto per espansione futura
     public List<Receptionist> findAll(boolean active) {
         return findByQuery("SELECT * FROM ADDETTO_SEGRETERIA WHERE Addetto_Attivo = ? ORDER BY ID_Addetto", active);
     }
@@ -68,9 +69,6 @@ public class ReceptionistDAO {
                 rs.getBoolean("Addetto_Attivo")
         );
     }
-
-    public void activate(int id) { updateStatus(id, true); }
-    public void deactivate(int id) { updateStatus(id, false); }
 
     public void insert(org.DPT.users.common.dto.UserCreationDTO data) {
         String sql = "INSERT INTO ADDETTO_SEGRETERIA (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";

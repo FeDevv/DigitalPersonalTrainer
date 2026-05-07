@@ -1,8 +1,8 @@
 package org.DPT.shared.catalog.esercizi.model;
 
 /**
- * Represents an exercise in the gym's catalog.
- * Maps to the ESERCIZIO table.
+ * Rappresenta un esercizio nel catalogo della palestra
+ * Mappa la tabella ESERCIZIO
  */
 public record Exercise(
         int id,

@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO for Workout Sessions.
- * Handles the lifecycle of a training session.
+ * DAO per la sessione di allenamento.
+ * Gestisce il ciclo di vita di una sessione di allenamento
  */
 public class WorkoutSessionDAO {
 
     /**
-     * Starts a new session. 
-     * Note: Database trigger 'trg_popola_serie_sessione' will automatically populate SERIE_ESEGUITA.
+     * Avvia una nuova sessione
+     * Nota: Il trigger 'trg_popola_serie_sessione' popolerà automaticamente SERIE_ESEGUITA.
      */
     public WorkoutSession startSession(int sheetId) {
         String sql = "INSERT INTO SESSIONE (ID_Scheda, Data, Ora_Inizio, Percentuale_Completamento) VALUES (?, ?, ?, 0)";
@@ -53,7 +53,7 @@ public class WorkoutSessionDAO {
     }
 
     /**
-     * Closes a session by setting the end time.
+     * Chiude la sessione e imposta il tempo di fine allenamento
      */
     public void endSession(int sessionId) {
         String sql = "UPDATE SESSIONE SET Ora_Fine = ? WHERE ID_Sessione = ?";

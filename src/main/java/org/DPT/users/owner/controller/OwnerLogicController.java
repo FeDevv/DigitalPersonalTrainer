@@ -24,7 +24,7 @@ public class OwnerLogicController {
     private final AuthToken token;
     private final Owner profile;
 
-    private final OwnerDAO ownerDAO = new OwnerDAO(); // Locale: istanziato internamente
+    private final OwnerDAO ownerDAO = new OwnerDAO(); // istanziato internamente
     private final PTDAO ptDAO;
     private final ReceptionistDAO receptionistDAO;
     private final ClientDAO clientDAO;

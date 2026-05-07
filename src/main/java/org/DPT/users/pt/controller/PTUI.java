@@ -45,7 +45,7 @@ public interface PTUI {
     void reportSuccess(String message);
     void reportGoodbye();
 
-    // Record di supporto per il report (interno all'interfaccia o in un file separato)
+    // Record di supporto per il report
     record PerformanceRecord(
             String clientName,
             LocalDate date,

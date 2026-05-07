@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Gestisce ESCLUSIVAMENTE l'output testuale per il modulo di Login.
+ * Gestisce l'output testuale per il modulo di Login.
  * Estende BaseCLIView per uniformità grafica.
  */
 public class LoginCLIView extends BaseCLIView {
@@ -33,7 +33,7 @@ public class LoginCLIView extends BaseCLIView {
                 });
             }
         }
-        // Aggiungiamo l'opzione di uscita
+        // opzione di uscita
         rows.add(new String[]{"0", "ESCI"});
 
         renderTable(headers, rows, new int[]{3, 20});

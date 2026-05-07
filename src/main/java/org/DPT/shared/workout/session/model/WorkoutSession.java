@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
- * Represents a specific training session performed by a client.
- * Maps to the SESSIONE table.
+ * Rappresenta una sessione di allenamento di un cliente.
+ * Mappa la tabella SESSIONE.
  */
 public record WorkoutSession(
         int id,

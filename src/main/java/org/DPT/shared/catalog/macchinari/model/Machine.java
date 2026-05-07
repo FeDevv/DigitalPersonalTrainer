@@ -1,8 +1,8 @@
 package org.DPT.shared.catalog.macchinari.model;
 
 /**
- * Represents a piece of equipment in the gym.
- * Maps to the MACCHINARIO table.
+ * Rappresenta un macchinario della palestra.
+ * Mappa la tabella MACCHINARIO
  */
 public record Machine(
         int id,

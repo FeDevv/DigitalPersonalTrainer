@@ -3,8 +3,8 @@ package org.DPT.shared.workout.sheet.model;
 import java.time.LocalDate;
 
 /**
- * Represents a workout sheet created by a PT for a client.
- * Maps to the SCHEDA table.
+ * Rappresenta una scheda creata da un PT per un cliente
+ * Mappa la tabella SCHEDA
  */
 public record WorkoutSheet(
         int id,

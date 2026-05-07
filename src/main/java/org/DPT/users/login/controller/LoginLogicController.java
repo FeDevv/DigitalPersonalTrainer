@@ -71,8 +71,4 @@ public class LoginLogicController {
             }
         }
     }
-
-    public void logout() {
-        DBConnectionManager.getInstance().closeConnection();
-    }
 }

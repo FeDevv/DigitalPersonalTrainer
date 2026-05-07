@@ -93,6 +93,7 @@ public class BaseCLIView {
         System.out.println(right);
     }
 
+    // non usato ma utile da tenere per future espansioni
     public void displayLabel(String label) {
         System.out.print(label);
     }

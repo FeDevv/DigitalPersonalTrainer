@@ -17,6 +17,7 @@ import org.DPT.users.owner.controller.OwnerLogicController;
 import org.DPT.users.pt.controller.PTLogicController;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.controller.ReceptionistLogicController;
+import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
 import java.util.Scanner;
 
@@ -86,7 +87,7 @@ public class Orchestrator {
                 // Il modulo ReceptionistDAO è istanziato internamente in OwnerLogicController se necessario,
                 // ma per coerenza con la DI ibrida passiamo i DAO condivisi definiti nell'Orchestrator.
                 new OwnerLogicController(config, sharedScanner, token, 
-                        ptDAO, new org.DPT.users.receptionist.dao.ReceptionistDAO(), clientDAO, machineDAO, exerciseDAO).execute();
+                        ptDAO, new ReceptionistDAO(), clientDAO, machineDAO, exerciseDAO).execute();
             }
             case PT -> {
                 new PTLogicController(config, sharedScanner, token, 

@@ -1,8 +1,8 @@
 package org.DPT.shared.workout.set.model;
 
 /**
- * Represents an atomic set performed during a session.
- * Weak entity mapping the SERIE_ESEGUITA table.
+ * Rappresenta un set (atomico) eseguito durante una sessione.
+ * mappa l'entità debole (e tabella) SERIE_ESEGUITA
  */
 public record PerformedSet(
         int sessionId,
