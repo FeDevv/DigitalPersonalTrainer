@@ -16,8 +16,6 @@ public class Main {
 
 // To resume this session: gemini --resume 859b85b4-6500-488d-a58b-18d3dc4cada6
 
-// aggiungere la visualizzazione dettagliata dello storico (per PT e per Clienti)
-
 // aggiungere al boot la modalità CLI color, dove creiamo un'altri elementi in shared.ui che sono
 // identici a quelli ora presenti, ma con i colori per CLI, l'orchestrator (o il boot) semplicemente
 // andrà ad istanziare il blocco corretto
