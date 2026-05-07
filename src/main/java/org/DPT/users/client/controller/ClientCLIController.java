@@ -30,12 +30,17 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
     public void showActiveSheetHeader(String sheetName) { clientView.displaySectionTitle("Scheda Attiva: " + sheetName); }
 
     @Override
-    public void showActiveRoutine(List<ActiveSheetItem> routine) { clientView.displayActiveRoutine(routine); }
+    public void showRoutine(String title, List<ActiveSheetItem> routine) { clientView.displayActiveRoutine(title, routine); }
 
     @Override
     public void showSheetHistory(List<WorkoutSheet> history) { clientView.displaySheetHistory(history); }
 
     @Override
+    public int askForID(String prompt) {
+        return readInt(prompt);
+    }
+
+    // --- WORKOUT ---
     public void showWorkoutStart(String sheetName) { clientView.displayWorkoutStart(sheetName); }
 
     @Override

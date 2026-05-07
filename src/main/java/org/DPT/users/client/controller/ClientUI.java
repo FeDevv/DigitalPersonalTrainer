@@ -15,8 +15,9 @@ public interface ClientUI {
 
     // Visualizzazione Schede
     void showActiveSheetHeader(String sheetName);
-    void showActiveRoutine(List<ActiveSheetItem> routine);
+    void showRoutine(String title, List<ActiveSheetItem> routine);
     void showSheetHistory(List<WorkoutSheet> history);
+    int askForID(String prompt);
 
     // Flusso Allenamento
     void showWorkoutStart(String sheetName);

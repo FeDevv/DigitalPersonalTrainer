@@ -110,6 +110,19 @@ public class PTLogicController {
         try {
             List<WorkoutSheet> history = sheetDAO.findByPTId(profile.getId());
             ui.showSheetHistory(history);
+            
+            if (!history.isEmpty()) {
+                int sheetId = ui.askForID("Inserisci ID Scheda per i dettagli (0 per uscire):");
+                if (sheetId != 0) {
+                    history.stream()
+                            .filter(s -> s.id() == sheetId)
+                            .findFirst()
+                            .ifPresentOrElse(
+                                    s -> ui.showSheetDetails(s.title(), sheetDAO.getSheetDetails(sheetId)),
+                                    () -> ui.reportError("ID non trovato nel tuo storico.")
+                            );
+                }
+            }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
         }

@@ -3,6 +3,7 @@ package org.DPT.users.pt.controller;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
 import org.DPT.shared.catalog.macchinari.model.Machine;
 import org.DPT.shared.ui.BaseCLIController;
+import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.SheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
@@ -70,6 +71,16 @@ public class PTCLIController extends BaseCLIController implements PTUI {
 
     @Override
     public void showSheetHistory(List<WorkoutSheet> sheets) { ptView.displaySheetHistory(sheets); }
+
+    @Override
+    public void showSheetDetails(String title, List<ActiveSheetItem> details) {
+        ptView.displaySheetDetails(title, details);
+    }
+
+    @Override
+    public int askForID(String prompt) {
+        return readInt(prompt);
+    }
 
     @Override
     public void showCatalog(List<Machine> machines, List<Exercise> exercises) {

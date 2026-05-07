@@ -3,6 +3,7 @@ package org.DPT.users.pt.view;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
 import org.DPT.shared.catalog.macchinari.model.Machine;
 import org.DPT.shared.ui.BaseCLIView;
+import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
 import org.DPT.users.pt.controller.PTUI;
@@ -110,6 +111,24 @@ public class PTCLIView extends BaseCLIView {
 
         displayExerciseCatalog(exercises);
 
+    }
+
+    public void displaySheetDetails(String title, List<ActiveSheetItem> details) {
+        displaySectionTitle("Dettaglio Scheda: " + title);
+        
+        String[] headers = {"ESERCIZIO", "SERIE", "REPS", "RECUPERO", "NOTE"};
+        List<String[]> rows = new ArrayList<>();
+        for (ActiveSheetItem item : details) {
+            rows.add(new String[]{
+                item.exerciseName(),
+                String.valueOf(item.expectedSets()),
+                String.valueOf(item.expectedReps()),
+                item.restTime() + "s",
+                item.executionNotes() != null ? item.executionNotes() : "-"
+            });
+        }
+        
+        renderTable(headers, rows, new int[]{25, 6, 6, 10, 25});
     }
 
     public void displayGoodbye() {

@@ -2,6 +2,7 @@ package org.DPT.users.pt.controller;
 
 import org.DPT.shared.catalog.esercizi.model.Exercise;
 import org.DPT.shared.catalog.macchinari.model.Machine;
+import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.SheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
@@ -31,7 +32,9 @@ public interface PTUI {
 
     // Visualizzazione
     void showSheetHistory(List<WorkoutSheet> sheets);
+    void showSheetDetails(String title, List<ActiveSheetItem> details);
     void showCatalog(List<Machine> machines, List<Exercise> exercises);
+    int askForID(String prompt);
 
     // Reporting
     LocalDate askForStartDate();

@@ -142,7 +142,11 @@ public class ClientLogicController {
     private void viewActiveRoutine() {
         try {
             List<ActiveSheetItem> routine = sheetDAO.getActiveRoutine(profile.getId());
-            ui.showActiveRoutine(routine);
+            if (routine.isEmpty()) {
+                ui.showRoutine("Tua Routine Corrente", routine);
+            } else {
+                ui.showRoutine("Tua Routine Corrente: " + routine.get(0).sheetName(), routine);
+            }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
         }
@@ -152,6 +156,19 @@ public class ClientLogicController {
         try {
             List<WorkoutSheet> history = sheetDAO.findAllByClientId(profile.getId());
             ui.showSheetHistory(history);
+            
+            if (!history.isEmpty()) {
+                int sheetId = ui.askForID("Inserisci ID Scheda per i dettagli (0 per uscire):");
+                if (sheetId != 0) {
+                    history.stream()
+                            .filter(s -> s.id() == sheetId)
+                            .findFirst()
+                            .ifPresentOrElse(
+                                    s -> ui.showRoutine("Dettaglio Scheda: " + s.title(), sheetDAO.getSheetDetails(sheetId)),
+                                    () -> ui.reportError("ID non trovato nel tuo storico.")
+                            );
+                }
+            }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
         }

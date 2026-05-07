@@ -21,19 +21,41 @@ public class WorkoutSheetDAO {
      * Interroga la vista 'vw_scheda_attiva_cliente'.
      */
     public List<ActiveSheetItem> getActiveRoutine(int clientId) {
+        return getRoutineByQuery("SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?", clientId);
+    }
+
+    /**
+     * Recupera i dettagli completi di una scheda specifica (anche archiviata).
+     * Utilizzato per la visualizzazione dello storico.
+     */
+    public List<ActiveSheetItem> getSheetDetails(int sheetId) {
+        String sql = """
+            SELECT 
+                s.ID_Cliente, s.ID_Scheda, s.Titolo as Nome_Scheda,
+                c.Codice_Esercizio, e.Nome as Nome_Esercizio,
+                c.Serie_Previste, c.Ripetizioni_Previste, c.Recupero,
+                c.Note_Esecuzione, e.Corpo_Libero
+            FROM SCHEDA s
+            JOIN COMPOSTA c ON s.ID_Scheda = c.ID_Scheda
+            JOIN ESERCIZIO e ON c.Codice_Esercizio = e.Codice_Esercizio
+            WHERE s.ID_Scheda = ?
+            """;
+        return getRoutineByQuery(sql, sheetId);
+    }
+
+    private List<ActiveSheetItem> getRoutineByQuery(String sql, int id) {
         List<ActiveSheetItem> routine = new ArrayList<>();
-        String sql = "SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?";
         Connection conn = DBConnectionManager.getInstance().getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, clientId);
+            pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     routine.add(mapResultSetToActiveItem(rs));
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore di recupero della routine attiva per il cliente: " + clientId, e);
+            throw new DatabaseException("Errore di recupero della routine per ID: " + id, e);
         }
         return routine;
     }

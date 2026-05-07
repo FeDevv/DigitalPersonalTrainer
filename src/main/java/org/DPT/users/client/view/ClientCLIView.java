@@ -21,8 +21,8 @@ public class ClientCLIView extends BaseCLIView {
         displayLine("0. Logout");
     }
 
-    public void displayActiveRoutine(List<ActiveSheetItem> routine) {
-        displaySectionTitle("Tua Routine Corrente");
+    public void displayActiveRoutine(String title, List<ActiveSheetItem> routine) {
+        displaySectionTitle(title);
         
         String[] headers = {"ESERCIZIO", "SERIE", "REPS", "RECUPERO"};
         List<String[]> rows = new ArrayList<>();
@@ -41,17 +41,18 @@ public class ClientCLIView extends BaseCLIView {
     public void displaySheetHistory(List<WorkoutSheet> history) {
         displaySectionTitle("Storico Tue Schede");
         
-        String[] headers = {"TITOLO SCHEDA", "DATA CREAZIONE", "STATO"};
+        String[] headers = {"ID", "TITOLO SCHEDA", "DATA CREAZIONE", "STATO"};
         List<String[]> rows = new ArrayList<>();
         for (WorkoutSheet s : history) {
             rows.add(new String[]{
+                String.valueOf(s.id()),
                 s.title(),
                 s.creationDate().toString(),
                 s.active() ? "ATTIVA" : "ARCHIVIATA"
             });
         }
         
-        renderTable(headers, rows, new int[]{25, 20, 12});
+        renderTable(headers, rows, new int[]{5, 25, 20, 12});
     }
 
     // --- WORKOUT EXPERIENCE ---
