@@ -42,7 +42,7 @@ public class PTCLIView extends BaseCLIView {
     }
 
     public void displayExerciseCatalog(List<Exercise> exercises) {
-        displaySectionTitle("Catalogo Esercizi");
+        displaySectionTitle("Esercizi Disponibili");
         
         String[] headers = {"ID", "NOME ESERCIZIO", "TIPO/MACCHINA"};
         List<String[]> rows = new ArrayList<>();
@@ -55,13 +55,13 @@ public class PTCLIView extends BaseCLIView {
             });
         }
         
-        renderTable(headers, rows, new int[]{5, 25, 20});
+        renderTable(headers, rows, new int[]{5, 31, 20});
     }
 
     public void displaySheetHistory(List<WorkoutSheet> sheets) {
         displaySectionTitle("Storico Schede Redatte");
         
-        String[] headers = {"ID", "CLI ID", "TITOLO SCHEDA", "DATA", "STATO"};
+        String[] headers = {"ID", "ID CLI.", "TITOLO SCHEDA", "DATA", "STATO"};
         List<String[]> rows = new ArrayList<>();
         for (WorkoutSheet s : sheets) {
             rows.add(new String[]{
@@ -73,7 +73,7 @@ public class PTCLIView extends BaseCLIView {
             });
         }
         
-        renderTable(headers, rows, new int[]{5, 6, 25, 12, 12});
+        renderTable(headers, rows, new int[]{5, 7, 25, 12, 12});
     }
 
     public void displayPerformanceReport(List<PTUI.PerformanceRecord> report) {
@@ -106,20 +106,10 @@ public class PTCLIView extends BaseCLIView {
                 m.description() != null ? m.description() : "-"
             });
         }
-        renderTable(mHeaders, mRows, new int[]{5, 25, 40});
+        renderTable(mHeaders, mRows, new int[]{5, 31, 40});
 
-        displaySectionTitle("Esercizi Disponibili");
-        String[] eHeaders = {"ID", "NOME ESERCIZIO", "TIPO/MACCHINA"};
-        List<String[]> eRows = new ArrayList<>();
-        for (Exercise e : exercises) {
-            String tipo = e.bodyweight() ? "Corpo Libero" : "Macchina ID: " + e.machineId();
-            eRows.add(new String[]{
-                String.valueOf(e.id()),
-                e.name(),
-                tipo
-            });
-        }
-        renderTable(eHeaders, eRows, new int[]{5, 25, 25});
+        displayExerciseCatalog(exercises);
+
     }
 
     public void displayGoodbye() {

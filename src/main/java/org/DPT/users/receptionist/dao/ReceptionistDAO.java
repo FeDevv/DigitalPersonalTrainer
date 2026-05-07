@@ -92,7 +92,10 @@ public class ReceptionistDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            if (rows == 0) {
+                throw new DatabaseException("Impossibile aggiornare lo stato: Addetto Segreteria con ID " + id + " non trovato.");
+            }
         } catch (SQLException e) {
             throw new DatabaseException("Errore d'aggiornamento dello stato dell'ADDETTO SEGRETERIA", e);
         }

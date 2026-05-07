@@ -71,6 +71,7 @@ public class ReceptionistLogicController {
                 case 2 -> manageUtenzaSpecifica("ADDETTO");
                 case 3 -> manageUtenzaSpecifica("CLIENTE");
                 case 0 -> back = true;
+                default -> ui.reportError("Scelta non valida.");
             }
         }
     }
@@ -84,14 +85,14 @@ public class ReceptionistLogicController {
                 switch (choice) {
                     case 1 -> {
                         if (tipo.equals("PT")) ui.showUtenti(ptDAO.getAll(), "PT");
-                        else if (tipo.equals("ADDETTO SEGRETERIA")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA");
+                        else if (tipo.equals("ADDETTO")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA");
                         else ui.showUtenti(clientDAO.getAll(), "CLIENTI");
                     }
                     case 2 -> {
                         int id = ui.askForIDUtente();
                         boolean status = ui.askForNewStatus();
                         if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
-                        else if (tipo.equals("ADDETTO SEGRETERIA")) receptionistDAO.updateStatus(id, status);
+                        else if (tipo.equals("ADDETTO")) receptionistDAO.updateStatus(id, status);
                         else {
                             if (status) clientDAO.activate(id);
                             else clientDAO.deactivate(id);

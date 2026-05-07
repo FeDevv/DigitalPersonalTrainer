@@ -103,7 +103,10 @@ public class ExerciseDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            if (rows == 0) {
+                throw new DatabaseException("Impossibile aggiornare lo stato: Esercizio con ID " + id + " non trovato.");
+            }
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiornamento dello stato dell'esercizio: " + id, e);
         }

@@ -35,7 +35,7 @@ public class ClientCLIView extends BaseCLIView {
             });
         }
         
-        renderTable(headers, rows, new int[]{25, 6, 6, 10});
+        renderTable(headers, rows, new int[]{31, 6, 6, 10});
     }
 
     public void displaySheetHistory(List<WorkoutSheet> history) {

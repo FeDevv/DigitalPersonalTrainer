@@ -127,9 +127,12 @@ public class ClientDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, clientId);
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            if (rows == 0) {
+                throw new DatabaseException("Impossibile aggiornare lo stato: Cliente con ID " + clientId + " non trovato.");
+            }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore di aggiornamento dello stato del cliente ad attivo", e);
+            throw new DatabaseException("Errore di aggiornamento dello stato del cliente", e);
         }
     }
 }

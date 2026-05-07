@@ -95,7 +95,10 @@ public class MachineDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            if (rows == 0) {
+                throw new DatabaseException("Impossibile aggiornare lo stato: Macchinario con ID " + id + " non trovato.");
+            }
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiornamento dello stato del macchinario: " + id, e);
         }

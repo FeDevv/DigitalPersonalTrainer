@@ -87,7 +87,7 @@ public class OwnerCLIView extends BaseCLIView {
             });
         }
         
-        renderTable(headers, rows, new int[]{5, 25, 10, 20});
+        renderTable(headers, rows, new int[]{5, 31, 10, 20});
     }
 
     public void displayUtenti(List<? extends User> lista, String titolo) {
