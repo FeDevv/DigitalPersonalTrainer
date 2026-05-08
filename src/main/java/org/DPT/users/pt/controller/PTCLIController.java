@@ -7,6 +7,7 @@ import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.SheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
+import org.DPT.users.pt.model.PerformanceDTO;
 import org.DPT.users.pt.view.PTCLIView;
 
 import java.time.LocalDate;
@@ -109,7 +110,7 @@ public class PTCLIController extends BaseCLIController implements PTUI {
     }
 
     @Override
-    public void showPerformanceReport(List<PerformanceRecord> report) {
+    public void showPerformanceReport(List<PerformanceDTO> report) {
         ptView.displayPerformanceReport(report);
     }
 

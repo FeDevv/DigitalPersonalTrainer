@@ -6,6 +6,7 @@ import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.SheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
+import org.DPT.users.pt.model.PerformanceDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,17 +40,10 @@ public interface PTUI {
     // Reporting
     LocalDate askForStartDate();
     LocalDate askForEndDate();
-    void showPerformanceReport(List<PerformanceRecord> report);
+    void showPerformanceReport(List<PerformanceDTO> report);
 
     void reportError(String message);
     void reportSuccess(String message);
     void reportGoodbye();
 
-    // Record di supporto per il report
-    record PerformanceRecord(
-            String clientName,
-            LocalDate date,
-            int duration,
-            int completionPercentage
-    ) {}
 }

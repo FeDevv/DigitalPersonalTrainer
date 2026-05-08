@@ -13,6 +13,7 @@ import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.pt.factory.PTUIFactory;
 import org.DPT.users.pt.model.PT;
+import org.DPT.users.pt.model.PerformanceDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -132,7 +133,7 @@ public class PTLogicController {
         try {
             LocalDate start = ui.askForStartDate();
             LocalDate end = ui.askForEndDate();
-            List<PTUI.PerformanceRecord> report = ptDAO.getPerformanceReport(profile.getId(), start, end);
+            List<PerformanceDTO> report = ptDAO.getPerformanceReport(profile.getId(), start, end);
             ui.showPerformanceReport(report);
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());

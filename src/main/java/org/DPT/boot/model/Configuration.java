@@ -6,6 +6,10 @@ import java.util.Objects;
 /**
  * Rappresenta la configurazione di avvio immutabile.
  * Focalizzata esclusivamente sulla modalità di interfaccia e sulla localizzazione.
+ * @param locale Campo mantenuto per garantire la scalabilità futura dell'applicativo (Internazionalizzazione/i18n).
+ * Sebbene non attualmente utilizzato dalla logica di business, permette di predisporre il sistema
+ * all'adattamento di formati di date, valute e localizzazione dei messaggi in caso di
+ * espansione o deployment in diverse regioni geografiche.
  */
 public record Configuration(UIMode uiMode, Locale locale) {
 

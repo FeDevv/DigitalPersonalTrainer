@@ -6,7 +6,7 @@ import org.DPT.shared.ui.BaseCLIView;
 import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import org.DPT.users.client.model.Client;
-import org.DPT.users.pt.controller.PTUI;
+import org.DPT.users.pt.model.PerformanceDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,12 +77,12 @@ public class PTCLIView extends BaseCLIView {
         renderTable(headers, rows, new int[]{5, 7, 25, 12, 12});
     }
 
-    public void displayPerformanceReport(List<PTUI.PerformanceRecord> report) {
+    public void displayPerformanceReport(List<PerformanceDTO> report) {
         displaySectionTitle("Report Prestazioni Clienti");
         
         String[] headers = {"CLIENTE", "DATA", "DURATA(m)", "COMPLETAMENTO"};
         List<String[]> rows = new ArrayList<>();
-        for (PTUI.PerformanceRecord r : report) {
+        for (PerformanceDTO r : report) {
             rows.add(new String[]{
                 r.clientName(),
                 r.date().toString(),
