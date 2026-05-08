@@ -1,36 +1,18 @@
 package org.DPT.users.receptionist.controller;
 
-import org.DPT.shared.auth.Role;
-import org.DPT.users.common.dto.ClientCreationDTO;
-import org.DPT.users.common.dto.UserCreationDTO;
-import org.DPT.users.common.model.User;
-
-import java.util.List;
+import org.DPT.users.common.controller.UserManagementUI;
 
 /**
  * Contratto per l'interfaccia utente del modulo Addetto Segreteria.
+ * Estende UserManagementUI per la gestione delle anagrafiche.
  */
-public interface ReceptionistUI {
+public interface ReceptionistUI extends UserManagementUI {
     void showHeader(String name);
     void showMainMenu();
-    void showUtenzeMenu();
-    void showUtenzaActionMenu(Role tipo);
     
-    int askForChoice();
-    
-    // Metodi di Input
-    UserCreationDTO askForStaffData();
-    ClientCreationDTO askForClientData();
-    int askForIDUtente();
-    boolean askForNewStatus();
-    
-    // Gestione Assegnazioni
+    // Gestione Assegnazioni (specifico per Receptionist)
     int askForPTId();
     int askForClientId();
 
-    void showUtenti(List<? extends User> lista, String titolo);
-
-    void reportError(String message);
-    void reportSuccess(String message);
     void reportGoodbye();
 }

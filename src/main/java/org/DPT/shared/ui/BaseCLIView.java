@@ -1,5 +1,8 @@
 package org.DPT.shared.ui;
 
+import org.DPT.users.common.model.User;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -120,5 +123,25 @@ public class BaseCLIView {
 
     public void displayEmptyLine() {
         System.out.println();
+    }
+
+    /**
+     * Renderizza una tabella standard per la visualizzazione di una lista di utenti.
+     * Centralizzato per rispettare il principio DRY tra le diverse View.
+     */
+    public void renderUserTable(List<? extends User> users, String title) {
+        displaySectionTitle("Elenco " + title);
+
+        String[] headers = {"ID", "NOMINATIVO COMPLETO", "STATO"};
+        List<String[]> rows = new ArrayList<>();
+        for (User u : users) {
+            rows.add(new String[]{
+                    String.valueOf(u.getId()),
+                    u.getFirstName() + " " + u.getLastName(),
+                    u.isActive() ? "ATTIVO" : "DISATTIVO"
+            });
+        }
+
+        renderTable(headers, rows, new int[]{5, 30, 10});
     }
 }

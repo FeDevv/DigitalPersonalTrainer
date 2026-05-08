@@ -83,6 +83,13 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
         return new UserCreationDTO(nome, cognome, email, pass);
     }
 
+    @Override
+    public ClientCreationDTO askForClientData() {
+        // L'Owner non dovrebbe poter chiamare questo metodo grazie alla logica del controller,
+        // ma lo implementiamo per completezza dell'interfaccia.
+        throw new UnsupportedOperationException("I Clienti possono essere inseriti solo dalla Segreteria.");
+    }
+
     // --- TOGGLE & STATO ---
 
     @Override
@@ -111,7 +118,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     public void showEsercizi(List<Exercise> lista) { ownerView.displayEsercizi(lista); }
 
     @Override
-    public void showUtenti(List<? extends User> lista, String titolo) { ownerView.displayUtenti(lista, titolo); }
+    public void showUtenti(List<? extends User> lista, String titolo) { ownerView.renderUserTable(lista, titolo); }
 
     @Override
     public void reportSuccess(String message) { ownerView.displaySuccess(message); }

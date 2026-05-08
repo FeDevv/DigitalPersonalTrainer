@@ -12,8 +12,6 @@ public class Main {
 
 }
 
-// clientLogicController linea 148 - spiegazione
+// check CODICE IN INGLESE, OUTPUT IN ITALIANO -> in PROSSIMI PASSI.txt le parti da rivedere
 
-// Orchestrator spiegazione del funzionamento | FunctionalInterface?
-
-// check CODICE IN INGLESE, OUTPUT IN ITALIANO -> in checked.txt le parti da rivedere
+// To resume this session: gemini --resume 564786ed-b1b2-4a47-a7a7-e603eda96da5 

@@ -8,7 +8,7 @@ import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.DPT.shared.catalog.esercizi.dao.ExerciseDAO;
 import org.DPT.shared.catalog.macchinari.dao.MachineDAO;
 import org.DPT.users.client.dao.ClientDAO;
-import org.DPT.users.common.utils.UserTypeHandler;
+import org.DPT.users.common.controller.UserManagementController;
 import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.owner.dao.OwnerDAO;
 import org.DPT.users.owner.factory.OwnerUIFactory;
@@ -16,8 +16,6 @@ import org.DPT.users.owner.model.Owner;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class OwnerLogicController {
@@ -26,14 +24,14 @@ public class OwnerLogicController {
     private final AuthToken token;
     private final Owner profile;
 
-    private final OwnerDAO ownerDAO = new OwnerDAO(); // istanziato internamente
+    private final OwnerDAO ownerDAO = new OwnerDAO();
     private final PTDAO ptDAO;
     private final ReceptionistDAO receptionistDAO;
     private final ClientDAO clientDAO;
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
-    private final Map<Role, UserTypeHandler> userHandlers = new HashMap<>();
+    private final UserManagementController userManagementController;
 
     public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token,
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
@@ -49,34 +47,7 @@ public class OwnerLogicController {
         this.profile = ownerDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));
 
-        initializeHandlers();
-    }
-
-    private void initializeHandlers() {
-        // Gestore per i Personal Trainer
-        userHandlers.put(Role.PT, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(ptDAO.getAll(), Role.PT.getPlural()); }
-            @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
-            @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); }
-        });
-
-        // Gestore per gli Addetti Segreteria
-        userHandlers.put(Role.RECEPTIONIST, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
-            @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
-            @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); }
-        });
-
-        // Gestore per i Clienti
-        userHandlers.put(Role.CLIENT, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(clientDAO.getAll(), Role.CLIENT.getPlural()); }
-            @Override public void toggleStatus() {
-                int id = ui.askForIDUtente();
-                if (ui.askForNewStatus()) clientDAO.activate(id);
-                else clientDAO.deactivate(id);
-            }
-            @Override public void createNew() { ui.reportError("I Clienti possono essere inseriti solo dalla Segreteria."); }
-        });
+        this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, false);
     }
 
     public void execute() {
@@ -90,7 +61,7 @@ public class OwnerLogicController {
             switch (choice) {
                 case 1 -> manageMacchinari();
                 case 2 -> manageEsercizi();
-                case 3 -> manageUtenze();
+                case 3 -> userManagementController.manageUtenze();
                 case 0 -> logout = true;
                 default -> ui.reportError("Scelta non valida.");
             }
@@ -149,43 +120,6 @@ public class OwnerLogicController {
                     default -> ui.reportError("Scelta non valida.");
                 }
             } catch (DatabaseException e) {
-                ui.reportError(e.getMessage());
-            }
-        }
-    }
-
-    private void manageUtenze() {
-        boolean back = false;
-        while (!back) {
-            ui.showUtenzeMenu();
-            int choice = ui.askForChoice();
-            switch (choice) {
-                case 1 -> manageUtenzaSpecifica(Role.PT);
-                case 2 -> manageUtenzaSpecifica(Role.RECEPTIONIST);
-                case 3 -> manageUtenzaSpecifica(Role.CLIENT);
-                case 0 -> back = true;
-                default -> ui.reportError("Scelta non valida.");
-            }
-        }
-    }
-
-    private void manageUtenzaSpecifica(Role role) {
-        UserTypeHandler handler = userHandlers.get(role);
-        if (handler == null) return;
-
-        boolean back = false;
-        while (!back) {
-            ui.showUtenzaActionMenu(role);
-            int choice = ui.askForChoice();
-            try {
-                switch (choice) {
-                    case 1 -> handler.showList();
-                    case 2 -> handler.toggleStatus();
-                    case 3 -> handler.createNew();
-                    case 0 -> back = true;
-                    default -> ui.reportError("Scelta non valida.");
-                }
-            } catch (Exception e) {
                 ui.reportError(e.getMessage());
             }
         }

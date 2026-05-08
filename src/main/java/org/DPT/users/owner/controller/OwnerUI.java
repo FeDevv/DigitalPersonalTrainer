@@ -1,45 +1,33 @@
 package org.DPT.users.owner.controller;
 
-import org.DPT.shared.auth.Role;
 import org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO;
 import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
 import org.DPT.shared.catalog.macchinari.model.Machine;
-import org.DPT.users.common.dto.ClientCreationDTO;
-import org.DPT.users.common.dto.UserCreationDTO;
-import org.DPT.users.common.model.User;
+import org.DPT.users.common.controller.UserManagementUI;
 
 import java.util.List;
 
 /**
  * Contratto per l'interfaccia utente del modulo Proprietario.
+ * Estende UserManagementUI per la gestione delle anagrafiche.
  */
-public interface OwnerUI {
+public interface OwnerUI extends UserManagementUI {
     void showHeader(String ownerName);
     void showMainMenu();
     void showMacchinariMenu();
     void showEserciziMenu();
-    void showUtenzeMenu();
-    void showUtenzaActionMenu(Role tipo);
     
-    int askForChoice();
-    
-    // Metodi di Input aggregati tramite DTO
+    // Metodi di Input aggregati tramite DTO (specifici per Owner)
     MachineCreationDTO askForMachineData();
     ExerciseCreationDTO askForExerciseData(List<Machine> availableMachines);
-    UserCreationDTO askForStaffData();
 
-    // Toggle stato
+    // Toggle stato (specifici per catalogo)
     int askForIDMacchinarioDaToggle();
     int askForIDEsercizioDaToggle();
-    int askForIDUtente();
-    boolean askForNewStatus();
 
     void showMacchinari(List<Machine> lista);
     void showEsercizi(List<Exercise> lista);
-    void showUtenti(List<? extends User> lista, String titolo);
 
-    void reportError(String message);
-    void reportSuccess(String message);
     void reportGoodbye();
 }

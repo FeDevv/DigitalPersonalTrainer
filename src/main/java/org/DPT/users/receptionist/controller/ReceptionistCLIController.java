@@ -82,7 +82,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     public int askForClientId() { return readInt("ID del Cliente:"); }
 
     @Override
-    public void showUtenti(List<? extends User> lista, String titolo) { recView.displayUtenti(lista, titolo); }
+    public void showUtenti(List<? extends User> lista, String titolo) { recView.renderUserTable(lista, titolo); }
 
     @Override
     public void reportSuccess(String message) { recView.displaySuccess(message); }

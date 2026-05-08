@@ -36,22 +36,6 @@ public class ReceptionistCLIView extends BaseCLIView {
         displayLine("0. Torna indietro");
     }
 
-    public void displayUtenti(List<? extends User> lista, String titolo) {
-        displaySectionTitle("Elenco " + titolo);
-        
-        String[] headers = {"ID", "NOMINATIVO COMPLETO", "STATO"};
-        List<String[]> rows = new ArrayList<>();
-        for (User u : lista) {
-            rows.add(new String[]{
-                String.valueOf(u.getId()),
-                u.getFirstName() + " " + u.getLastName(),
-                u.isActive() ? "ATTIVO" : "DISATTIVO"
-            });
-        }
-        
-        renderTable(headers, rows, new int[]{5, 30, 10});
-    }
-
     public void displayGoodbye() {
         displayLine("\n Logout effettuato. Arrivederci!");
     }
