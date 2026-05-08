@@ -4,6 +4,7 @@ import org.DPT.boot.controller.BootLogicController;
 import org.DPT.boot.model.Configuration;
 import org.DPT.boot.model.UIMode;
 import org.DPT.connection.DBConnectionManager;
+import org.DPT.shared.auth.Role;
 import org.DPT.shared.catalog.esercizi.dao.ExerciseDAO;
 import org.DPT.shared.catalog.macchinari.dao.MachineDAO;
 import org.DPT.shared.workout.session.dao.WorkoutSessionDAO;
@@ -19,6 +20,8 @@ import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.controller.ReceptionistLogicController;
 import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -33,15 +36,50 @@ public class Orchestrator {
     // Registry dei DAO condivisi (Dependency Injection per risorse cross-modulo)
     private final PTDAO ptDAO = new PTDAO();
     private final ClientDAO clientDAO = new ClientDAO();
+    private final ReceptionistDAO receptionistDAO = new ReceptionistDAO();
     private final MachineDAO machineDAO = new MachineDAO();
     private final ExerciseDAO exerciseDAO = new ExerciseDAO();
     private final WorkoutSheetDAO workoutSheetDAO = new WorkoutSheetDAO();
     private final WorkoutSessionDAO workoutSessionDAO = new WorkoutSessionDAO();
     private final PerformedSetDAO performedSetDAO = new PerformedSetDAO();
 
+    /**
+     * Interfaccia funzionale per il lancio dei moduli utente.
+     * Permette di disaccoppiare l'Orchestrator dalle implementazioni dei Controller.
+     */
+    @FunctionalInterface
+    private interface ModuleLauncher {
+        void launch(Configuration config, AuthToken token);
+    }
+
+    private final Map<Role, ModuleLauncher> dispatchMap = new EnumMap<>(Role.class);
+
     public Orchestrator() {
         // Unico punto di apertura dello Scanner di sistema
         this.sharedScanner = new Scanner(System.in);
+        initializeDispatchMap();
+    }
+
+    /**
+     * Inizializza la mappa di dispatching associando ogni ruolo al suo launcher.
+     * Segue il principio Open/Closed: l'aggiunta di nuovi ruoli richiede solo una nuova riga qui.
+     */
+    private void initializeDispatchMap() {
+        dispatchMap.put(Role.OWNER, (config, token) ->
+                new OwnerLogicController(config, sharedScanner, token,
+                        ptDAO, receptionistDAO, clientDAO, machineDAO, exerciseDAO).execute());
+
+        dispatchMap.put(Role.PT, (config, token) ->
+                new PTLogicController(config, sharedScanner, token,
+                        clientDAO, workoutSheetDAO, machineDAO, exerciseDAO).execute());
+
+        dispatchMap.put(Role.RECEPTIONIST, (config, token) ->
+                new ReceptionistLogicController(config, sharedScanner, token,
+                        ptDAO, clientDAO).execute());
+
+        dispatchMap.put(Role.CLIENT, (config, token) ->
+                new ClientLogicController(config, sharedScanner, token,
+                        clientDAO, workoutSheetDAO, workoutSessionDAO, performedSetDAO).execute());
     }
 
     /**
@@ -79,29 +117,14 @@ public class Orchestrator {
     }
 
     /**
-     * Indirizza l'utente al modulo di riferimento iniettando le dipendenze necessarie.
+     * Indirizza l'utente al modulo di riferimento tramite la dispatchMap.
      */
     private void dispatch(Configuration config, AuthToken token) {
-        switch (token.role()) {
-            case OWNER -> {
-                // Il modulo ReceptionistDAO è istanziato internamente in OwnerLogicController se necessario,
-                // ma per coerenza con la DI ibrida passiamo i DAO condivisi definiti nell'Orchestrator.
-                new OwnerLogicController(config, sharedScanner, token, 
-                        ptDAO, new ReceptionistDAO(), clientDAO, machineDAO, exerciseDAO).execute();
-            }
-            case PT -> {
-                new PTLogicController(config, sharedScanner, token, 
-                        clientDAO, workoutSheetDAO, machineDAO, exerciseDAO).execute();
-            }
-            case RECEPTIONIST -> {
-                new ReceptionistLogicController(config, sharedScanner, token, 
-                        ptDAO, clientDAO).execute();
-            }
-            case CLIENT -> {
-                new ClientLogicController(config, sharedScanner, token, 
-                        clientDAO, workoutSheetDAO, workoutSessionDAO, performedSetDAO).execute();
-            }
-            default -> System.err.println("\n[ERRORE] Ruolo non riconosciuto. Impossibile avviare il modulo.");
+        ModuleLauncher launcher = dispatchMap.get(token.role());
+        if (launcher != null) {
+            launcher.launch(config, token);
+        } else {
+            System.err.println("\n[ERRORE] Ruolo non riconosciuto o non configurato.");
         }
     }
 

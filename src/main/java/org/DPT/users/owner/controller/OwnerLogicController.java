@@ -16,6 +16,8 @@ import org.DPT.users.owner.model.Owner;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class OwnerLogicController {
@@ -31,6 +33,17 @@ public class OwnerLogicController {
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
+    /**
+     * Strategia per la gestione di uno specifico tipo di utenza.
+     */
+    private interface UserTypeHandler {
+        void showList();
+        void toggleStatus();
+        void createNew();
+    }
+
+    private final Map<String, UserTypeHandler> userHandlers = new HashMap<>();
+
     public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token,
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
@@ -44,6 +57,35 @@ public class OwnerLogicController {
 
         this.profile = ownerDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));
+
+        initializeHandlers();
+    }
+
+    private void initializeHandlers() {
+        // Gestore per i Personal Trainer
+        userHandlers.put("PT", new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(ptDAO.getAll(), "PT"); }
+            @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
+            @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); }
+        });
+
+        // Gestore per gli Addetti Segreteria
+        userHandlers.put("ADDETTO SEGRETERIA", new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA"); }
+            @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
+            @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); }
+        });
+
+        // Gestore per i Clienti
+        userHandlers.put("CLIENTE", new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(clientDAO.getAll(), "CLIENTI"); }
+            @Override public void toggleStatus() {
+                int id = ui.askForIDUtente();
+                if (ui.askForNewStatus()) clientDAO.activate(id);
+                else clientDAO.deactivate(id);
+            }
+            @Override public void createNew() { ui.reportError("I Clienti possono essere inseriti solo dalla Segreteria."); }
+        });
     }
 
     public void execute() {
@@ -137,38 +179,18 @@ public class OwnerLogicController {
     }
 
     private void manageUtenzaSpecifica(String tipo) {
+        UserTypeHandler handler = userHandlers.get(tipo);
+        if (handler == null) return;
+
         boolean back = false;
         while (!back) {
             ui.showUtenzaActionMenu(tipo);
             int choice = ui.askForChoice();
             try {
                 switch (choice) {
-                    case 1 -> {
-                        if (tipo.equals("PT")) ui.showUtenti(ptDAO.getAll(), "PT");
-                        else if (tipo.equals("ADDETTO SEGRETERIA")) ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA");
-                        else ui.showUtenti(clientDAO.getAll(), "CLIENTI");
-                    }
-                    case 2 -> {
-                        int id = ui.askForIDUtente();
-                        boolean status = ui.askForNewStatus();
-                        if (tipo.equals("PT")) ptDAO.updateStatus(id, status);
-                        else if (tipo.equals("ADDETTO SEGRETERIA")) receptionistDAO.updateStatus(id, status);
-                        else {
-                            if (status) clientDAO.activate(id);
-                            else clientDAO.deactivate(id);
-                        }
-                        ui.reportSuccess("Stato aggiornato.");
-                    }
-                    case 3 -> {
-                        if (tipo.equals("CLIENTE")) {
-                            ui.reportError("Scelta non valida.");
-                        } else {
-                            UserCreationDTO data = ui.askForStaffData();
-                            if (tipo.equals("PT")) ptDAO.insert(data);
-                            else receptionistDAO.insert(data);
-                            ui.reportSuccess(tipo + " inserito.");
-                        }
-                    }
+                    case 1 -> handler.showList();
+                    case 2 -> handler.toggleStatus();
+                    case 3 -> handler.createNew();
                     case 0 -> back = true;
                     default -> ui.reportError("Scelta non valida.");
                 }

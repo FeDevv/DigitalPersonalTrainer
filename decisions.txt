@@ -83,3 +83,18 @@ In questo file sono documentate le scelte architetturali non banali che richiedo
 *   **Evoluzione Indipendente**: Se in futuro la vista dovesse includere nuovi dati (es. immagini o video tutorial), basterà aggiornare il Read-Model senza impattare sulla logica di creazione delle schede.
 
 ---
+
+## 6. Dispatching dei Ruoli tramite Strategy Pattern (OCP Compliance)
+
+**Data della decisione**: 08/05/2026
+
+**Contesto**: L'Orchestrator centrale utilizzava un blocco `switch` per indirizzare l'utente autenticato al modulo corretto. Questo approccio violava l'Open/Closed Principle, richiedendo modifiche al codice core per ogni nuovo ruolo aggiunto.
+
+**Decisione**: Si è sostituito lo `switch` con una `EnumMap<Role, ModuleLauncher>`, dove `ModuleLauncher` è un'interfaccia funzionale che incapsula l'istanziazione e l'avvio dei LogicController.
+
+**Razionale Tecnico**:
+*   **Open/Closed Principle (OCP)**: L'Orchestrator è ora "chiuso" alle modifiche (il metodo `dispatch` rimane invariato) e "aperto" alle estensioni (basta aggiungere una entry nella mappa di inizializzazione).
+*   **Decoupling**: L'Orchestrator non ha più una dipendenza diretta e rigida dai controller nel flusso di esecuzione, ma delega a una registry pre-configurata.
+*   **Clean Code**: Riduce la complessità ciclomomatica del metodo di dispatching e migliora la leggibilità complessiva del ciclo di vita globale.
+
+---
