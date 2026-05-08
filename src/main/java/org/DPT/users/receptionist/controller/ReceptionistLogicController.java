@@ -5,6 +5,7 @@ import org.DPT.exception.DatabaseException;
 import org.DPT.users.client.dao.ClientDAO;
 import org.DPT.users.common.dto.ClientCreationDTO;
 import org.DPT.users.common.dto.UserCreationDTO;
+import org.DPT.users.common.utils.UserTypeHandlerI;
 import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.dao.AssignmentDAO;
@@ -34,16 +35,7 @@ public class ReceptionistLogicController {
     private final PTDAO ptDAO;
     private final ClientDAO clientDAO;
 
-    /**
-     * Strategia per la gestione di uno specifico tipo di utenza.
-     */
-    private interface UserTypeHandler {
-        void showList();
-        void toggleStatus();
-        void createNew();
-    }
-
-    private final Map<String, UserTypeHandler> userHandlers = new HashMap<>();
+    private final Map<String, UserTypeHandlerI> userHandlers = new HashMap<>();
 
     public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token,
                                        PTDAO ptDAO, ClientDAO clientDAO) {
@@ -60,21 +52,21 @@ public class ReceptionistLogicController {
 
     private void initializeHandlers() {
         // Gestore per i Personal Trainer
-        userHandlers.put("PT", new UserTypeHandler() {
+        userHandlers.put("PT", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(ptDAO.getAll(), "PT"); }
             @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per gli Addetti Segreteria
-        userHandlers.put("ADDETTO", new UserTypeHandler() {
+        userHandlers.put("ADDETTO", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA"); }
             @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per i Clienti
-        userHandlers.put("CLIENTE", new UserTypeHandler() {
+        userHandlers.put("CLIENTE", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(clientDAO.getAll(), "CLIENTI"); }
             @Override public void toggleStatus() {
                 int id = ui.askForIDUtente();
@@ -119,7 +111,7 @@ public class ReceptionistLogicController {
     }
 
     private void manageUtenzaSpecifica(String tipo) {
-        UserTypeHandler handler = userHandlers.get(tipo);
+        UserTypeHandlerI handler = userHandlers.get(tipo);
         if (handler == null) return;
 
         boolean back = false;

@@ -9,6 +9,7 @@ import org.DPT.shared.catalog.macchinari.dao.MachineDAO;
 import org.DPT.users.client.dao.ClientDAO;
 import org.DPT.users.common.dto.ClientCreationDTO;
 import org.DPT.users.common.dto.UserCreationDTO;
+import org.DPT.users.common.utils.UserTypeHandlerI;
 import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.owner.dao.OwnerDAO;
 import org.DPT.users.owner.factory.OwnerUIFactory;
@@ -33,16 +34,7 @@ public class OwnerLogicController {
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
-    /**
-     * Strategia per la gestione di uno specifico tipo di utenza.
-     */
-    private interface UserTypeHandler {
-        void showList();
-        void toggleStatus();
-        void createNew();
-    }
-
-    private final Map<String, UserTypeHandler> userHandlers = new HashMap<>();
+    private final Map<String, UserTypeHandlerI> userHandlers = new HashMap<>();
 
     public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token,
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
@@ -63,21 +55,21 @@ public class OwnerLogicController {
 
     private void initializeHandlers() {
         // Gestore per i Personal Trainer
-        userHandlers.put("PT", new UserTypeHandler() {
+        userHandlers.put("PT", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(ptDAO.getAll(), "PT"); }
             @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per gli Addetti Segreteria
-        userHandlers.put("ADDETTO SEGRETERIA", new UserTypeHandler() {
+        userHandlers.put("ADDETTO SEGRETERIA", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA"); }
             @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per i Clienti
-        userHandlers.put("CLIENTE", new UserTypeHandler() {
+        userHandlers.put("CLIENTE", new UserTypeHandlerI() {
             @Override public void showList() { ui.showUtenti(clientDAO.getAll(), "CLIENTI"); }
             @Override public void toggleStatus() {
                 int id = ui.askForIDUtente();
@@ -179,7 +171,7 @@ public class OwnerLogicController {
     }
 
     private void manageUtenzaSpecifica(String tipo) {
-        UserTypeHandler handler = userHandlers.get(tipo);
+        UserTypeHandlerI handler = userHandlers.get(tipo);
         if (handler == null) return;
 
         boolean back = false;
