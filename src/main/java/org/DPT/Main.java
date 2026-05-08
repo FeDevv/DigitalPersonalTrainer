@@ -15,3 +15,5 @@ public class Main {
 // clientLogicController linea 148 - spiegazione
 
 // Orchestrator spiegazione del funzionamento | FunctionalInterface?
+
+// check CODICE IN INGLESE, OUTPUT IN ITALIANO -> in checked.txt le parti da rivedere

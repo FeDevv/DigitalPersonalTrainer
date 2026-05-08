@@ -2,10 +2,9 @@ package org.DPT.users.receptionist.controller;
 
 import org.DPT.boot.model.Configuration;
 import org.DPT.exception.DatabaseException;
+import org.DPT.shared.auth.Role;
 import org.DPT.users.client.dao.ClientDAO;
-import org.DPT.users.common.dto.ClientCreationDTO;
-import org.DPT.users.common.dto.UserCreationDTO;
-import org.DPT.users.common.utils.UserTypeHandlerI;
+import org.DPT.users.common.utils.UserTypeHandler;
 import org.DPT.users.login.model.AuthToken;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.dao.AssignmentDAO;
@@ -35,7 +34,7 @@ public class ReceptionistLogicController {
     private final PTDAO ptDAO;
     private final ClientDAO clientDAO;
 
-    private final Map<String, UserTypeHandlerI> userHandlers = new HashMap<>();
+    private final Map<Role, UserTypeHandler> userHandlers = new HashMap<>();
 
     public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token,
                                        PTDAO ptDAO, ClientDAO clientDAO) {
@@ -52,22 +51,22 @@ public class ReceptionistLogicController {
 
     private void initializeHandlers() {
         // Gestore per i Personal Trainer
-        userHandlers.put("PT", new UserTypeHandlerI() {
-            @Override public void showList() { ui.showUtenti(ptDAO.getAll(), "PT"); }
+        userHandlers.put(Role.PT, new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(ptDAO.getAll(), Role.PT.getPlural()); }
             @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per gli Addetti Segreteria
-        userHandlers.put("ADDETTO", new UserTypeHandlerI() {
-            @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), "ADDETTI SEGRETERIA"); }
+        userHandlers.put(Role.RECEPTIONIST, new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
             @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); }
         });
 
         // Gestore per i Clienti
-        userHandlers.put("CLIENTE", new UserTypeHandlerI() {
-            @Override public void showList() { ui.showUtenti(clientDAO.getAll(), "CLIENTI"); }
+        userHandlers.put(Role.CLIENT, new UserTypeHandler() {
+            @Override public void showList() { ui.showUtenti(clientDAO.getAll(), Role.CLIENT.getPlural()); }
             @Override public void toggleStatus() {
                 int id = ui.askForIDUtente();
                 if (ui.askForNewStatus()) clientDAO.activate(id);
@@ -101,22 +100,22 @@ public class ReceptionistLogicController {
             ui.showUtenzeMenu();
             int choice = ui.askForChoice();
             switch (choice) {
-                case 1 -> manageUtenzaSpecifica("PT");
-                case 2 -> manageUtenzaSpecifica("ADDETTO");
-                case 3 -> manageUtenzaSpecifica("CLIENTE");
+                case 1 -> manageUtenzaSpecifica(Role.PT);
+                case 2 -> manageUtenzaSpecifica(Role.RECEPTIONIST);
+                case 3 -> manageUtenzaSpecifica(Role.CLIENT);
                 case 0 -> back = true;
                 default -> ui.reportError("Scelta non valida.");
             }
         }
     }
 
-    private void manageUtenzaSpecifica(String tipo) {
-        UserTypeHandlerI handler = userHandlers.get(tipo);
+    private void manageUtenzaSpecifica(Role role) {
+        UserTypeHandler handler = userHandlers.get(role);
         if (handler == null) return;
 
         boolean back = false;
         while (!back) {
-            ui.showUtenzaActionMenu(tipo);
+            ui.showUtenzaActionMenu(role);
             int choice = ui.askForChoice();
             try {
                 switch (choice) {

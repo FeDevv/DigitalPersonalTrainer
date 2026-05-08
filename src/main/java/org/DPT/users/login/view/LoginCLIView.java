@@ -29,7 +29,7 @@ public class LoginCLIView extends BaseCLIView {
             if (role != Role.LOGIN) {
                 rows.add(new String[]{
                     String.valueOf(role.getId()),
-                    role.getTranslation()
+                    role.getSingular()
                 });
             }
         }

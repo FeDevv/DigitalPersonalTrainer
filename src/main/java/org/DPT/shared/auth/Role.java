@@ -6,26 +6,32 @@ package org.DPT.shared.auth;
  * e le configurazioni nel file db.properties.
  */
 public enum Role {
-    LOGIN(0, "Autenticazione di Sistema"),
-    OWNER(1, "PROPRIETARIO"),
-    PT(2, "PERSONAL TRAINER"),
-    RECEPTIONIST(3, "SEGRETERIA"),
-    CLIENT(4, "CLIENTE");
+    LOGIN(0, "LOGIN", "LOGIN"),
+    OWNER(1, "PROPRIETARIO", "PROPRIETARI"),
+    PT(2, "PERSONAL TRAINER", "PERSONAL TRAINER"),
+    RECEPTIONIST(3, "ADDETTO SEGRETERIA", "ADDETTI SEGRETERIA"),
+    CLIENT(4, "CLIENTE", "CLIENTI");
 
     private final int id;
-    private final String translation;
+    private final String singular;
+    private final String plural;
 
-    Role(int id, String translation) {
+    Role(int id, String singular, String plural) {
         this.id = id;
-        this.translation = translation;
+        this.singular = singular;
+        this.plural = plural;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getSingular() {
+        return singular;
+    }
+
+    public String getPlural() {
+        return plural;
     }
 
     /**

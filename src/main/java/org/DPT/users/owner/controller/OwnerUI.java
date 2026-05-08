@@ -1,5 +1,6 @@
 package org.DPT.users.owner.controller;
 
+import org.DPT.shared.auth.Role;
 import org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO;
 import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
@@ -19,7 +20,7 @@ public interface OwnerUI {
     void showMacchinariMenu();
     void showEserciziMenu();
     void showUtenzeMenu();
-    void showUtenzaActionMenu(String tipo);
+    void showUtenzaActionMenu(Role tipo);
     
     int askForChoice();
     

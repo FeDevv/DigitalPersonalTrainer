@@ -1,5 +1,6 @@
 package org.DPT.users.owner.controller;
 
+import org.DPT.shared.auth.Role;
 import org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO;
 import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
@@ -41,7 +42,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     public void showUtenzeMenu() { ownerView.displayUtenzeMenu(); }
 
     @Override
-    public void showUtenzaActionMenu(String tipo) { ownerView.displayUtenzaActionMenu(tipo); }
+    public void showUtenzaActionMenu(Role role) { ownerView.displayUtenzaActionMenu(role); }
 
     @Override
     public int askForChoice() { return readInt(""); }

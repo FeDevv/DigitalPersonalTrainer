@@ -5,7 +5,7 @@ package org.DPT.users.common.utils;
  * Definisce le operazioni standard di visualizzazione, modifica stato e creazione
  * che ogni modulo di gestione utenze deve implementare.
  */
-public interface UserTypeHandlerI {
+public interface UserTypeHandler {
     void showList();
     void toggleStatus();
     void createNew();

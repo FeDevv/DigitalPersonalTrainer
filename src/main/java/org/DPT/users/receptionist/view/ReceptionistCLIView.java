@@ -1,5 +1,6 @@
 package org.DPT.users.receptionist.view;
 
+import org.DPT.shared.auth.Role;
 import org.DPT.shared.ui.BaseCLIView;
 import org.DPT.users.common.model.User;
 
@@ -27,11 +28,11 @@ public class ReceptionistCLIView extends BaseCLIView {
         displayLine("0. Torna indietro");
     }
 
-    public void displayUtenzaActionMenu(String tipo) {
-        displaySectionTitle("Azioni " + tipo);
-        displayLine("1. Visualizza lista " + tipo);
-        displayLine("2. Attiva/Disattiva " + tipo);
-        displayLine("3. Inserisci nuovo " + tipo);
+    public void displayUtenzaActionMenu(Role role) {
+        displaySectionTitle("Azioni " + role);
+        displayLine("1. Visualizza lista " + role.getPlural());
+        displayLine("2. Attiva/Disattiva " + role.getSingular());
+        displayLine("3. Inserisci nuovo " + role.getSingular());
         displayLine("0. Torna indietro");
     }
 

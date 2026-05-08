@@ -1,5 +1,6 @@
 package org.DPT.users.receptionist.controller;
 
+import org.DPT.shared.auth.Role;
 import org.DPT.shared.ui.BaseCLIController;
 import org.DPT.shared.utils.ValidationUtils;
 import org.DPT.users.common.dto.ClientCreationDTO;
@@ -31,7 +32,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     public void showUtenzeMenu() { recView.displayUtenzeMenu(); }
 
     @Override
-    public void showUtenzaActionMenu(String tipo) { recView.displayUtenzaActionMenu(tipo); }
+    public void showUtenzaActionMenu(Role role) { recView.displayUtenzaActionMenu(role); }
 
     @Override
     public int askForChoice() { return readInt(""); }

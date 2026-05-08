@@ -1,5 +1,6 @@
 package org.DPT.users.receptionist.controller;
 
+import org.DPT.shared.auth.Role;
 import org.DPT.users.common.dto.ClientCreationDTO;
 import org.DPT.users.common.dto.UserCreationDTO;
 import org.DPT.users.common.model.User;
@@ -13,7 +14,7 @@ public interface ReceptionistUI {
     void showHeader(String name);
     void showMainMenu();
     void showUtenzeMenu();
-    void showUtenzaActionMenu(String tipo);
+    void showUtenzaActionMenu(Role tipo);
     
     int askForChoice();
     
