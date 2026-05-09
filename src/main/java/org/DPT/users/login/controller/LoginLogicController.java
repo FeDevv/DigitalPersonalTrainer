@@ -11,6 +11,7 @@ import org.DPT.users.login.model.UserCredentials;
 import org.DPT.users.login.dao.LoginDAO;
 import org.DPT.connection.DBConnectionManager;
 
+import java.sql.Connection;
 import java.util.Scanner;
 
 /**
@@ -22,8 +23,8 @@ public class LoginLogicController {
     private final LoginDAO loginDAO;
     private final LoginUI ui;
 
-    public LoginLogicController(Configuration config, Scanner sharedScanner) {
-        this.loginDAO = new LoginDAO();
+    public LoginLogicController(Configuration config, Scanner sharedScanner, Connection conn) {
+        this.loginDAO = new LoginDAO(conn);
         // L'interfaccia viene istanziata tramite la factory locale
         this.ui = LoginUIFactory.getUI(config.uiMode(), sharedScanner);
     }

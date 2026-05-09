@@ -13,6 +13,7 @@ import org.DPT.users.client.factory.ClientUIFactory;
 import org.DPT.users.client.model.Client;
 import org.DPT.users.login.model.AuthToken;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,7 +32,7 @@ public class ClientLogicController {
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
 
-    public ClientLogicController(Configuration config, Scanner scanner, AuthToken token,
+    public ClientLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
         this.ui = ClientUIFactory.getUI(config.uiMode(), scanner);

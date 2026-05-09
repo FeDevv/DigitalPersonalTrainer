@@ -1,8 +1,9 @@
 package org.DPT.shared.catalog.macchinari.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.exception.EntityNotFoundException;
 import org.DPT.shared.catalog.macchinari.model.Machine;
+import org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,12 +14,20 @@ import java.util.Optional;
  * Data Access Object per la gestione dei macchinari.
  */
 public class MachineDAO {
+    private final Connection connection;
+
+    private static final String FIND_BY_ID = "SELECT * FROM MACCHINARIO WHERE ID_Macchinario = ?";
+    private static final String SELECT_ALL = "SELECT * FROM MACCHINARIO ORDER BY ID_Macchinario";
+    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario";
+    private static final String INSERT_MACHINE = "INSERT INTO MACCHINARIO (ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo) VALUES (?, ?, ?, 1)";
+    private static final String UPDATE_STATUS = "UPDATE MACCHINARIO SET Macchinario_Attivo = ? WHERE ID_Macchinario = ?";
+
+    public MachineDAO(Connection connection) {
+        this.connection = connection;
+    }
 
     public Optional<Machine> findById(int id) {
-        String sql = "SELECT * FROM MACCHINARIO WHERE ID_Macchinario = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -32,18 +41,16 @@ public class MachineDAO {
     }
 
     public List<Machine> getAll() {
-        return findByQuery("SELECT * FROM MACCHINARIO ORDER BY ID_Macchinario", (Object[]) null);
+        return findByQuery(SELECT_ALL, null);
     }
 
     public List<Machine> findAll(boolean active) {
-        return findByQuery("SELECT * FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario", active);
+        return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
 
-    private List<Machine> findByQuery(String sql, Object... params) {
+    private List<Machine> findByQuery(String sql, Object[] params) {
         List<Machine> list = new ArrayList<>();
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     pstmt.setObject(i + 1, params[i]);
@@ -60,11 +67,8 @@ public class MachineDAO {
         return list;
     }
 
-    public Machine insert(org.DPT.shared.catalog.macchinari.dto.MachineCreationDTO data, int ownerId) {
-        String sql = "INSERT INTO MACCHINARIO (ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo) VALUES (?, ?, ?, 1)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public Machine insert(MachineCreationDTO data, int ownerId) {
+        try (PreparedStatement pstmt = connection.prepareStatement(INSERT_MACHINE, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, ownerId);
             pstmt.setString(2, data.name());
             pstmt.setString(3, data.description());
@@ -90,14 +94,12 @@ public class MachineDAO {
     }
 
     public void updateStatus(int id, boolean active) {
-        String sql = "UPDATE MACCHINARIO SET Macchinario_Attivo = ? WHERE ID_Macchinario = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new DatabaseException("Impossibile aggiornare lo stato: Macchinario con ID " + id + " non trovato.");
+                throw new EntityNotFoundException("Macchinario con ID " + id + " non trovato.");
             }
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiornamento dello stato del macchinario: " + id, e);

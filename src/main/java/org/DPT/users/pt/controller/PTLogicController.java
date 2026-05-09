@@ -15,6 +15,7 @@ import org.DPT.users.pt.factory.PTUIFactory;
 import org.DPT.users.pt.model.PT;
 import org.DPT.users.pt.model.PerformanceDTO;
 
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -25,13 +26,13 @@ public class PTLogicController {
     private final AuthToken token;
     private final PT profile;
 
-    private final PTDAO ptDAO = new PTDAO();
+    private final PTDAO ptDAO;
     private final ClientDAO clientDAO;
     private final WorkoutSheetDAO sheetDAO;
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
-    public PTLogicController(Configuration config, Scanner scanner, AuthToken token,
+    public PTLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                              ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                              MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
         this.ui = PTUIFactory.getUI(config.uiMode(), scanner);
@@ -40,6 +41,8 @@ public class PTLogicController {
         this.sheetDAO = sheetDAO;
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
+
+        this.ptDAO = new PTDAO(conn);
 
         this.profile = ptDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo PT non trovato."));

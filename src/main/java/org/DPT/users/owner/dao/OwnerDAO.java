@@ -1,6 +1,5 @@
 package org.DPT.users.owner.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
 import org.DPT.users.owner.model.Owner;
 
@@ -12,15 +11,18 @@ import java.util.Optional;
 
 /**
  * Data Access Object specifico per il Proprietario.
- * Gestisce solo le operazioni legate al profilo del Proprietario.
  */
 public class OwnerDAO {
+    private final Connection connection;
+
+    private static final String FIND_BY_ID = "SELECT ID_Proprietario, Nome, Cognome, Email FROM PROPRIETARIO WHERE ID_Proprietario = ?";
+
+    public OwnerDAO(Connection connection) {
+        this.connection = connection;
+    }
 
     public Optional<Owner> findById(int id) {
-        String sql = "SELECT ID_Proprietario, Nome, Cognome, Email FROM PROPRIETARIO WHERE ID_Proprietario = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {

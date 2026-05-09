@@ -20,33 +20,18 @@ import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.controller.ReceptionistLogicController;
 import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
+import java.sql.Connection;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Scanner;
 
 /**
  * Orchestrator centrale dell'applicazione Digital Personal Trainer.
- * Gestisce il ciclo di vita globale, l'iniezione delle dipendenze (DAO condivisi)
- * e il routing dell'utente verso il modulo corretto in base al ruolo.
  */
 public class Orchestrator {
 
     private final Scanner sharedScanner;
 
-    // Registry dei DAO condivisi (Dependency Injection per risorse cross-modulo)
-    private final PTDAO ptDAO = new PTDAO();
-    private final ClientDAO clientDAO = new ClientDAO();
-    private final ReceptionistDAO receptionistDAO = new ReceptionistDAO();
-    private final MachineDAO machineDAO = new MachineDAO();
-    private final ExerciseDAO exerciseDAO = new ExerciseDAO();
-    private final WorkoutSheetDAO workoutSheetDAO = new WorkoutSheetDAO();
-    private final WorkoutSessionDAO workoutSessionDAO = new WorkoutSessionDAO();
-    private final PerformedSetDAO performedSetDAO = new PerformedSetDAO();
-
-    /**
-     * Interfaccia funzionale per il lancio dei moduli utente.
-     * Permette di disaccoppiare l'Orchestrator dalle implementazioni dei Controller.
-     */
     @FunctionalInterface
     private interface ModuleLauncher {
         void launch(Configuration config, AuthToken token);
@@ -55,88 +40,84 @@ public class Orchestrator {
     private final Map<Role, ModuleLauncher> dispatchMap = new EnumMap<>(Role.class);
 
     public Orchestrator() {
-        // Unico punto di apertura dello Scanner di sistema
         this.sharedScanner = new Scanner(System.in);
-        initializeDispatchMap();
     }
 
-    /**
-     * Inizializza la mappa di dispatching associando ogni ruolo al suo launcher.
-     * Segue il principio Open/Closed: l'aggiunta di nuovi ruoli richiede solo una nuova riga qui.
-     */
-    private void initializeDispatchMap() {
-        dispatchMap.put(Role.OWNER, (config, token) ->
-                new OwnerLogicController(config, sharedScanner, token,
-                        ptDAO, receptionistDAO, clientDAO, machineDAO, exerciseDAO).execute());
+    private void initializeDispatchMap(Connection conn) {
+        dispatchMap.put(Role.OWNER, (config, token) -> {
+            PTDAO ptDAO = new PTDAO(conn);
+            ReceptionistDAO receptionistDAO = new ReceptionistDAO(conn);
+            ClientDAO clientDAO = new ClientDAO(conn);
+            MachineDAO machineDAO = new MachineDAO(conn);
+            ExerciseDAO exerciseDAO = new ExerciseDAO(conn);
+            new OwnerLogicController(config, sharedScanner, token, conn,
+                    ptDAO, receptionistDAO, clientDAO, machineDAO, exerciseDAO).execute();
+        });
 
-        dispatchMap.put(Role.PT, (config, token) ->
-                new PTLogicController(config, sharedScanner, token,
-                        clientDAO, workoutSheetDAO, machineDAO, exerciseDAO).execute());
+        dispatchMap.put(Role.PT, (config, token) -> {
+            ClientDAO clientDAO = new ClientDAO(conn);
+            WorkoutSheetDAO sheetDAO = new WorkoutSheetDAO(conn);
+            MachineDAO machineDAO = new MachineDAO(conn);
+            ExerciseDAO exerciseDAO = new ExerciseDAO(conn);
+            new PTLogicController(config, sharedScanner, token, conn,
+                    clientDAO, sheetDAO, machineDAO, exerciseDAO).execute();
+        });
 
-        dispatchMap.put(Role.RECEPTIONIST, (config, token) ->
-                new ReceptionistLogicController(config, sharedScanner, token,
-                        ptDAO, clientDAO).execute());
+        dispatchMap.put(Role.RECEPTIONIST, (config, token) -> {
+            PTDAO ptDAO = new PTDAO(conn);
+            ClientDAO clientDAO = new ClientDAO(conn);
+            new ReceptionistLogicController(config, sharedScanner, token, conn,
+                    ptDAO, clientDAO).execute();
+        });
 
-        dispatchMap.put(Role.CLIENT, (config, token) ->
-                new ClientLogicController(config, sharedScanner, token,
-                        clientDAO, workoutSheetDAO, workoutSessionDAO, performedSetDAO).execute());
+        dispatchMap.put(Role.CLIENT, (config, token) -> {
+            ClientDAO clientDAO = new ClientDAO(conn);
+            WorkoutSheetDAO sheetDAO = new WorkoutSheetDAO(conn);
+            WorkoutSessionDAO sessionDAO = new WorkoutSessionDAO(conn);
+            PerformedSetDAO setDAO = new PerformedSetDAO(conn);
+            new ClientLogicController(config, sharedScanner, token, conn,
+                    clientDAO, sheetDAO, sessionDAO, setDAO).execute();
+        });
     }
 
-    /**
-     * Avvia il flusso principale dell'applicazione.
-     */
     public void run(String[] args) {
         try {
-            // FASE 1: BOOTSTRAP (Configurazione UI e parametri avvio)
             BootLogicController bootController = new BootLogicController(sharedScanner);
             Configuration config = bootController.execute(args);
 
             if (config.uiMode() == UIMode.GUI) {
-                System.out.println("\n[AVVISO] Interfaccia Grafica non ancora implementata. Riavviare in modalità CLI.");
+                System.out.println("\n[AVVISO] Interfaccia Grafica non ancora implementata.");
                 return;
             }
 
-            // FASE 2: AUTHENTICATION (Handshake iniziale)
-            LoginLogicController loginController = new LoginLogicController(config, sharedScanner);
+            Connection loginConn = DBConnectionManager.getInstance().connectAs(Role.LOGIN);
+            LoginLogicController loginController = new LoginLogicController(config, sharedScanner, loginConn);
             AuthToken sessionToken = loginController.execute();
 
-            // Se l'utente ha annullato il login
-            if (sessionToken == null) {
-                return;
-            }
+            if (sessionToken == null) return;
 
-            // FASE 3: DISPATCHING (Routing basato sul Ruolo RBAC)
+            initializeDispatchMap(DBConnectionManager.getInstance().getConnection());
             dispatch(config, sessionToken);
 
         } catch (Exception e) {
             System.err.println("\n[ERRORE DI SISTEMA] " + e.getMessage());
         } finally {
-            // FASE 4: TEARDOWN (Chiusura sicura risorse)
             shutDown();
         }
     }
 
-    /**
-     * Indirizza l'utente al modulo di riferimento tramite la dispatchMap.
-     */
     private void dispatch(Configuration config, AuthToken token) {
         ModuleLauncher launcher = dispatchMap.get(token.role());
         if (launcher != null) {
             launcher.launch(config, token);
         } else {
-            System.err.println("\n[ERRORE] Ruolo non riconosciuto o non configurato.");
+            System.err.println("\n[ERRORE] Ruolo non riconosciuto.");
         }
     }
 
-    /**
-     * Libera le risorse e chiude la connessione al database.
-     */
     private void shutDown() {
         System.out.println("\nChiusura applicazione...");
         DBConnectionManager.getInstance().closeConnection();
-        if (sharedScanner != null) {
-            sharedScanner.close();
-        }
-        System.out.println("Risorse liberate. Arrivederci.");
+        if (sharedScanner != null) sharedScanner.close();
     }
 }

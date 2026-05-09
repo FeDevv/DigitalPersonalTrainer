@@ -1,22 +1,38 @@
 package org.DPT.users.client.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.exception.EntityNotFoundException;
 import org.DPT.users.client.model.Client;
 import org.DPT.users.common.dto.ClientCreationDTO;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientDAO {
-    public Optional<Client> findById(int id) {
-        String sql = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE ID_Cliente = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
+    private final Connection connection;
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    private static final String FIND_BY_ID = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE ID_Cliente = ?";
+    private static final String SELECT_ALL = "SELECT * FROM CLIENTE ORDER BY ID_Cliente";
+    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente";
+    private static final String FIND_ASSIGNED_TO_PT = """
+                SELECT c.* 
+                FROM CLIENTE c 
+                JOIN ASSEGNA a ON c.ID_Cliente = a.ID_Cliente 
+                WHERE a.ID_PT = ? AND a.Assegnazione_Attiva = 1 AND c.Cliente_Attivo = 1
+                ORDER BY c.ID_Cliente
+                """;
+    private static final String DEACTIVATE_CLIENT = "{CALL sp_disattiva_cliente(?)}";
+    private static final String INSERT_CLIENT = "INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String UPDATE_STATUS = "UPDATE CLIENTE SET Cliente_Attivo = ? WHERE ID_Cliente = ?";
+
+    public ClientDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    public Optional<Client> findById(int id) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -30,30 +46,20 @@ public class ClientDAO {
     }
 
     public List<Client> getAll() {
-        return findByQuery("SELECT * FROM CLIENTE ORDER BY ID_Cliente", (Object[]) null);
+        return findByQuery(SELECT_ALL, null);
     }
 
-    // metodo tenuto per futura espansione
     public List<Client> findAll(boolean active) {
-        return findByQuery("SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente", active);
+        return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
 
     public List<Client> findAssignedToPT(int ptId) {
-        String sql = """
-                SELECT c.* 
-                FROM CLIENTE c 
-                JOIN ASSEGNA a ON c.ID_Cliente = a.ID_Cliente 
-                WHERE a.ID_PT = ? AND a.Assegnazione_Attiva = 1 AND c.Cliente_Attivo = 1
-                ORDER BY c.ID_Cliente
-                """;
-        return findByQuery(sql, ptId);
+        return findByQuery(FIND_ASSIGNED_TO_PT, new Object[]{ptId});
     }
 
-    private List<Client> findByQuery(String sql, Object... params) {
+    private List<Client> findByQuery(String sql, Object[] params) {
         List<Client> list = new ArrayList<>();
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     pstmt.setObject(i + 1, params[i]);
@@ -83,14 +89,8 @@ public class ClientDAO {
         );
     }
 
-    /**
-     * Disattiva un cliente e la scheda ad esso legata in maniera atomica usando una stored procedure.
-     */
     public void deactivate(int clientId) {
-        String sql = "{CALL sp_disattiva_cliente(?)}";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (CallableStatement cstmt = connection.prepareCall(DEACTIVATE_CLIENT)) {
             cstmt.setInt(1, clientId);
             cstmt.execute();
         } catch (SQLException e) {
@@ -98,17 +98,12 @@ public class ClientDAO {
         }
     }
 
-    /**
-     * Attiva un cliente. Non usando una sp, la precedente scheda assegnata andrà ri-creata.
-     */
     public void activate(int id) {
         updateActiveStatus(id, true);
     }
 
     public void insert(ClientCreationDTO data) {
-        String sql = "INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(INSERT_CLIENT)) {
             pstmt.setString(1, data.userBase().firstName());
             pstmt.setString(2, data.userBase().lastName());
             pstmt.setString(3, data.userBase().email());
@@ -123,15 +118,12 @@ public class ClientDAO {
     }
 
     public void updateActiveStatus(int clientId, boolean active) {
-        String sql = "UPDATE CLIENTE SET Cliente_Attivo = ? WHERE ID_Cliente = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, clientId);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new DatabaseException("Impossibile aggiornare lo stato: Cliente con ID " + clientId + " non trovato.");
+                throw new EntityNotFoundException("Cliente con ID " + clientId + " non trovato.");
             }
         } catch (SQLException e) {
             throw new DatabaseException("Errore di aggiornamento dello stato del cliente", e);

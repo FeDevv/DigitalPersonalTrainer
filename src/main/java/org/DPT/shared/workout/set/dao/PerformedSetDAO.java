@@ -1,6 +1,5 @@
 package org.DPT.shared.workout.set.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
 import org.DPT.shared.workout.set.model.PerformedSet;
 
@@ -12,21 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO per la serie eseguito.
- * La serie eseguita serve alla gestione del progressio di una sessione.
+ * DAO per la serie eseguita.
  */
 public class PerformedSetDAO {
+    private final Connection connection;
 
-    // anche se non usato, questo metodo è stato lasciato per facilitare una eventuale espansione del progetto
-    /**
-     * recupera tutte le serie per una sessione.
-     */
+    private static final String FIND_ALL_BY_SESSION_ID = "SELECT * FROM SERIE_ESEGUITA WHERE ID_Sessione = ? ORDER BY Codice_Esercizio, Numero_Serie";
+    private static final String UPDATE_PERFORMANCE = "UPDATE SERIE_ESEGUITA SET Carico_Effettivo = ?, Completata = ? " +
+                     "WHERE ID_Sessione = ? AND Codice_Esercizio = ? AND Numero_Serie = ?";
+
+    public PerformedSetDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public List<PerformedSet> findAllBySessionId(int sessionId) {
         List<PerformedSet> sets = new ArrayList<>();
-        String sql = "SELECT * FROM SERIE_ESEGUITA WHERE ID_Sessione = ? ORDER BY Codice_Esercizio, Numero_Serie";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_ALL_BY_SESSION_ID)) {
             pstmt.setInt(1, sessionId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -39,17 +39,8 @@ public class PerformedSetDAO {
         return sets;
     }
 
-    /**
-     * Aggiorna la performance di una serie (momento in cui l'atleta completa una serie e
-     * aggiunge, a sua discrezione, il carico).
-     * Nota: Il trigger 'trg_aggiorna_percentuale_update' aggiorna automaticamente la percentuale di completamento.
-     */
     public void updatePerformance(int sessionId, int exerciseId, int setNumber, Double weight, boolean completed) {
-        String sql = "UPDATE SERIE_ESEGUITA SET Carico_Effettivo = ?, Completata = ? " +
-                     "WHERE ID_Sessione = ? AND Codice_Esercizio = ? AND Numero_Serie = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_PERFORMANCE)) {
             if (weight != null) {
                 pstmt.setDouble(1, weight);
             } else {

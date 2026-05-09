@@ -9,6 +9,7 @@ import java.util.List;
  * Classe base per tutte le View CLI del sistema.
  * Fornisce metodi standard per la formattazione dell'output tramite tabelle e box.
  */
+@SuppressWarnings("java:S106")
 public class BaseCLIView {
 
     // Caratteri Box-Drawing per tabelle e cornici

@@ -16,6 +16,7 @@ import org.DPT.users.owner.model.Owner;
 import org.DPT.users.pt.dao.PTDAO;
 import org.DPT.users.receptionist.dao.ReceptionistDAO;
 
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class OwnerLogicController {
@@ -24,7 +25,7 @@ public class OwnerLogicController {
     private final AuthToken token;
     private final Owner profile;
 
-    private final OwnerDAO ownerDAO = new OwnerDAO();
+    private final OwnerDAO ownerDAO;
     private final PTDAO ptDAO;
     private final ReceptionistDAO receptionistDAO;
     private final ClientDAO clientDAO;
@@ -33,7 +34,7 @@ public class OwnerLogicController {
 
     private final UserManagementController userManagementController;
 
-    public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token,
+    public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
         this.ui = OwnerUIFactory.getUI(config.uiMode(), scanner);
@@ -43,6 +44,8 @@ public class OwnerLogicController {
         this.clientDAO = clientDAO;
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
+
+        this.ownerDAO = new OwnerDAO(conn);
 
         this.profile = ownerDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));

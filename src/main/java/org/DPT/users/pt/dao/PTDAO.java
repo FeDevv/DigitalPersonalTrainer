@@ -1,7 +1,7 @@
 package org.DPT.users.pt.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.exception.EntityNotFoundException;
 import org.DPT.users.common.dto.UserCreationDTO;
 import org.DPT.users.pt.model.PT;
 import org.DPT.users.pt.model.PerformanceDTO;
@@ -16,11 +16,34 @@ import java.util.List;
 import java.util.Optional;
 
 public class PTDAO {
-    public Optional<PT> findById(int id) {
-        String sql = "SELECT ID_PT, Nome, Cognome, Email, PT_Attivo FROM PT WHERE ID_PT = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
+    private final Connection connection;
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    private static final String FIND_BY_ID = "SELECT ID_PT, Nome, Cognome, Email, PT_Attivo FROM PT WHERE ID_PT = ?";
+    private static final String SELECT_ALL = "SELECT * FROM PT ORDER BY ID_PT";
+    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT";
+    private static final String INSERT_PT = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_STATUS = "UPDATE PT SET PT_Attivo = ? WHERE ID_PT = ?";
+    
+    // Query aggiornata con GROUP BY e COUNT tramite Join per mostrare sia l'aggregato che il dettaglio
+    private static final String PERFORMANCE_REPORT = """
+                SELECT v.Nominativo_Cliente, stats.Num_Allenamenti, v.Data, v.Durata_Minuti, v.Percentuale_Completamento
+                FROM vw_prestazioni_pt v
+                JOIN (
+                    SELECT ID_Cliente, COUNT(*) as Num_Allenamenti
+                    FROM vw_prestazioni_pt
+                    WHERE ID_PT = ? AND Data BETWEEN ? AND ?
+                    GROUP BY ID_Cliente
+                ) stats ON v.ID_Cliente = stats.ID_Cliente
+                WHERE v.ID_PT = ? AND v.Data BETWEEN ? AND ?
+                ORDER BY v.Nominativo_Cliente, v.Data DESC
+                """;
+
+    public PTDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    public Optional<PT> findById(int id) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -28,25 +51,22 @@ public class PTDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore durante il caricamente del profilo del PT", e);
+            throw new DatabaseException("Errore durante il caricamento del profilo del PT", e);
         }
         return Optional.empty();
     }
 
     public List<PT> getAll() {
-        return findByQuery("SELECT * FROM PT ORDER BY ID_PT", (Object[]) null);
+        return findByQuery(SELECT_ALL, null);
     }
 
-    // metodo tenuto per futura espansione
     public List<PT> findAll(boolean active) {
-        return findByQuery("SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT", active);
+        return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
 
-    private List<PT> findByQuery(String sql, Object... params) {
+    private List<PT> findByQuery(String sql, Object[] params) {
         List<PT> list = new ArrayList<>();
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     pstmt.setObject(i + 1, params[i]);
@@ -74,9 +94,7 @@ public class PTDAO {
     }
 
     public void insert(UserCreationDTO data) {
-        String sql = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(INSERT_PT)) {
             pstmt.setString(1, data.firstName());
             pstmt.setString(2, data.lastName());
             pstmt.setString(3, data.email());
@@ -88,14 +106,12 @@ public class PTDAO {
     }
 
     public void updateStatus(int id, boolean active) {
-        String sql = "UPDATE PT SET PT_Attivo = ? WHERE ID_PT = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new DatabaseException("Impossibile aggiornare lo stato: Personal Trainer con ID " + id + " non trovato.");
+                throw new EntityNotFoundException("Personal Trainer con ID " + id + " non trovato.");
             }
         } catch (SQLException e) {
             throw new DatabaseException("Errore di aggiornamento dello stato del PT", e);
@@ -104,23 +120,22 @@ public class PTDAO {
 
     public List<PerformanceDTO> getPerformanceReport(int ptId, LocalDate start, LocalDate end) {
         List<PerformanceDTO> report = new ArrayList<>();
-        String sql = """
-                SELECT Nominativo_Cliente, Data, Durata_Minuti, Percentuale_Completamento 
-                FROM vw_prestazioni_pt 
-                WHERE ID_PT = ? AND Data BETWEEN ? AND ?
-                ORDER BY Data DESC
-                """;
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(PERFORMANCE_REPORT)) {
+            // Parametri per la subquery (stats)
             pstmt.setInt(1, ptId);
             pstmt.setDate(2, java.sql.Date.valueOf(start));
             pstmt.setDate(3, java.sql.Date.valueOf(end));
+            
+            // Parametri per la query principale (v)
+            pstmt.setInt(4, ptId);
+            pstmt.setDate(5, java.sql.Date.valueOf(start));
+            pstmt.setDate(6, java.sql.Date.valueOf(end));
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     report.add(new PerformanceDTO(
                             rs.getString("Nominativo_Cliente"),
+                            rs.getInt("Num_Allenamenti"),
                             rs.getDate("Data").toLocalDate(),
                             rs.getInt("Durata_Minuti"),
                             rs.getInt("Percentuale_Completamento")

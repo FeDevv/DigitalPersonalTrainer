@@ -81,18 +81,19 @@ public class PTCLIView extends BaseCLIView {
     public void displayPerformanceReport(List<PerformanceDTO> report) {
         displaySectionTitle("Report Prestazioni Clienti");
         
-        String[] headers = {"CLIENTE", "DATA", "DURATA(m)", "COMPLETAMENTO"};
+        String[] headers = {"CLIENTE", "TOT. ALLEN.", "DATA", "DURATA(m)", "COMPLETAMENTO"};
         List<String[]> rows = new ArrayList<>();
         for (PerformanceDTO r : report) {
             rows.add(new String[]{
                 r.clientName(),
+                String.valueOf(r.totalWorkouts()),
                 r.date().toString(),
                 String.valueOf(r.duration()),
                 r.completionPercentage() + "%"
             });
         }
         
-        renderTable(headers, rows, new int[]{20, 12, 10, 15});
+        renderTable(headers, rows, new int[]{20, 12, 12, 10, 15});
     }
 
     public void displayCatalog(List<Machine> machines, List<Exercise> exercises) {

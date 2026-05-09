@@ -1,6 +1,5 @@
 package org.DPT.shared.workout.session.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
 import org.DPT.shared.workout.session.model.WorkoutSession;
 
@@ -12,21 +11,23 @@ import java.util.List;
 
 /**
  * DAO per la sessione di allenamento.
- * Gestisce il ciclo di vita di una sessione di allenamento
  */
 public class WorkoutSessionDAO {
+    private final Connection connection;
 
-    /**
-     * Avvia una nuova sessione
-     * Nota: Il trigger 'trg_popola_serie_sessione' popolerà automaticamente SERIE_ESEGUITA.
-     */
+    private static final String START_SESSION = "INSERT INTO SESSIONE (ID_Scheda, Data, Ora_Inizio, Percentuale_Completamento) VALUES (?, ?, ?, 0)";
+    private static final String END_SESSION = "UPDATE SESSIONE SET Ora_Fine = ? WHERE ID_Sessione = ?";
+    private static final String FIND_ALL_BY_SHEET_ID = "SELECT * FROM SESSIONE WHERE ID_Scheda = ? ORDER BY Data DESC, Ora_Inizio DESC";
+
+    public WorkoutSessionDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public WorkoutSession startSession(int sheetId) {
-        String sql = "INSERT INTO SESSIONE (ID_Scheda, Data, Ora_Inizio, Percentuale_Completamento) VALUES (?, ?, ?, 0)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
         LocalDate now = LocalDate.now();
         LocalTime startTime = LocalTime.now();
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(START_SESSION, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sheetId);
             pstmt.setDate(2, Date.valueOf(now));
             pstmt.setTime(3, Time.valueOf(startTime));
@@ -52,17 +53,10 @@ public class WorkoutSessionDAO {
         }
     }
 
-    /**
-     * Chiude la sessione e imposta il tempo di fine allenamento
-     */
     public void endSession(int sessionId) {
-        String sql = "UPDATE SESSIONE SET Ora_Fine = ? WHERE ID_Sessione = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(END_SESSION)) {
             pstmt.setTime(1, Time.valueOf(LocalTime.now()));
             pstmt.setInt(2, sessionId);
-
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DatabaseException("Errore di chiusura della sessione: " + sessionId, e);
@@ -71,10 +65,7 @@ public class WorkoutSessionDAO {
 
     public List<WorkoutSession> findAllBySheetId(int sheetId) {
         List<WorkoutSession> sessions = new ArrayList<>();
-        String sql = "SELECT * FROM SESSIONE WHERE ID_Scheda = ? ORDER BY Data DESC, Ora_Inizio DESC";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_ALL_BY_SHEET_ID)) {
             pstmt.setInt(1, sheetId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

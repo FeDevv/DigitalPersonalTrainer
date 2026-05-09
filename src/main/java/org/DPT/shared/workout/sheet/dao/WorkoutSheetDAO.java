@@ -1,6 +1,5 @@
 package org.DPT.shared.workout.sheet.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
 import org.DPT.shared.workout.sheet.model.ActiveSheetItem;
 import org.DPT.shared.workout.sheet.model.WorkoutSheet;
@@ -12,24 +11,12 @@ import java.util.Optional;
 
 /**
  * DAO per le Schede di Allenamento.
- * Utilizza stored procedure per la creazione per garantire la coerenza della logica di business.
  */
 public class WorkoutSheetDAO {
+    private final Connection connection;
 
-    /**
-     * Recupera la routine dettagliata della scheda attualmente attiva per un cliente.
-     * Interroga la vista 'vw_scheda_attiva_cliente'.
-     */
-    public List<ActiveSheetItem> getActiveRoutine(int clientId) {
-        return getRoutineByQuery("SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?", clientId);
-    }
-
-    /**
-     * Recupera i dettagli completi di una scheda specifica (anche archiviata).
-     * Utilizzato per la visualizzazione dello storico.
-     */
-    public List<ActiveSheetItem> getSheetDetails(int sheetId) {
-        String sql = """
+    private static final String ACTIVE_ROUTINE = "SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?";
+    private static final String SHEET_DETAILS = """
             SELECT s.ID_Cliente, s.ID_Scheda, s.Titolo as Nome_Scheda,
                 c.Codice_Esercizio, e.Nome as Nome_Esercizio,
                 c.Serie_Previste, c.Ripetizioni_Previste, c.Recupero,
@@ -39,14 +26,27 @@ public class WorkoutSheetDAO {
             JOIN ESERCIZIO e ON c.Codice_Esercizio = e.Codice_Esercizio
             WHERE s.ID_Scheda = ?
             """;
-        return getRoutineByQuery(sql, sheetId);
+    private static final String FIND_ALL_BY_CLIENT_ID = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? ORDER BY Data_Creazione DESC";
+    private static final String FIND_ACTIVE_BY_CLIENT_ID = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? AND Scheda_Attiva = 1";
+    private static final String CREATE_NEW_SHEET = "{CALL sp_crea_nuova_scheda(?, ?, ?, ?)}";
+    private static final String ADD_EXERCISE_TO_SHEET = "INSERT INTO COMPOSTA (ID_Scheda, Codice_Esercizio, Recupero, Note_Esecuzione, Serie_Previste, Ripetizioni_Previste) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String FIND_BY_PT_ID = "SELECT * FROM SCHEDA WHERE ID_PT = ? ORDER BY Data_Creazione DESC";
+
+    public WorkoutSheetDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    public List<ActiveSheetItem> getActiveRoutine(int clientId) {
+        return getRoutineByQuery(ACTIVE_ROUTINE, clientId);
+    }
+
+    public List<ActiveSheetItem> getSheetDetails(int sheetId) {
+        return getRoutineByQuery(SHEET_DETAILS, sheetId);
     }
 
     private List<ActiveSheetItem> getRoutineByQuery(String sql, int id) {
         List<ActiveSheetItem> routine = new ArrayList<>();
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -59,15 +59,9 @@ public class WorkoutSheetDAO {
         return routine;
     }
 
-    /**
-     * Recupera tutte le schede (attive e archiviate) di un cliente.
-     */
     public List<WorkoutSheet> findAllByClientId(int clientId) {
         List<WorkoutSheet> history = new ArrayList<>();
-        String sql = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? ORDER BY Data_Creazione DESC";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_ALL_BY_CLIENT_ID)) {
             pstmt.setInt(1, clientId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -80,14 +74,8 @@ public class WorkoutSheetDAO {
         return history;
     }
 
-    /**
-     * Recupera la scheda attualmente attiva per un cliente.
-     */
     public Optional<WorkoutSheet> findActiveByClientId(int clientId) {
-        String sql = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? AND Scheda_Attiva = 1";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_ACTIVE_BY_CLIENT_ID)) {
             pstmt.setInt(1, clientId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -100,56 +88,35 @@ public class WorkoutSheetDAO {
         return Optional.empty();
     }
 
-    /**
-     * Crea una nuova scheda utilizzando la stored procedure del database.
-     * Questa procedura disattiva automaticamente la scheda attiva precedente.
-     */
     public void createNewSheet(int ptId, int clientId, String title, int totalSets) {
-        String sql = "{CALL sp_crea_nuova_scheda(?, ?, ?, ?)}";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (CallableStatement cstmt = connection.prepareCall(CREATE_NEW_SHEET)) {
             cstmt.setInt(1, ptId);
             cstmt.setInt(2, clientId);
             cstmt.setString(3, title);
             cstmt.setInt(4, totalSets);
-
             cstmt.execute();
         } catch (SQLException e) {
             throw new DatabaseException("Errore di creazione di scheda tramite stored procedure", e);
         }
     }
 
-    /**
-     * Aggiunge un esercizio a una scheda (tabella COMPOSTA).
-     */
     public void addExerciseToSheet(int sheetId, int exerciseId, int rest, String notes, int sets, int reps) {
-        String sql = "INSERT INTO COMPOSTA (ID_Scheda, Codice_Esercizio, Recupero, Note_Esecuzione, Serie_Previste, Ripetizioni_Previste) VALUES (?, ?, ?, ?, ?, ?)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(ADD_EXERCISE_TO_SHEET)) {
             pstmt.setInt(1, sheetId);
             pstmt.setInt(2, exerciseId);
             pstmt.setInt(3, rest);
             pstmt.setString(4, notes);
             pstmt.setInt(5, sets);
             pstmt.setInt(6, reps);
-
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiunta dell'esercizio alla scheda: " + sheetId, e);
         }
     }
 
-    /**
-     * Recupera tutte le schede redatte da uno specifico PT.
-     */
     public List<WorkoutSheet> findByPTId(int ptId) {
         List<WorkoutSheet> sheets = new ArrayList<>();
-        String sql = "SELECT * FROM SCHEDA WHERE ID_PT = ? ORDER BY Data_Creazione DESC";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_PT_ID)) {
             pstmt.setInt(1, ptId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

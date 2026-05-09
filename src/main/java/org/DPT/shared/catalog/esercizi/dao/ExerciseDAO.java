@@ -1,8 +1,9 @@
 package org.DPT.shared.catalog.esercizi.dao;
 
-import org.DPT.connection.DBConnectionManager;
 import org.DPT.exception.DatabaseException;
+import org.DPT.exception.EntityNotFoundException;
 import org.DPT.shared.catalog.esercizi.model.Exercise;
+import org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,12 +14,20 @@ import java.util.Optional;
  * Data Access Object per la gestione degli esercizi.
  */
 public class ExerciseDAO {
+    private final Connection connection;
+
+    private static final String FIND_BY_ID = "SELECT * FROM ESERCIZIO WHERE Codice_Esercizio = ?";
+    private static final String SELECT_ALL = "SELECT * FROM ESERCIZIO ORDER BY Codice_Esercizio";
+    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Codice_Esercizio";
+    private static final String INSERT_EXERCISE = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, 1)";
+    private static final String UPDATE_STATUS = "UPDATE ESERCIZIO SET Esercizio_Attivo = ? WHERE Codice_Esercizio = ?";
+
+    public ExerciseDAO(Connection connection) {
+        this.connection = connection;
+    }
 
     public Optional<Exercise> findById(int id) {
-        String sql = "SELECT * FROM ESERCIZIO WHERE Codice_Esercizio = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -32,18 +41,16 @@ public class ExerciseDAO {
     }
 
     public List<Exercise> getAll() {
-        return findByQuery("SELECT * FROM ESERCIZIO ORDER BY Codice_Esercizio", (Object[]) null);
+        return findByQuery(SELECT_ALL, null);
     }
 
     public List<Exercise> findAll(boolean active) {
-        return findByQuery("SELECT * FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Codice_Esercizio", active);
+        return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
 
-    private List<Exercise> findByQuery(String sql, Object... params) {
+    private List<Exercise> findByQuery(String sql, Object[] params) {
         List<Exercise> list = new ArrayList<>();
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     pstmt.setObject(i + 1, params[i]);
@@ -60,11 +67,8 @@ public class ExerciseDAO {
         return list;
     }
 
-    public Exercise insert(org.DPT.shared.catalog.esercizi.dto.ExerciseCreationDTO data, int ownerId) {
-        String sql = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, 1)";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public Exercise insert(ExerciseCreationDTO data, int ownerId) {
+        try (PreparedStatement pstmt = connection.prepareStatement(INSERT_EXERCISE, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, ownerId);
             if (data.machineId() != null) {
                 pstmt.setInt(2, data.machineId());
@@ -98,14 +102,12 @@ public class ExerciseDAO {
     }
 
     public void updateStatus(int id, boolean active) {
-        String sql = "UPDATE ESERCIZIO SET Esercizio_Attivo = ? WHERE Codice_Esercizio = ?";
-        Connection conn = DBConnectionManager.getInstance().getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);
             pstmt.setInt(2, id);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new DatabaseException("Impossibile aggiornare lo stato: Esercizio con ID " + id + " non trovato.");
+                throw new EntityNotFoundException("Esercizio con ID " + id + " non trovato.");
             }
         } catch (SQLException e) {
             throw new DatabaseException("Errore durante l'aggiornamento dello stato dell'esercizio: " + id, e);

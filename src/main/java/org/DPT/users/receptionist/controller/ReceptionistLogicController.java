@@ -11,6 +11,7 @@ import org.DPT.users.receptionist.dao.ReceptionistDAO;
 import org.DPT.users.receptionist.factory.ReceptionistUIFactory;
 import org.DPT.users.receptionist.model.Receptionist;
 
+import java.sql.Connection;
 import java.util.Scanner;
 
 /**
@@ -24,8 +25,8 @@ public class ReceptionistLogicController {
     private final Receptionist profile;
 
     // DAO Locali (Istanziati internamente)
-    private final ReceptionistDAO receptionistDAO = new ReceptionistDAO();
-    private final AssignmentDAO assignmentDAO = new AssignmentDAO();
+    private final ReceptionistDAO receptionistDAO;
+    private final AssignmentDAO assignmentDAO;
 
     // DAO Esterni (Ricevuti tramite DI)
     private final PTDAO ptDAO;
@@ -33,12 +34,15 @@ public class ReceptionistLogicController {
 
     private final UserManagementController userManagementController;
 
-    public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token,
+    public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                                        PTDAO ptDAO, ClientDAO clientDAO) {
         this.ui = ReceptionistUIFactory.getUI(config.uiMode(), scanner);
         this.token = token;
         this.ptDAO = ptDAO;
         this.clientDAO = clientDAO;
+
+        this.receptionistDAO = new ReceptionistDAO(conn);
+        this.assignmentDAO = new AssignmentDAO(conn);
 
         this.profile = receptionistDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo addetto non trovato."));
