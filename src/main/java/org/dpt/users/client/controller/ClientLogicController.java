@@ -67,17 +67,15 @@ public class ClientLogicController {
 
     private void startWorkoutSession() {
         try {
-            // 1. Verifica presenza scheda attiva
             List<ActiveSheetItem> routine = sheetDAO.getActiveRoutine(profile.getId());
             if (routine.isEmpty()) {
                 ui.reportError("Non hai una scheda attiva. Contatta il tuo Personal Trainer!");
                 return;
             }
 
-            String sheetName = routine.getFirst().sheetName();
-            int sheetId = routine.getFirst().sheetId();
+            String sheetName = routine.get(0).sheetName();
+            int sheetId = routine.get(0).sheetId();
 
-            // 2. Avvio Sessione (Il DB popola automaticamente le serie)
             WorkoutSession session = sessionDAO.startSession(sheetId);
             ui.showWorkoutStart(sheetName);
 
@@ -89,13 +87,13 @@ public class ClientLogicController {
 
             boolean workoutInterrupted = false;
 
-            // 3. Training Loop (Esercizi)
             for (int i = 0; i < routine.size() && !workoutInterrupted; i++) {
                 ActiveSheetItem exercise = routine.get(i);
                 ui.showExerciseProgress(i + 1, routine.size(), exercise.exerciseName(), exercise.executionNotes());
 
-                // 4. Sub-loop (Serie)
-                for (int s = 1; s <= exercise.expectedSets(); s++) {
+                // REFAC: Usiamo skipExercise e workoutInterrupted nella condizione del ciclo per rimuovere i break
+                boolean skipExercise = false;
+                for (int s = 1; s <= exercise.expectedSets() && !skipExercise && !workoutInterrupted; s++) {
                     ui.showSetProgress(s, exercise.expectedSets(), exercise.expectedReps());
                     
                     int action = ui.askSetAction();
@@ -106,7 +104,6 @@ public class ClientLogicController {
                         totalCompleted++;
                         ui.reportSuccess("Serie registrata!");
                         
-                        // Timer di recupero (non mostrato dopo l'ultima serie dell'ultimo esercizio)
                         if (!(i == routine.size() - 1 && s == exercise.expectedSets())) {
                             ui.showRestTimer(exercise.restTime());
                         }
@@ -114,18 +111,15 @@ public class ClientLogicController {
                         ui.reportInfo("Serie saltata.");
                     } else if (action == 3) { // SALTA ESERCIZIO
                         ui.reportInfo("Esercizio saltato.");
-                        break;
+                        skipExercise = true;
                     } else if (action == 0) { // TERMINA ALLENAMENTO
                         workoutInterrupted = true;
-                        break;
                     }
                 }
             }
 
-            // 5. Chiusura Sessione
             sessionDAO.endSession(session.id());
             
-            // Recupero dati aggiornati per il riepilogo (la percentuale è calcolata dai trigger)
             List<WorkoutSession> updatedSessions = sessionDAO.findAllBySheetId(sheetId);
             int finalPercentage = updatedSessions.stream()
                     .filter(s -> s.id() == session.id())
@@ -146,7 +140,7 @@ public class ClientLogicController {
             if (routine.isEmpty()) {
                 ui.showRoutine("Tua Routine Corrente", routine);
             } else {
-                ui.showRoutine("Tua Routine Corrente: " + routine.getFirst().sheetName(), routine);
+                ui.showRoutine("Tua Routine Corrente: " + routine.get(0).sheetName(), routine);
             }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
