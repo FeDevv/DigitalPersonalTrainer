@@ -11,6 +11,7 @@ import org.DPT.users.pt.model.PerformanceDTO;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("java:S106")
 public class PTCLIView extends BaseCLIView {
 
     public void displayPTHeader(String name) {

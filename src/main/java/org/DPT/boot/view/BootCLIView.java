@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Gestisce ESCLUSIVAMENTE l'output a schermo per il boot.
  */
+@SuppressWarnings("java:S106")
 public class BootCLIView extends BaseCLIView {
 
     public void displayWelcome() {

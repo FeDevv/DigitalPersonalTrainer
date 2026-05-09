@@ -9,6 +9,7 @@ import org.DPT.users.common.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("java:S106")
 public class OwnerCLIView extends BaseCLIView {
 
     public void displayOwnerHeader(String name) {

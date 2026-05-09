@@ -7,6 +7,7 @@ import org.DPT.shared.workout.sheet.model.WorkoutSheet;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("java:S106")
 public class ClientCLIView extends BaseCLIView {
 
     public void displayClientHeader(String name) {

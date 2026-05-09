@@ -13,6 +13,7 @@ import java.util.List;
  * Gestisce l'output testuale per il modulo di Login.
  * Estende BaseCLIView per uniformità grafica.
  */
+@SuppressWarnings("java:S106")
 public class LoginCLIView extends BaseCLIView {
 
     public void showLoginHeader() {

@@ -7,6 +7,7 @@ import org.DPT.users.common.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("java:S106")
 public class ReceptionistCLIView extends BaseCLIView {
 
     public void displayReceptionistHeader(String name) {
