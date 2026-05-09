@@ -67,7 +67,7 @@ public class ClientCLIController extends BaseCLIController implements ClientUI {
         if (input.isEmpty()) return null;
         try {
             return Double.parseDouble(input);
-        } catch (NumberFormatException numExc) {
+        } catch (NumberFormatException _) {
             clientView.displayError("Formato non valido. Peso impostato a NULL.");
             return null;
         }

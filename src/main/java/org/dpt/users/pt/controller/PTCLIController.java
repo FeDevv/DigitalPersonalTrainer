@@ -103,7 +103,7 @@ public class PTCLIController extends BaseCLIController implements PTUI {
             String input = readString(prompt);
             try {
                 return LocalDate.parse(input);
-            } catch (DateTimeParseException parseException) {
+            } catch (DateTimeParseException _) {
                 ptView.displayError("Formato data non valido. Usa AAAA-MM-GG.");
             }
         }

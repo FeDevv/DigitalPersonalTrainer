@@ -55,7 +55,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
         while (data == null) {
             try {
                 data = LocalDate.parse(readString("Data di Nascita (AAAA-MM-GG):"));
-            } catch (DateTimeParseException parseException) {
+            } catch (DateTimeParseException _) {
                 recView.displayError("Formato data non valido.");
             }
         }
