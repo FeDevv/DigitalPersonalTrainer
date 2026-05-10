@@ -18,22 +18,14 @@ public class ReceptionistLogicController {
     private final ReceptionistUI ui;
     private final Receptionist profile;
 
-    // DAO Locali
-    private final ReceptionistDAO receptionistDAO;
     private final AssignmentDAO assignmentDAO;
-
-    // DAO Esterni
-    private final PTDAO ptDAO;
-    private final ClientDAO clientDAO;
 
     private final UserManagementController userManagementController;
 
     public ReceptionistLogicController(ControllerContext ctx, PTDAO ptDAO, ClientDAO clientDAO) {
         this.ui = ReceptionistUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
-        this.ptDAO = ptDAO;
-        this.clientDAO = clientDAO;
 
-        this.receptionistDAO = new ReceptionistDAO(ctx.connection());
+        ReceptionistDAO receptionistDAO = new ReceptionistDAO(ctx.connection());
         this.assignmentDAO = new AssignmentDAO(ctx.connection());
 
         this.profile = receptionistDAO.findById(ctx.token().userId())
