@@ -11,6 +11,8 @@ import java.util.List;
 @SuppressWarnings("java:S106")
 public class OwnerCLIView extends BaseCLIView {
 
+    private static final String GO_BACK = "Torna indietro";
+
     public void displayOwnerHeader(String name) {
         displayHeader("PANNELLO PROPRIETARIO - Benvenuto/a " + name);
     }
@@ -28,7 +30,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("1. Visualizza tutti i MACCHINARI");
         displayLine("2. Attiva/Disattiva MACCHINARIO");
         displayLine("3. Inserisci nuovo MACCHINARIO");
-        displayLine("0. Torna indietro");
+        displayLine("0. " + GO_BACK);
     }
 
     public void displayEserciziMenu() {
@@ -36,7 +38,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("1. Visualizza tutti gli ESERCIZI");
         displayLine("2. Attiva/Disattiva ESERCIZIO");
         displayLine("3. Inserisci nuovo ESERCIZIO");
-        displayLine("0. Torna indietro");
+        displayLine("0. " + GO_BACK);
     }
 
     public void displayUtenzeMenu() {
@@ -44,7 +46,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("1. Gestione PERSONAL TRAINER");
         displayLine("2. Gestione ADDETTI SEGRETERIA");
         displayLine("3. Gestione CLIENTI");
-        displayLine("0. Torna indietro");
+        displayLine("0. " + GO_BACK);
     }
 
     public void displayUtenzaActionMenu(Role role) {
@@ -54,7 +56,7 @@ public class OwnerCLIView extends BaseCLIView {
         if (role != Role.CLIENT) {
             displayLine("3. Inserisci nuovo " + role.getSingular());
         }
-        displayLine("0. Torna indietro");
+        displayLine("0. " + GO_BACK);
     }
 
     public void displayMacchinari(List<Machine> lista) {

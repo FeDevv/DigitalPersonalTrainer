@@ -18,16 +18,18 @@ import java.util.Scanner;
 
 /**
  * Controller Logico per il modulo Cliente.
- * Gestisce l'esecuzione dell'allenamento e la consultazione dei dati personali.
  */
 public class ClientLogicController {
 
     private final ClientUI ui;
     private final Client profile;
-
     private final WorkoutSheetDAO sheetDAO;
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
+
+    // Stato temporaneo per la sessione corrente
+    private boolean workoutInterrupted;
+    private int totalCompleted;
 
     public ClientLogicController(Configuration config, Scanner scanner, AuthToken token,
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
@@ -68,75 +70,85 @@ public class ClientLogicController {
                 return;
             }
 
-            String sheetName = routine.get(0).sheetName();
             int sheetId = routine.get(0).sheetId();
-
             WorkoutSession session = sessionDAO.startSession(sheetId);
-            ui.showWorkoutStart(sheetName);
+            ui.showWorkoutStart(routine.get(0).sheetName());
 
-            int totalCompleted = 0;
-            int totalExpected = 0;
-            for (ActiveSheetItem item : routine) {
-                totalExpected += item.expectedSets();
-            }
+            // Reset stato sessione
+            this.workoutInterrupted = false;
+            this.totalCompleted = 0;
 
-            boolean workoutInterrupted = false;
+            executeRoutine(routine, session.id());
 
-            for (int i = 0; i < routine.size() && !workoutInterrupted; i++) {
-                ActiveSheetItem exercise = routine.get(i);
-                ui.showExerciseProgress(i + 1, routine.size(), exercise.exerciseName(), exercise.executionNotes());
-
-                // REFAC: Usiamo skipExercise e workoutInterrupted nella condizione del ciclo per rimuovere i break
-                boolean skipExercise = false;
-                for (int s = 1; s <= exercise.expectedSets() && !skipExercise && !workoutInterrupted; s++) {
-                    ui.showSetProgress(s, exercise.expectedSets(), exercise.expectedReps());
-                    
-                    int action = ui.askSetAction();
-                    
-                    if (action == 1) { // FATTO
-                        Double weight = exercise.bodyweight() ? null : ui.askForWeight();
-                        setDAO.updatePerformance(session.id(), exercise.exerciseId(), s, weight, true);
-                        totalCompleted++;
-                        ui.reportSuccess("Serie registrata!");
-                        
-                        if (!(i == routine.size() - 1 && s == exercise.expectedSets())) {
-                            ui.showRestTimer(exercise.restTime());
-                        }
-                    } else if (action == 2) { // SALTA SERIE
-                        ui.reportInfo("Serie saltata.");
-                    } else if (action == 3) { // SALTA ESERCIZIO
-                        ui.reportInfo("Esercizio saltato.");
-                        skipExercise = true;
-                    } else if (action == 0) { // TERMINA ALLENAMENTO
-                        workoutInterrupted = true;
-                    }
-                }
-            }
-
-            sessionDAO.endSession(session.id());
-            
-            List<WorkoutSession> updatedSessions = sessionDAO.findAllBySheetId(sheetId);
-            int finalPercentage = updatedSessions.stream()
-                    .filter(s -> s.id() == session.id())
-                    .findFirst()
-                    .map(WorkoutSession::completionPercentage)
-                    .orElse(0);
-
-            ui.showWorkoutSummary(totalCompleted, totalExpected, finalPercentage);
+            finalizeSession(session.id(), sheetId, routine);
 
         } catch (Exception e) {
             ui.reportError("Errore durante l'allenamento: " + e.getMessage());
         }
     }
 
+    private void executeRoutine(List<ActiveSheetItem> routine, int sessionId) {
+        for (int i = 0; i < routine.size() && !workoutInterrupted; i++) {
+            ActiveSheetItem exercise = routine.get(i);
+            ui.showExerciseProgress(i + 1, routine.size(), exercise.exerciseName(), exercise.executionNotes());
+            executeExercise(exercise, sessionId, i == routine.size() - 1);
+        }
+    }
+
+    private void executeExercise(ActiveSheetItem exercise, int sessionId, boolean isLastExercise) {
+        boolean skipExercise = false;
+        int expectedSets = exercise.expectedSets();
+
+        for (int s = 1; s <= expectedSets && !skipExercise && !workoutInterrupted; s++) {
+            ui.showSetProgress(s, expectedSets, exercise.expectedReps());
+            int action = ui.askSetAction();
+            
+            switch (action) {
+                case 1 -> { // FATTO
+                    handleSetDone(exercise, sessionId, s);
+                    if (!(isLastExercise && s == expectedSets)) {
+                        ui.showRestTimer(exercise.restTime());
+                    }
+                }
+                case 2 -> ui.reportInfo("Serie saltata.");
+                case 3 -> {
+                    ui.reportInfo("Esercizio saltato.");
+                    skipExercise = true;
+                }
+                case 0 -> workoutInterrupted = true;
+                default -> ui.reportError("Azione non valida.");
+            }
+        }
+    }
+
+    private void handleSetDone(ActiveSheetItem exercise, int sessionId, int setNumber) {
+        Double weight = exercise.bodyweight() ? null : ui.askForWeight();
+        setDAO.updatePerformance(sessionId, exercise.exerciseId(), setNumber, weight, true);
+        this.totalCompleted++;
+        ui.reportSuccess("Serie registrata!");
+    }
+
+    private void finalizeSession(int sessionId, int sheetId, List<ActiveSheetItem> routine) {
+        sessionDAO.endSession(sessionId);
+        
+        int totalExpected = routine.stream()
+                .mapToInt(ActiveSheetItem::expectedSets)
+                .sum();
+
+        int finalPercentage = sessionDAO.findAllBySheetId(sheetId).stream()
+                .filter(s -> s.id() == sessionId)
+                .findFirst()
+                .map(WorkoutSession::completionPercentage)
+                .orElse(0);
+
+        ui.showWorkoutSummary(totalCompleted, totalExpected, finalPercentage);
+    }
+
     private void viewActiveRoutine() {
         try {
             List<ActiveSheetItem> routine = sheetDAO.getActiveRoutine(profile.getId());
-            if (routine.isEmpty()) {
-                ui.showRoutine("Tua Routine Corrente", routine);
-            } else {
-                ui.showRoutine("Tua Routine Corrente: " + routine.get(0).sheetName(), routine);
-            }
+            String title = routine.isEmpty() ? "Tua Routine Corrente" : "Tua Routine Corrente: " + routine.get(0).sheetName();
+            ui.showRoutine(title, routine);
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
         }
@@ -148,19 +160,23 @@ public class ClientLogicController {
             ui.showSheetHistory(history);
             
             if (!history.isEmpty()) {
-                int sheetId = ui.askForID("Inserisci ID Scheda per i dettagli (0 per uscire):");
-                if (sheetId != 0) {
-                    history.stream()
-                            .filter(s -> s.id() == sheetId)
-                            .findFirst()
-                            .ifPresentOrElse(
-                                    s -> ui.showRoutine("Dettaglio Scheda: " + s.title(), sheetDAO.getSheetDetails(sheetId)),
-                                    () -> ui.reportError("ID non trovato nel tuo storico.")
-                            );
-                }
+                handleHistorySelection(history);
             }
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
+        }
+    }
+
+    private void handleHistorySelection(List<WorkoutSheet> history) {
+        int sheetId = ui.askForID("Inserisci ID Scheda per i dettagli (0 per uscire):");
+        if (sheetId != 0) {
+            history.stream()
+                    .filter(s -> s.id() == sheetId)
+                    .findFirst()
+                    .ifPresentOrElse(
+                            s -> ui.showRoutine("Dettaglio Scheda: " + s.title(), sheetDAO.getSheetDetails(sheetId)),
+                            () -> ui.reportError("ID non trovato nel tuo storico.")
+                    );
         }
     }
 }

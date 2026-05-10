@@ -28,6 +28,8 @@ public class OwnerLogicController {
 
     private final UserManagementController userManagementController;
 
+    private static final String INVALID_CHOICE = "scelta non valida.";
+
     public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
@@ -56,7 +58,7 @@ public class OwnerLogicController {
                 case 2 -> manageEsercizi();
                 case 3 -> userManagementController.manageUtenze();
                 case 0 -> logout = true;
-                default -> ui.reportError("Scelta non valida.");
+                default -> ui.reportError(INVALID_CHOICE);
             }
         }
         ui.reportGoodbye();
@@ -82,7 +84,7 @@ public class OwnerLogicController {
                         ui.reportSuccess("Macchinario inserito.");
                     }
                     case 0 -> back = true;
-                    default -> ui.reportError("Scelta non valida.");
+                    default -> ui.reportError(INVALID_CHOICE);
                 }
             } catch (DatabaseException e) {
                 ui.reportError(e.getMessage());
@@ -110,7 +112,7 @@ public class OwnerLogicController {
                         ui.reportSuccess("Esercizio inserito.");
                     }
                     case 0 -> back = true;
-                    default -> ui.reportError("Scelta non valida.");
+                    default -> ui.reportError(INVALID_CHOICE);
                 }
             } catch (DatabaseException e) {
                 ui.reportError(e.getMessage());
