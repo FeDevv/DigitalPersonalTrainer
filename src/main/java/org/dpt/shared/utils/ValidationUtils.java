@@ -8,6 +8,10 @@ import org.dpt.exception.ValidationException;
  */
 public class ValidationUtils {
 
+    private ValidationUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
     /**

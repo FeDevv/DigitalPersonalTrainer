@@ -75,7 +75,7 @@ public class Orchestrator {
             WorkoutSheetDAO sheetDAO = new WorkoutSheetDAO(conn);
             WorkoutSessionDAO sessionDAO = new WorkoutSessionDAO(conn);
             PerformedSetDAO setDAO = new PerformedSetDAO(conn);
-            new ClientLogicController(config, sharedScanner, token, conn,
+            new ClientLogicController(config, sharedScanner, token,
                     clientDAO, sheetDAO, sessionDAO, setDAO).execute();
         });
     }

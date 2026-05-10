@@ -11,6 +11,10 @@ import java.util.Scanner;
  */
 public class PTUIFactory {
 
+    private PTUIFactory() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static PTUI getUI(UIMode mode, Scanner scanner) {
         return switch (mode) {
             case CLI -> new PTCLIController(scanner);

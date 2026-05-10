@@ -11,6 +11,10 @@ import java.util.Scanner;
  */
 public class ClientUIFactory {
 
+    private ClientUIFactory() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static ClientUI getUI(UIMode mode, Scanner scanner) {
         return switch (mode) {
             case CLI -> new ClientCLIController(scanner);

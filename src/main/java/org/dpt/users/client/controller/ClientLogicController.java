@@ -30,7 +30,7 @@ public class ClientLogicController {
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
 
-    public ClientLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
+    public ClientLogicController(Configuration config, Scanner scanner, AuthToken token,
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
         this.ui = ClientUIFactory.getUI(config.uiMode(), scanner);
