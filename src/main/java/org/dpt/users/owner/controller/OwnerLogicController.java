@@ -21,13 +21,8 @@ import java.util.Scanner;
 public class OwnerLogicController {
 
     private final OwnerUI ui;
-    private final AuthToken token;
     private final Owner profile;
 
-    private final OwnerDAO ownerDAO;
-    private final PTDAO ptDAO;
-    private final ReceptionistDAO receptionistDAO;
-    private final ClientDAO clientDAO;
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
@@ -37,14 +32,10 @@ public class OwnerLogicController {
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
         this.ui = OwnerUIFactory.getUI(config.uiMode(), scanner);
-        this.token = token;
-        this.ptDAO = ptDAO;
-        this.receptionistDAO = receptionistDAO;
-        this.clientDAO = clientDAO;
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
 
-        this.ownerDAO = new OwnerDAO(conn);
+        OwnerDAO ownerDAO = new OwnerDAO(conn);
 
         this.profile = ownerDAO.findById(token.userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));

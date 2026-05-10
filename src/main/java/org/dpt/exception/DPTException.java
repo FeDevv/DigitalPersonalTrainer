@@ -6,11 +6,11 @@ package org.dpt.exception;
  * delle PROSSIMI PASSI exceptions, permettendo una gestione centralizzata degli errori.
  */
 public abstract class DPTException extends RuntimeException {
-    public DPTException(String message) {
+    protected DPTException(String message) {
         super(message);
     }
 
-    public DPTException(String message, Throwable cause) {
+    protected DPTException(String message, Throwable cause) {
         super(message, cause);
     }
 }

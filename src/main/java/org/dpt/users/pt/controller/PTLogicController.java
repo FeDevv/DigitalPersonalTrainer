@@ -23,7 +23,6 @@ import java.util.Scanner;
 public class PTLogicController {
 
     private final PTUI ui;
-    private final AuthToken token;
     private final PT profile;
 
     private final PTDAO ptDAO;
@@ -36,7 +35,6 @@ public class PTLogicController {
                              ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                              MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
         this.ui = PTUIFactory.getUI(config.uiMode(), scanner);
-        this.token = token;
         this.clientDAO = clientDAO;
         this.sheetDAO = sheetDAO;
         this.machineDAO = machineDAO;

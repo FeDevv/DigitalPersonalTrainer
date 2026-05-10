@@ -24,10 +24,8 @@ import java.util.Scanner;
 public class ClientLogicController {
 
     private final ClientUI ui;
-    private final AuthToken token;
     private final Client profile;
 
-    private final ClientDAO clientDAO;
     private final WorkoutSheetDAO sheetDAO;
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
@@ -36,8 +34,6 @@ public class ClientLogicController {
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
         this.ui = ClientUIFactory.getUI(config.uiMode(), scanner);
-        this.token = token;
-        this.clientDAO = clientDAO;
         this.sheetDAO = sheetDAO;
         this.sessionDAO = sessionDAO;
         this.setDAO = setDAO;

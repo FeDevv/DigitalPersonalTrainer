@@ -21,27 +21,19 @@ import java.util.Scanner;
 public class ReceptionistLogicController {
 
     private final ReceptionistUI ui;
-    private final AuthToken token;
     private final Receptionist profile;
 
-    // DAO Locali (Istanziati internamente)
-    private final ReceptionistDAO receptionistDAO;
     private final AssignmentDAO assignmentDAO;
-
-    // DAO Esterni (Ricevuti tramite DI)
-    private final PTDAO ptDAO;
-    private final ClientDAO clientDAO;
 
     private final UserManagementController userManagementController;
 
     public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
                                        PTDAO ptDAO, ClientDAO clientDAO) {
         this.ui = ReceptionistUIFactory.getUI(config.uiMode(), scanner);
-        this.token = token;
-        this.ptDAO = ptDAO;
-        this.clientDAO = clientDAO;
+        // DAO Esterni (Ricevuti tramite DI)
 
-        this.receptionistDAO = new ReceptionistDAO(conn);
+        // DAO Locali (Istanziati internamente)
+        ReceptionistDAO receptionistDAO = new ReceptionistDAO(conn);
         this.assignmentDAO = new AssignmentDAO(conn);
 
         this.profile = receptionistDAO.findById(token.userId())
