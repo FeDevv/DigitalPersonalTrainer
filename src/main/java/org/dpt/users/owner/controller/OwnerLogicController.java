@@ -1,45 +1,39 @@
 package org.dpt.users.owner.controller;
 
-import org.dpt.boot.model.Configuration;
 import org.dpt.exception.DatabaseException;
+import org.dpt.shared.context.ControllerContext;
 import org.dpt.shared.catalog.esercizi.dto.ExerciseCreationDTO;
 import org.dpt.shared.catalog.macchinari.dto.MachineCreationDTO;
 import org.dpt.shared.catalog.esercizi.dao.ExerciseDAO;
 import org.dpt.shared.catalog.macchinari.dao.MachineDAO;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.common.controller.UserManagementController;
-import org.dpt.users.login.model.AuthToken;
 import org.dpt.users.owner.dao.OwnerDAO;
 import org.dpt.users.owner.factory.OwnerUIFactory;
 import org.dpt.users.owner.model.Owner;
 import org.dpt.users.pt.dao.PTDAO;
 import org.dpt.users.receptionist.dao.ReceptionistDAO;
 
-import java.sql.Connection;
-import java.util.Scanner;
-
 public class OwnerLogicController {
 
     private final OwnerUI ui;
     private final Owner profile;
-
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
-
     private final UserManagementController userManagementController;
 
     private static final String INVALID_CHOICE = "scelta non valida.";
 
-    public OwnerLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
+    public OwnerLogicController(ControllerContext ctx, 
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
-        this.ui = OwnerUIFactory.getUI(config.uiMode(), scanner);
+        this.ui = OwnerUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
 
-        OwnerDAO ownerDAO = new OwnerDAO(conn);
+        OwnerDAO ownerDAO = new OwnerDAO(ctx.connection());
 
-        this.profile = ownerDAO.findById(token.userId())
+        this.profile = ownerDAO.findById(ctx.token().userId())
                 .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));
 
         this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, false);

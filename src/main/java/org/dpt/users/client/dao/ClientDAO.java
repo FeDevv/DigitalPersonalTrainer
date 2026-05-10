@@ -3,6 +3,7 @@ package org.dpt.users.client.dao;
 import org.dpt.exception.DatabaseException;
 import org.dpt.exception.EntityNotFoundException;
 import org.dpt.users.client.model.Client;
+import org.dpt.users.client.model.ClientPersonalInfo;
 import org.dpt.users.common.dto.ClientCreationDTO;
 
 import java.sql.*;
@@ -14,10 +15,10 @@ public class ClientDAO {
     private final Connection connection;
 
     private static final String FIND_BY_ID = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE ID_Cliente = ?";
-    private static final String SELECT_ALL = "SELECT * FROM CLIENTE ORDER BY ID_Cliente";
-    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente";
+    private static final String SELECT_ALL = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE ORDER BY ID_Cliente";
+    private static final String FIND_ALL_BY_STATUS = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente";
     private static final String FIND_ASSIGNED_TO_PT = """
-                SELECT c.* 
+                SELECT c.ID_Cliente, c.Nome, c.Cognome, c.Email, c.Codice_Fiscale, c.Indirizzo_Residenza, c.Data_Nascita, c.Cliente_Attivo 
                 FROM CLIENTE c 
                 JOIN ASSEGNA a ON c.ID_Cliente = a.ID_Cliente 
                 WHERE a.ID_PT = ? AND a.Assegnazione_Attiva = 1 AND c.Cliente_Attivo = 1
@@ -77,14 +78,18 @@ public class ClientDAO {
     }
 
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
+        ClientPersonalInfo info = new ClientPersonalInfo(
+                rs.getString("Codice_Fiscale"),
+                rs.getString("Indirizzo_Residenza"),
+                rs.getDate("Data_Nascita").toLocalDate()
+        );
+
         return new Client(
                 rs.getInt("ID_Cliente"),
                 rs.getString("Nome"),
                 rs.getString("Cognome"),
                 rs.getString("Email"),
-                rs.getString("Codice_Fiscale"),
-                rs.getString("Indirizzo_Residenza"),
-                rs.getDate("Data_Nascita").toLocalDate(),
+                info,
                 rs.getBoolean("Cliente_Attivo")
         );
     }

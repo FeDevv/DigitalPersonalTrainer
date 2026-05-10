@@ -1,42 +1,42 @@
 package org.dpt.users.receptionist.controller;
 
-import org.dpt.boot.model.Configuration;
 import org.dpt.exception.DatabaseException;
+import org.dpt.shared.context.ControllerContext;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.common.controller.UserManagementController;
-import org.dpt.users.login.model.AuthToken;
 import org.dpt.users.pt.dao.PTDAO;
 import org.dpt.users.receptionist.dao.AssignmentDAO;
 import org.dpt.users.receptionist.dao.ReceptionistDAO;
 import org.dpt.users.receptionist.factory.ReceptionistUIFactory;
 import org.dpt.users.receptionist.model.Receptionist;
 
-import java.sql.Connection;
-import java.util.Scanner;
-
 /**
  * Controller Logico per il modulo Addetto Segreteria.
- * Gestisce l'anagrafica utenti e le assegnazioni PT-Cliente.
  */
 public class ReceptionistLogicController {
 
     private final ReceptionistUI ui;
     private final Receptionist profile;
 
+    // DAO Locali
+    private final ReceptionistDAO receptionistDAO;
     private final AssignmentDAO assignmentDAO;
+
+    // DAO Esterni
+    private final PTDAO ptDAO;
+    private final ClientDAO clientDAO;
 
     private final UserManagementController userManagementController;
 
-    public ReceptionistLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
-                                       PTDAO ptDAO, ClientDAO clientDAO) {
-        this.ui = ReceptionistUIFactory.getUI(config.uiMode(), scanner);
-        // DAO Esterni (Ricevuti tramite DI)
+    public ReceptionistLogicController(ControllerContext ctx, PTDAO ptDAO, ClientDAO clientDAO) {
+        this.ui = ReceptionistUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
+        this.ptDAO = ptDAO;
+        this.clientDAO = clientDAO;
 
-        // DAO Locali (Istanziati internamente)
-        ReceptionistDAO receptionistDAO = new ReceptionistDAO(conn);
-        this.assignmentDAO = new AssignmentDAO(conn);
+        this.receptionistDAO = new ReceptionistDAO(ctx.connection());
+        this.assignmentDAO = new AssignmentDAO(ctx.connection());
 
-        this.profile = receptionistDAO.findById(token.userId())
+        this.profile = receptionistDAO.findById(ctx.token().userId())
                 .orElseThrow(() -> new DatabaseException("Profilo addetto non trovato."));
 
         this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, true);

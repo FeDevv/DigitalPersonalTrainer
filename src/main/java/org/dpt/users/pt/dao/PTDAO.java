@@ -19,12 +19,11 @@ public class PTDAO {
     private final Connection connection;
 
     private static final String FIND_BY_ID = "SELECT ID_PT, Nome, Cognome, Email, PT_Attivo FROM PT WHERE ID_PT = ?";
-    private static final String SELECT_ALL = "SELECT * FROM PT ORDER BY ID_PT";
-    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT";
+    private static final String SELECT_ALL = "SELECT ID_PT, Nome, Cognome, Email, PT_Attivo FROM PT ORDER BY ID_PT";
+    private static final String FIND_ALL_BY_STATUS = "SELECT ID_PT, Nome, Cognome, Email, PT_Attivo FROM PT WHERE PT_Attivo = ? ORDER BY ID_PT";
     private static final String INSERT_PT = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_STATUS = "UPDATE PT SET PT_Attivo = ? WHERE ID_PT = ?";
     
-    // Query aggiornata con GROUP BY e COUNT tramite Join per mostrare sia l'aggregato che il dettaglio
     private static final String PERFORMANCE_REPORT = """
                 SELECT v.Nominativo_Cliente, stats.Num_Allenamenti, v.Data, v.Durata_Minuti, v.Percentuale_Completamento
                 FROM vw_prestazioni_pt v
@@ -121,12 +120,9 @@ public class PTDAO {
     public List<PerformanceDTO> getPerformanceReport(int ptId, LocalDate start, LocalDate end) {
         List<PerformanceDTO> report = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(PERFORMANCE_REPORT)) {
-            // Parametri per la subquery (stats)
             pstmt.setInt(1, ptId);
             pstmt.setDate(2, java.sql.Date.valueOf(start));
             pstmt.setDate(3, java.sql.Date.valueOf(end));
-            
-            // Parametri per la query principale (v)
             pstmt.setInt(4, ptId);
             pstmt.setDate(5, java.sql.Date.valueOf(start));
             pstmt.setDate(6, java.sql.Date.valueOf(end));

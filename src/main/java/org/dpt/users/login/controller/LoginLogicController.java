@@ -1,7 +1,7 @@
 package org.dpt.users.login.controller;
 
 import org.dpt.shared.auth.Role;
-import org.dpt.boot.model.Configuration;
+import org.dpt.shared.context.ControllerContext;
 import org.dpt.exception.AuthException;
 import org.dpt.exception.DatabaseException;
 import org.dpt.exception.ValidationException;
@@ -11,22 +11,17 @@ import org.dpt.users.login.model.UserCredentials;
 import org.dpt.users.login.dao.LoginDAO;
 import org.dpt.connection.DBConnectionManager;
 
-import java.sql.Connection;
-import java.util.Scanner;
-
 /**
  * Controller Logico (Core) per il modulo di Login.
- * Gestisce il coordinamento tra l'interfaccia utente (agnostica) e la logica di autenticazione.
  */
 public class LoginLogicController {
 
     private final LoginDAO loginDAO;
     private final LoginUI ui;
 
-    public LoginLogicController(Configuration config, Scanner sharedScanner, Connection conn) {
-        this.loginDAO = new LoginDAO(conn);
-        // L'interfaccia viene istanziata tramite la factory locale
-        this.ui = LoginUIFactory.getUI(config.uiMode(), sharedScanner);
+    public LoginLogicController(ControllerContext ctx) {
+        this.loginDAO = new LoginDAO(ctx.connection());
+        this.ui = LoginUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
     }
 
     /**

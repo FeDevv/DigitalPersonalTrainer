@@ -17,7 +17,7 @@ public class WorkoutSessionDAO {
 
     private static final String START_SESSION = "INSERT INTO SESSIONE (ID_Scheda, Data, Ora_Inizio, Percentuale_Completamento) VALUES (?, ?, ?, 0)";
     private static final String END_SESSION = "UPDATE SESSIONE SET Ora_Fine = ? WHERE ID_Sessione = ?";
-    private static final String FIND_ALL_BY_SHEET_ID = "SELECT * FROM SESSIONE WHERE ID_Scheda = ? ORDER BY Data DESC, Ora_Inizio DESC";
+    private static final String FIND_ALL_BY_SHEET_ID = "SELECT ID_Sessione, ID_Scheda, Data, Ora_Inizio, Ora_Fine, Percentuale_Completamento FROM SESSIONE WHERE ID_Scheda = ? ORDER BY Data DESC, Ora_Inizio DESC";
 
     public WorkoutSessionDAO(Connection connection) {
         this.connection = connection;

@@ -1,7 +1,7 @@
 package org.dpt.users.pt.controller;
 
-import org.dpt.boot.model.Configuration;
 import org.dpt.exception.DatabaseException;
+import org.dpt.shared.context.ControllerContext;
 import org.dpt.shared.catalog.esercizi.dao.ExerciseDAO;
 import org.dpt.shared.catalog.macchinari.dao.MachineDAO;
 import org.dpt.shared.workout.sheet.dao.WorkoutSheetDAO;
@@ -9,40 +9,36 @@ import org.dpt.shared.workout.sheet.model.SheetItem;
 import org.dpt.shared.workout.sheet.model.WorkoutSheet;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.client.model.Client;
-import org.dpt.users.login.model.AuthToken;
 import org.dpt.users.pt.dao.PTDAO;
 import org.dpt.users.pt.factory.PTUIFactory;
 import org.dpt.users.pt.model.PT;
 import org.dpt.users.pt.model.PerformanceDTO;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Scanner;
 
 public class PTLogicController {
 
     private final PTUI ui;
     private final PT profile;
-
     private final PTDAO ptDAO;
     private final ClientDAO clientDAO;
     private final WorkoutSheetDAO sheetDAO;
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
 
-    public PTLogicController(Configuration config, Scanner scanner, AuthToken token, Connection conn,
+    public PTLogicController(ControllerContext ctx,
                              ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                              MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
-        this.ui = PTUIFactory.getUI(config.uiMode(), scanner);
+        this.ui = PTUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.clientDAO = clientDAO;
         this.sheetDAO = sheetDAO;
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
 
-        this.ptDAO = new PTDAO(conn);
+        this.ptDAO = new PTDAO(ctx.connection());
 
-        this.profile = ptDAO.findById(token.userId())
+        this.profile = ptDAO.findById(ctx.token().userId())
                 .orElseThrow(() -> new DatabaseException("Profilo PT non trovato."));
     }
 
@@ -77,14 +73,11 @@ public class PTLogicController {
             int clientId = ui.askForClientId(assignedClients);
             String title = ui.askForSheetTitle();
 
-            // 1. Creazione record SCHEDA (tramite SP, Totale_Serie inizialmente 0)
             sheetDAO.createNewSheet(profile.getId(), clientId, title, 0);
 
-            // 2. Recupero ID della scheda appena creata (quella attiva per il cliente)
             WorkoutSheet newSheet = sheetDAO.findActiveByClientId(clientId)
                     .orElseThrow(() -> new DatabaseException("Errore critico: scheda creata ma non trovata."));
 
-            // 3. Composizione Esercizi (COMPOSTA)
             boolean adding = true;
             while (adding) {
                 int exerciseId = ui.askForExerciseId(exerciseDAO.findAll(true));

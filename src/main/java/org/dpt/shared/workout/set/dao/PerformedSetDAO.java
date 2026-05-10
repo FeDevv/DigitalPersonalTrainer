@@ -16,7 +16,7 @@ import java.util.List;
 public class PerformedSetDAO {
     private final Connection connection;
 
-    private static final String FIND_ALL_BY_SESSION_ID = "SELECT * FROM SERIE_ESEGUITA WHERE ID_Sessione = ? ORDER BY Codice_Esercizio, Numero_Serie";
+    private static final String FIND_ALL_BY_SESSION_ID = "SELECT ID_Sessione, Codice_Esercizio, Numero_Serie, Carico_Effettivo, Completata FROM SERIE_ESEGUITA WHERE ID_Sessione = ? ORDER BY Codice_Esercizio, Numero_Serie";
     private static final String UPDATE_PERFORMANCE = "UPDATE SERIE_ESEGUITA SET Carico_Effettivo = ?, Completata = ? " +
                      "WHERE ID_Sessione = ? AND Codice_Esercizio = ? AND Numero_Serie = ?";
 

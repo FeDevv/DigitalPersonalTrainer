@@ -15,7 +15,7 @@ import java.util.Optional;
 public class WorkoutSheetDAO {
     private final Connection connection;
 
-    private static final String ACTIVE_ROUTINE = "SELECT * FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?";
+    private static final String ACTIVE_ROUTINE = "SELECT ID_Cliente, ID_Scheda, Nome_Scheda, Codice_Esercizio, Nome_Esercizio, Serie_Previste, Ripetizioni_Previste, Recupero, Note_Esecuzione, Corpo_Libero FROM vw_scheda_attiva_cliente WHERE ID_Cliente = ?";
     private static final String SHEET_DETAILS = """
             SELECT s.ID_Cliente, s.ID_Scheda, s.Titolo as Nome_Scheda,
                 c.Codice_Esercizio, e.Nome as Nome_Esercizio,
@@ -26,11 +26,11 @@ public class WorkoutSheetDAO {
             JOIN ESERCIZIO e ON c.Codice_Esercizio = e.Codice_Esercizio
             WHERE s.ID_Scheda = ?
             """;
-    private static final String FIND_ALL_BY_CLIENT_ID = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? ORDER BY Data_Creazione DESC";
-    private static final String FIND_ACTIVE_BY_CLIENT_ID = "SELECT * FROM SCHEDA WHERE ID_Cliente = ? AND Scheda_Attiva = 1";
+    private static final String FIND_ALL_BY_CLIENT_ID = "SELECT ID_Scheda, ID_PT, ID_Cliente, Data_Creazione, Titolo, Scheda_Attiva, Totale_Serie_Previste FROM SCHEDA WHERE ID_Cliente = ? ORDER BY Data_Creazione DESC";
+    private static final String FIND_ACTIVE_BY_CLIENT_ID = "SELECT ID_Scheda, ID_PT, ID_Cliente, Data_Creazione, Titolo, Scheda_Attiva, Totale_Serie_Previste FROM SCHEDA WHERE ID_Cliente = ? AND Scheda_Attiva = 1";
     private static final String CREATE_NEW_SHEET = "{CALL sp_crea_nuova_scheda(?, ?, ?, ?)}";
     private static final String ADD_EXERCISE_TO_SHEET = "INSERT INTO COMPOSTA (ID_Scheda, Codice_Esercizio, Recupero, Note_Esecuzione, Serie_Previste, Ripetizioni_Previste) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String FIND_BY_PT_ID = "SELECT * FROM SCHEDA WHERE ID_PT = ? ORDER BY Data_Creazione DESC";
+    private static final String FIND_BY_PT_ID = "SELECT ID_Scheda, ID_PT, ID_Cliente, Data_Creazione, Titolo, Scheda_Attiva, Totale_Serie_Previste FROM SCHEDA WHERE ID_PT = ? ORDER BY Data_Creazione DESC";
 
     public WorkoutSheetDAO(Connection connection) {
         this.connection = connection;

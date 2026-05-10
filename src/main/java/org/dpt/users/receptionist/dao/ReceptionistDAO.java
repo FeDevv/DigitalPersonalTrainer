@@ -17,8 +17,8 @@ public class ReceptionistDAO {
     private final Connection connection;
 
     private static final String FIND_BY_ID = "SELECT ID_Addetto, Nome, Cognome, Email, Addetto_Attivo FROM ADDETTO_SEGRETERIA WHERE ID_Addetto = ?";
-    private static final String SELECT_ALL = "SELECT * FROM ADDETTO_SEGRETERIA ORDER BY ID_Addetto";
-    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM ADDETTO_SEGRETERIA WHERE Addetto_Attivo = ? ORDER BY ID_Addetto";
+    private static final String SELECT_ALL = "SELECT ID_Addetto, Nome, Cognome, Email, Addetto_Attivo FROM ADDETTO_SEGRETERIA ORDER BY ID_Addetto";
+    private static final String FIND_ALL_BY_STATUS = "SELECT ID_Addetto, Nome, Cognome, Email, Addetto_Attivo FROM ADDETTO_SEGRETERIA WHERE Addetto_Attivo = ? ORDER BY ID_Addetto";
     private static final String INSERT_RECEPTIONIST = "INSERT INTO ADDETTO_SEGRETERIA (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_STATUS = "UPDATE ADDETTO_SEGRETERIA SET Addetto_Attivo = ? WHERE ID_Addetto = ?";
 

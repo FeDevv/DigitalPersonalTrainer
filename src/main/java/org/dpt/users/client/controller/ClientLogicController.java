@@ -1,7 +1,7 @@
 package org.dpt.users.client.controller;
 
-import org.dpt.boot.model.Configuration;
 import org.dpt.exception.DatabaseException;
+import org.dpt.shared.context.ControllerContext;
 import org.dpt.shared.workout.session.dao.WorkoutSessionDAO;
 import org.dpt.shared.workout.session.model.WorkoutSession;
 import org.dpt.shared.workout.set.dao.PerformedSetDAO;
@@ -11,10 +11,8 @@ import org.dpt.shared.workout.sheet.model.WorkoutSheet;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.client.factory.ClientUIFactory;
 import org.dpt.users.client.model.Client;
-import org.dpt.users.login.model.AuthToken;
 
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Controller Logico per il modulo Cliente.
@@ -27,19 +25,18 @@ public class ClientLogicController {
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
 
-    // Stato temporaneo per la sessione corrente
     private boolean workoutInterrupted;
     private int totalCompleted;
 
-    public ClientLogicController(Configuration config, Scanner scanner, AuthToken token,
+    public ClientLogicController(ControllerContext ctx,
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
-        this.ui = ClientUIFactory.getUI(config.uiMode(), scanner);
+        this.ui = ClientUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.sheetDAO = sheetDAO;
         this.sessionDAO = sessionDAO;
         this.setDAO = setDAO;
 
-        this.profile = clientDAO.findById(token.userId())
+        this.profile = clientDAO.findById(ctx.token().userId())
                 .orElseThrow(() -> new DatabaseException("Profilo cliente non trovato."));
     }
 
@@ -74,7 +71,6 @@ public class ClientLogicController {
             WorkoutSession session = sessionDAO.startSession(sheetId);
             ui.showWorkoutStart(routine.get(0).sheetName());
 
-            // Reset stato sessione
             this.workoutInterrupted = false;
             this.totalCompleted = 0;
 

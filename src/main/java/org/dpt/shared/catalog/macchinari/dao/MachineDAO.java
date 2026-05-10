@@ -16,9 +16,9 @@ import java.util.Optional;
 public class MachineDAO {
     private final Connection connection;
 
-    private static final String FIND_BY_ID = "SELECT * FROM MACCHINARIO WHERE ID_Macchinario = ?";
-    private static final String SELECT_ALL = "SELECT * FROM MACCHINARIO ORDER BY ID_Macchinario";
-    private static final String FIND_ALL_BY_STATUS = "SELECT * FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario";
+    private static final String FIND_BY_ID = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO WHERE ID_Macchinario = ?";
+    private static final String SELECT_ALL = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO ORDER BY ID_Macchinario";
+    private static final String FIND_ALL_BY_STATUS = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario";
     private static final String INSERT_MACHINE = "INSERT INTO MACCHINARIO (ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo) VALUES (?, ?, ?, 1)";
     private static final String UPDATE_STATUS = "UPDATE MACCHINARIO SET Macchinario_Attivo = ? WHERE ID_Macchinario = ?";
 
