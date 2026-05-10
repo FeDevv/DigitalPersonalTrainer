@@ -59,11 +59,7 @@ public class BaseCLIView {
         printTableSeparator(TL, TJ, TR, colWidths);
 
         // Header
-        System.out.print(V);
-        for (int i = 0; i < headers.length; i++) {
-            System.out.printf(" %-" + colWidths[i] + "s " + V, headers[i]);
-        }
-        System.out.println();
+        renderRow(headers, colWidths);
 
         // Header separator
         printTableSeparator(LJ, CJ, RJ, colWidths);
@@ -73,19 +69,29 @@ public class BaseCLIView {
             int totalWidth = 0;
             for (int w : colWidths) totalWidth += w + 2;
             totalWidth += colWidths.length - 1;
-            System.out.printf(V + " %-" + totalWidth + "s " + V + "%n", "Nessun dato disponibile.");
+            String emptyFormat = "%s %-" + totalWidth + "s %s%n";
+            System.out.printf(emptyFormat, V, "Nessun dato disponibile.", V);
         } else {
             for (String[] row : rows) {
-                System.out.print(V);
-                for (int i = 0; i < row.length; i++) {
-                    System.out.printf(" %-" + colWidths[i] + "s " + V, row[i]);
-                }
-                System.out.println();
+                renderRow(row, colWidths);
             }
         }
 
         // Bottom border
         printTableSeparator(BL, BJ, BR, colWidths);
+    }
+
+    /**
+     * Metodo privato estratto per stampare una singola riga di dati (Header o Row).
+     * Rispetta il principio DRY eliminando la duplicazione in renderTable.
+     */
+    private void renderRow(String[] fields, int[] colWidths) {
+        System.out.print(V);
+        for (int i = 0; i < fields.length; i++) {
+            String format = " %-" + colWidths[i] + "s %s";
+            System.out.printf(format, fields[i], V);
+        }
+        System.out.println();
     }
 
     private void printTableSeparator(String left, String mid, String right, int[] widths) {
@@ -95,11 +101,6 @@ public class BaseCLIView {
             if (i < widths.length - 1) System.out.print(mid);
         }
         System.out.println(right);
-    }
-
-    // non usato ma utile da tenere per future espansioni
-    public void displayLabel(String label) {
-        System.out.print(label);
     }
 
     public void displayInputPrompt(String prompt) {
@@ -128,7 +129,6 @@ public class BaseCLIView {
 
     /**
      * Renderizza una tabella standard per la visualizzazione di una lista di utenti.
-     * Centralizzato per rispettare il principio DRY tra le diverse View.
      */
     public void renderUserTable(List<? extends User> users, String title) {
         displaySectionTitle("Elenco " + title);
