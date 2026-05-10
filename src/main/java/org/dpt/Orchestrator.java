@@ -7,6 +7,7 @@ import org.dpt.connection.DBConnectionManager;
 import org.dpt.shared.auth.Role;
 import org.dpt.shared.catalog.esercizi.dao.ExerciseDAO;
 import org.dpt.shared.catalog.macchinari.dao.MachineDAO;
+import org.dpt.shared.ui.BaseCLIView;
 import org.dpt.shared.workout.session.dao.WorkoutSessionDAO;
 import org.dpt.shared.workout.set.dao.PerformedSetDAO;
 import org.dpt.shared.workout.sheet.dao.WorkoutSheetDAO;
@@ -31,6 +32,7 @@ import java.util.Scanner;
 public class Orchestrator {
 
     private final Scanner sharedScanner;
+    private final BaseCLIView view; // Delegato per l'output globale
 
     @FunctionalInterface
     private interface ModuleLauncher {
@@ -41,6 +43,7 @@ public class Orchestrator {
 
     public Orchestrator() {
         this.sharedScanner = new Scanner(System.in);
+        this.view = new BaseCLIView();
     }
 
     private void initializeDispatchMap(Connection conn) {
@@ -86,7 +89,7 @@ public class Orchestrator {
             Configuration config = bootController.execute(args);
 
             if (config.uiMode() == UIMode.GUI) {
-                System.out.println("\n[AVVISO] Interfaccia Grafica non ancora implementata.");
+                view.displayError("Interfaccia Grafica non ancora implementata. Riavviare in modalità CLI.");
                 return;
             }
 
@@ -100,7 +103,7 @@ public class Orchestrator {
             dispatch(config, sessionToken);
 
         } catch (Exception e) {
-            System.err.println("\n[ERRORE DI SISTEMA] " + e.getMessage());
+            view.displayError("SISTEMA: " + e.getMessage());
         } finally {
             shutDown();
         }
@@ -111,13 +114,13 @@ public class Orchestrator {
         if (launcher != null) {
             launcher.launch(config, token);
         } else {
-            System.err.println("\n[ERRORE] Ruolo non riconosciuto.");
+            view.displayError("Ruolo non riconosciuto o non configurato.");
         }
     }
 
     private void shutDown() {
-        System.out.println("\nChiusura applicazione...");
+        view.displayLine("Chiusura applicazione...");
         DBConnectionManager.getInstance().closeConnection();
-        if (sharedScanner != null) sharedScanner.close();
+        sharedScanner.close();
     }
 }

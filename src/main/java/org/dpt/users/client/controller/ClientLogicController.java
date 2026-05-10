@@ -13,7 +13,6 @@ import org.dpt.users.client.factory.ClientUIFactory;
 import org.dpt.users.client.model.Client;
 import org.dpt.users.login.model.AuthToken;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 

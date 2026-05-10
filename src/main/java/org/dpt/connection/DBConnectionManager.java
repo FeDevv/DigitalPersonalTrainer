@@ -46,7 +46,7 @@ public class DBConnectionManager {
             }
             dbProps.load(input);
         } catch (IOException ex) {
-            throw new RuntimeException("Errore critico nel caricamento delle proprietà del DB", ex);
+            throw new DatabaseException("Errore critico nel caricamento delle proprietà del DB", ex);
         }
     }
 
