@@ -41,14 +41,20 @@ public class UserManagementController {
         // Gestore per i Personal Trainer
         userHandlers.put(Role.PT, new UserTypeHandler() {
             @Override public void showList() { ui.showUtenti(ptDAO.getAll(), Role.PT.getPlural()); }
-            @Override public void toggleStatus() { ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
+            @Override public void toggleStatus() {
+                ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
+                ui.reportSuccess("Stato utente aggiornato.");
+            }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); ui.reportSuccess("Personal Trainer inserito."); }
         });
 
         // Gestore per gli Addetti Segreteria
         userHandlers.put(Role.RECEPTIONIST, new UserTypeHandler() {
             @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
-            @Override public void toggleStatus() { receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus()); }
+            @Override public void toggleStatus() {
+                receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
+                ui.reportSuccess("Stato utente aggiornato.");
+            }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); ui.reportSuccess("Addetto segreteria inserito."); }
         });
 
@@ -59,7 +65,7 @@ public class UserManagementController {
                 int id = ui.askForIDUtente();
                 if (ui.askForNewStatus()) clientDAO.activate(id);
                 else clientDAO.deactivate(id);
-                ui.reportSuccess("Stato cliente aggiornato.");
+                ui.reportSuccess("Stato utente aggiornato.");
             }
             @Override public void createNew() {
                 if (canCreateClients) {

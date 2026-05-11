@@ -94,19 +94,24 @@ public class Orchestrator {
                 return;
             }
 
-            Connection loginConn = DBConnectionManager.getInstance().connectAs(Role.LOGIN);
-            
-            // FASE 2: AUTHENTICATION
-            // Creiamo un contesto temporaneo senza token per il login
-            ControllerContext loginCtx = new ControllerContext(config, sharedScanner, null, loginConn);
-            LoginLogicController loginController = new LoginLogicController(loginCtx);
-            AuthToken sessionToken = loginController.execute();
+            boolean exitApp = false;
+            while (!exitApp) {
+                Connection loginConn = DBConnectionManager.getInstance().connectAs(Role.LOGIN);
 
-            if (sessionToken == null) return;
+                // FASE 2: AUTHENTICATION
+                ControllerContext loginCtx = new ControllerContext(config, sharedScanner, null, loginConn);
+                LoginLogicController loginController = new LoginLogicController(loginCtx);
+                AuthToken sessionToken = loginController.execute();
 
-            // FASE 3: DISPATCHING
-            initializeDispatchMap(DBConnectionManager.getInstance().getConnection());
-            dispatch(config, sessionToken);
+                if (sessionToken == null) {
+                    exitApp = true; // L'utente ha scelto di uscire dal login
+                } else {
+                    // FASE 3: DISPATCHING
+                    initializeDispatchMap(DBConnectionManager.getInstance().getConnection());
+                    dispatch(config, sessionToken);
+                    // Una volta terminato il dispatch (logout), il loop ricomincia dal login
+                }
+            }
 
         } catch (Exception e) {
             view.displayError("SISTEMA: " + e.getMessage());
