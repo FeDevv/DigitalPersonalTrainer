@@ -1,25 +1,4 @@
-1. Riduzione del Boilerplate nei DAO (Pattern Template Method/Functional)
-  Attualmente ogni DAO ripete la stessa struttura: try-with-resources, PreparedStatement, ciclo while(rs.next()), e mapping manuale.
-   * Miglioramento: Creare una BaseDAO o un'utility che accetti una query SQL e una Lambda (un Mapper) per trasformare il ResultSet in oggetto.
-   * Risultato: I DAO diventano di 3-4 righe, focalizzati solo sulla query SQL. Meno codice = meno bug.
-
-  2. Disaccoppiamento Totale della Connessione (Dependency Injection)
-  Al momento i DAO chiamano DBConnectionManager.getInstance().getConnection(). Questo crea un legame rigido con un Singleton globale (difficile da testare in isolamento).
-   * Miglioramento: Passare la Connection (o un Supplier<Connection>) nel costruttore del DAO.
-   * Risultato: I DAO diventano "puri": gli dai una connessione e loro fanno il loro lavoro, senza sapere da dove venga (Singleton, Pool di connessioni, Mock per test).
-
-  3. Centralizzazione delle Query SQL
-  Le stringhe SQL sono "hardcoded" dentro i metodi. 
-   * Miglioramento: Spostarle in costanti private static final String all'inizio della classe o, per un livello ancora superiore, in un file di properties esterno.
-   * Risultato: Se cambia un nome di colonna nel DB, lo modifichi in un unico posto ben visibile, non in mezzo a 500 righe di codice logico.
-
-  4. Gestione degli Errori e Transazioni lato Java
-  Hai delegato molto al DB (ottimo per un Thin-Client), ma lato Java potremmo migliorare la granularità delle eccezioni.
-   * Miglioramento: Invece di lanciare solo DatabaseException, potremmo creare eccezioni specifiche come EntityNotFoundException o ConstraintViolationException.
-   * Risultato: Il Controller potrebbe dare feedback molto più precisi all'utente ("Questo nome esiste già" invece di un generico "Errore Database").
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
 Ecco dove intervenire per "pulire" il codice:
 
   1. Moduli Controller (Owner e Receptionist)

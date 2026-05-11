@@ -1,9 +1,9 @@
-package org.dpt.shared.catalog.esercizi.dao;
+package org.dpt.shared.catalog.exercises.dao;
 
 import org.dpt.exception.DatabaseException;
 import org.dpt.exception.EntityNotFoundException;
-import org.dpt.shared.catalog.esercizi.model.Exercise;
-import org.dpt.shared.catalog.esercizi.dto.ExerciseCreationDTO;
+import org.dpt.shared.catalog.exercises.model.Exercise;
+import org.dpt.shared.catalog.exercises.dto.ExerciseCreationDTO;
 
 import java.sql.*;
 import java.util.ArrayList;

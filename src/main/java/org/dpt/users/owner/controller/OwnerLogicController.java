@@ -2,10 +2,10 @@ package org.dpt.users.owner.controller;
 
 import org.dpt.exception.DatabaseException;
 import org.dpt.shared.context.ControllerContext;
-import org.dpt.shared.catalog.esercizi.dto.ExerciseCreationDTO;
-import org.dpt.shared.catalog.macchinari.dto.MachineCreationDTO;
-import org.dpt.shared.catalog.esercizi.dao.ExerciseDAO;
-import org.dpt.shared.catalog.macchinari.dao.MachineDAO;
+import org.dpt.shared.catalog.exercises.dto.ExerciseCreationDTO;
+import org.dpt.shared.catalog.machinery.dto.MachineCreationDTO;
+import org.dpt.shared.catalog.exercises.dao.ExerciseDAO;
+import org.dpt.shared.catalog.machinery.dao.MachineDAO;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.common.controller.UserManagementController;
 import org.dpt.users.owner.dao.OwnerDAO;

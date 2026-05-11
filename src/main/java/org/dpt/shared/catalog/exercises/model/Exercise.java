@@ -1,4 +1,4 @@
-package org.dpt.shared.catalog.esercizi.model;
+package org.dpt.shared.catalog.exercises.model;
 
 /**
  * Rappresenta un esercizio nel catalogo della palestra

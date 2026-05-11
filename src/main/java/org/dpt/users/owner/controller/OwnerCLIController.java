@@ -1,10 +1,10 @@
 package org.dpt.users.owner.controller;
 
 import org.dpt.shared.auth.Role;
-import org.dpt.shared.catalog.esercizi.dto.ExerciseCreationDTO;
-import org.dpt.shared.catalog.macchinari.dto.MachineCreationDTO;
-import org.dpt.shared.catalog.esercizi.model.Exercise;
-import org.dpt.shared.catalog.macchinari.model.Machine;
+import org.dpt.shared.catalog.exercises.dto.ExerciseCreationDTO;
+import org.dpt.shared.catalog.machinery.dto.MachineCreationDTO;
+import org.dpt.shared.catalog.exercises.model.Exercise;
+import org.dpt.shared.catalog.machinery.model.Machine;
 import org.dpt.shared.ui.BaseCLIController;
 import org.dpt.shared.utils.ValidationUtils;
 import org.dpt.users.common.dto.ClientCreationDTO;

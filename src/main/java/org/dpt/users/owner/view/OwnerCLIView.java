@@ -1,8 +1,8 @@
 package org.dpt.users.owner.view;
 
 import org.dpt.shared.auth.Role;
-import org.dpt.shared.catalog.esercizi.model.Exercise;
-import org.dpt.shared.catalog.macchinari.model.Machine;
+import org.dpt.shared.catalog.exercises.model.Exercise;
+import org.dpt.shared.catalog.machinery.model.Machine;
 import org.dpt.shared.ui.BaseCLIView;
 
 import java.util.ArrayList;

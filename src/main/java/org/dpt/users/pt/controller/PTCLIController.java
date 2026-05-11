@@ -1,7 +1,7 @@
 package org.dpt.users.pt.controller;
 
-import org.dpt.shared.catalog.esercizi.model.Exercise;
-import org.dpt.shared.catalog.macchinari.model.Machine;
+import org.dpt.shared.catalog.exercises.model.Exercise;
+import org.dpt.shared.catalog.machinery.model.Machine;
 import org.dpt.shared.ui.BaseCLIController;
 import org.dpt.shared.workout.sheet.model.ActiveSheetItem;
 import org.dpt.shared.workout.sheet.model.SheetItem;

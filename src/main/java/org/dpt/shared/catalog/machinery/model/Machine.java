@@ -1,4 +1,4 @@
-package org.dpt.shared.catalog.macchinari.model;
+package org.dpt.shared.catalog.machinery.model;
 
 /**
  * Rappresenta un macchinario della palestra.

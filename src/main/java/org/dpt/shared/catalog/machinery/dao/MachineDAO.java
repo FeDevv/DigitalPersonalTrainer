@@ -1,9 +1,9 @@
-package org.dpt.shared.catalog.macchinari.dao;
+package org.dpt.shared.catalog.machinery.dao;
 
 import org.dpt.exception.DatabaseException;
 import org.dpt.exception.EntityNotFoundException;
-import org.dpt.shared.catalog.macchinari.model.Machine;
-import org.dpt.shared.catalog.macchinari.dto.MachineCreationDTO;
+import org.dpt.shared.catalog.machinery.model.Machine;
+import org.dpt.shared.catalog.machinery.dto.MachineCreationDTO;
 
 import java.sql.*;
 import java.util.ArrayList;

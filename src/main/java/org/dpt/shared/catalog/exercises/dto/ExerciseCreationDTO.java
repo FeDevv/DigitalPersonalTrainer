@@ -1,4 +1,4 @@
-package org.dpt.shared.catalog.esercizi.dto;
+package org.dpt.shared.catalog.exercises.dto;
 
 /**
  * DTO per l'inserimento di un nuovo esercizio nel catalogo.

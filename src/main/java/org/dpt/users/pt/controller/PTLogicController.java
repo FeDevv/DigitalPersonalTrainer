@@ -2,8 +2,8 @@ package org.dpt.users.pt.controller;
 
 import org.dpt.exception.DatabaseException;
 import org.dpt.shared.context.ControllerContext;
-import org.dpt.shared.catalog.esercizi.dao.ExerciseDAO;
-import org.dpt.shared.catalog.macchinari.dao.MachineDAO;
+import org.dpt.shared.catalog.exercises.dao.ExerciseDAO;
+import org.dpt.shared.catalog.machinery.dao.MachineDAO;
 import org.dpt.shared.workout.sheet.dao.WorkoutSheetDAO;
 import org.dpt.shared.workout.sheet.model.SheetItem;
 import org.dpt.shared.workout.sheet.model.WorkoutSheet;

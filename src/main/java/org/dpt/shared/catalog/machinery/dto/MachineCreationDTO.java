@@ -1,4 +1,4 @@
-package org.dpt.shared.catalog.macchinari.dto;
+package org.dpt.shared.catalog.machinery.dto;
 
 /**
  * DTO per l'inserimento di un nuovo macchinario nel catalogo.
