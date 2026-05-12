@@ -496,6 +496,70 @@ BEGIN
     END IF;
 END //
 
+-- 1. PROTEZIONE CLIENTE: Blocco sessioni se disattivato
+CREATE TRIGGER trg_check_cliente_attivo_sessione_insert
+    BEFORE INSERT ON SESSIONE
+    FOR EACH ROW
+BEGIN
+    DECLARE v_cliente_attivo TINYINT;
+    SELECT c.Cliente_Attivo INTO v_cliente_attivo FROM CLIENTE c
+    JOIN SCHEDA s ON c.ID_Cliente = s.ID_Cliente WHERE s.ID_Scheda = NEW.ID_Scheda;
+    IF v_cliente_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: Il Cliente è disattivato.';
+    END IF;
+END //
+
+-- 2. PROTEZIONE PT: Blocco modifiche schede se disattivato
+CREATE TRIGGER trg_check_pt_attivo_composta_insert
+    BEFORE INSERT ON COMPOSTA
+    FOR EACH ROW
+BEGIN
+    DECLARE v_pt_attivo TINYINT;
+    SELECT pt.PT_Attivo INTO v_pt_attivo FROM PT pt
+    JOIN SCHEDA s ON pt.ID_PT = s.ID_PT WHERE s.ID_Scheda = NEW.ID_Scheda;
+    IF v_pt_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: Il PT è disattivato.';
+    END IF;
+END //
+
+-- 3. PROTEZIONE SEGRETERIA: Blocco assegnazioni se l'addetto è disattivato
+CREATE TRIGGER trg_check_addetto_attivo_assegna_insert
+    BEFORE INSERT ON ASSEGNA
+    FOR EACH ROW
+BEGIN
+    DECLARE v_addetto_attivo TINYINT;
+    SELECT Addetto_Attivo INTO v_addetto_attivo FROM ADDETTO_SEGRETERIA WHERE ID_Addetto = NEW.ID_Addetto;
+    IF v_addetto_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: L''Addetto Segreteria è disattivato.';
+    END IF;
+END //
+
+CREATE TRIGGER trg_check_cliente_attivo_sessione_update
+    BEFORE UPDATE ON SESSIONE
+    FOR EACH ROW
+BEGIN
+    DECLARE v_cliente_attivo TINYINT;
+    SELECT c.Cliente_Attivo INTO v_cliente_attivo FROM CLIENTE c
+    JOIN SCHEDA s ON c.ID_Cliente = s.ID_Cliente WHERE s.ID_Scheda = NEW.ID_Scheda;
+    IF v_cliente_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: Il Cliente è disattivato.';
+    END IF;
+END //
+
+CREATE TRIGGER trg_check_cliente_attivo_serie_update
+    BEFORE UPDATE ON SERIE_ESEGUITA
+    FOR EACH ROW
+BEGIN
+    DECLARE v_cliente_attivo TINYINT;
+    SELECT c.Cliente_Attivo INTO v_cliente_attivo FROM CLIENTE c
+    JOIN SCHEDA sch ON c.ID_Cliente = sch.ID_Cliente
+    JOIN SESSIONE sess ON sch.ID_Scheda = sess.ID_Scheda
+    WHERE sess.ID_Sessione = NEW.ID_Sessione;
+    IF v_cliente_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: Il Cliente è disattivato.';
+    END IF;
+END //
+
 DELIMITER ;
 
 -- ==============================================================================

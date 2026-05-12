@@ -8,13 +8,14 @@ import org.dpt.shared.catalog.exercises.dao.ExerciseDAO;
 import org.dpt.shared.catalog.machinery.dao.MachineDAO;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.common.controller.UserManagementController;
+import org.dpt.shared.ui.BaseLogicController;
 import org.dpt.users.owner.dao.OwnerDAO;
 import org.dpt.users.owner.factory.OwnerUIFactory;
 import org.dpt.users.owner.model.Owner;
 import org.dpt.users.pt.dao.PTDAO;
 import org.dpt.users.receptionist.dao.ReceptionistDAO;
 
-public class OwnerLogicController {
+public class OwnerLogicController extends BaseLogicController {
 
     private final OwnerUI ui;
     private final Owner profile;
@@ -27,6 +28,7 @@ public class OwnerLogicController {
     public OwnerLogicController(ControllerContext ctx, 
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
+        super(ctx);
         this.ui = OwnerUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.machineDAO = machineDAO;
         this.exerciseDAO = exerciseDAO;
@@ -39,23 +41,44 @@ public class OwnerLogicController {
         this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, false);
     }
 
-    public void execute() {
+    @Override
+    protected boolean isUserActive() {
+        return true; // Il proprietario non è disattivabile
+    }
+
+    @Override
+    protected void showHeader() {
         ui.showHeader(profile.getFirstName());
-        boolean logout = false;
+    }
 
-        while (!logout) {
-            ui.showMainMenu();
-            int choice = ui.askForChoice();
+    @Override
+    protected void renderMenu() {
+        ui.showMainMenu();
+    }
 
-            switch (choice) {
-                case 1 -> manageMacchinari();
-                case 2 -> manageEsercizi();
-                case 3 -> userManagementController.manageUtenze();
-                case 0 -> logout = true;
-                default -> ui.reportError(INVALID_CHOICE);
-            }
+    @Override
+    protected int askForChoice() {
+        return ui.askForChoice();
+    }
+
+    @Override
+    protected void handleChoice(int choice) throws Exception {
+        switch (choice) {
+            case 1 -> manageMacchinari();
+            case 2 -> manageEsercizi();
+            case 3 -> userManagementController.manageUtenze();
+            default -> ui.reportError(INVALID_CHOICE);
         }
+    }
+
+    @Override
+    protected void onLogout() {
         ui.reportGoodbye();
+    }
+
+    @Override
+    protected void reportError(String message) {
+        ui.reportError(message);
     }
 
     private void manageMacchinari() {

@@ -2,6 +2,7 @@ package org.dpt.users.client.controller;
 
 import org.dpt.exception.DatabaseException;
 import org.dpt.shared.context.ControllerContext;
+import org.dpt.shared.ui.BaseLogicController;
 import org.dpt.shared.workout.session.dao.WorkoutSessionDAO;
 import org.dpt.shared.workout.session.model.WorkoutSession;
 import org.dpt.shared.workout.set.dao.PerformedSetDAO;
@@ -17,7 +18,7 @@ import java.util.List;
 /**
  * Controller Logico per il modulo Cliente.
  */
-public class ClientLogicController {
+public class ClientLogicController extends BaseLogicController {
 
     private final ClientUI ui;
     private final Client profile;
@@ -25,12 +26,13 @@ public class ClientLogicController {
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
 
-    private boolean workoutInterrupted;
     private int totalCompleted;
+    private boolean workoutInterrupted;
 
     public ClientLogicController(ControllerContext ctx,
                                  ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
+        super(ctx);
         this.ui = ClientUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.sheetDAO = sheetDAO;
         this.sessionDAO = sessionDAO;
@@ -40,23 +42,47 @@ public class ClientLogicController {
                 .orElseThrow(() -> new DatabaseException("Profilo cliente non trovato."));
     }
 
-    public void execute() {
+    @Override
+    protected boolean isUserActive() {
+        // Recuperiamo il DAO nel caso non sia già disponibile come campo
+        return context.connection() != null && new ClientDAO(context.connection()).findById(profile.getId())
+                .map(Client::isActive)
+                .orElse(false);
+    }
+
+    @Override
+    protected void showHeader() {
         ui.showHeader(profile.getFirstName());
-        boolean logout = false;
+    }
 
-        while (!logout) {
-            ui.showMainMenu();
-            int choice = ui.askForChoice();
+    @Override
+    protected void renderMenu() {
+        ui.showMainMenu();
+    }
 
-            switch (choice) {
-                case 1 -> startWorkoutSession();
-                case 2 -> viewActiveRoutine();
-                case 3 -> viewHistory();
-                case 0 -> logout = true;
-                default -> ui.reportError("Scelta non valida.");
-            }
+    @Override
+    protected int askForChoice() {
+        return ui.askForChoice();
+    }
+
+    @Override
+    protected void handleChoice(int choice) throws Exception {
+        switch (choice) {
+            case 1 -> startWorkoutSession();
+            case 2 -> viewActiveRoutine();
+            case 3 -> viewHistory();
+            default -> ui.reportError("Scelta non valida.");
         }
+    }
+
+    @Override
+    protected void onLogout() {
         ui.reportGoodbye();
+    }
+
+    @Override
+    protected void reportError(String message) {
+        ui.reportError(message);
     }
 
     private void startWorkoutSession() {

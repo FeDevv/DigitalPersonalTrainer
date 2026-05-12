@@ -10,6 +10,7 @@ import org.dpt.shared.workout.sheet.model.WorkoutSheet;
 import org.dpt.users.client.dao.ClientDAO;
 import org.dpt.users.client.model.Client;
 import org.dpt.users.pt.dao.PTDAO;
+import org.dpt.shared.ui.BaseLogicController;
 import org.dpt.users.pt.factory.PTUIFactory;
 import org.dpt.users.pt.model.PT;
 import org.dpt.users.pt.model.PerformanceDTO;
@@ -17,7 +18,7 @@ import org.dpt.users.pt.model.PerformanceDTO;
 import java.time.LocalDate;
 import java.util.List;
 
-public class PTLogicController {
+public class PTLogicController extends BaseLogicController {
 
     private final PTUI ui;
     private final PT profile;
@@ -30,6 +31,7 @@ public class PTLogicController {
     public PTLogicController(ControllerContext ctx,
                              ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
                              MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
+        super(ctx);
         this.ui = PTUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
         this.clientDAO = clientDAO;
         this.sheetDAO = sheetDAO;
@@ -42,24 +44,47 @@ public class PTLogicController {
                 .orElseThrow(() -> new DatabaseException("Profilo PT non trovato."));
     }
 
-    public void execute() {
+    @Override
+    protected boolean isUserActive() {
+        return ptDAO.findById(profile.getId())
+                .map(PT::isActive)
+                .orElse(false);
+    }
+
+    @Override
+    protected void showHeader() {
         ui.showHeader(profile.getFirstName());
-        boolean logout = false;
+    }
 
-        while (!logout) {
-            ui.showMainMenu();
-            int choice = ui.askForChoice();
+    @Override
+    protected void renderMenu() {
+        ui.showMainMenu();
+    }
 
-            switch (choice) {
-                case 1 -> createNewWorkoutSheet();
-                case 2 -> viewSheetHistory();
-                case 3 -> generateReport();
-                case 4 -> viewCatalog();
-                case 0 -> logout = true;
-                default -> ui.reportError("Scelta non valida.");
-            }
+    @Override
+    protected int askForChoice() {
+        return ui.askForChoice();
+    }
+
+    @Override
+    protected void handleChoice(int choice) throws Exception {
+        switch (choice) {
+            case 1 -> createNewWorkoutSheet();
+            case 2 -> viewSheetHistory();
+            case 3 -> generateReport();
+            case 4 -> viewCatalog();
+            default -> ui.reportError("Scelta non valida.");
         }
+    }
+
+    @Override
+    protected void onLogout() {
         ui.reportGoodbye();
+    }
+
+    @Override
+    protected void reportError(String message) {
+        ui.reportError(message);
     }
 
     private void createNewWorkoutSheet() {

@@ -13,15 +13,12 @@ public class Main {
 }
 
 /*
- NOTE ARCHITETTONICHE PER LO STUDIO:
- 
- 1. GESTIONE SELF-DEACTIVATION:
- se un addetto di segreteria si disattiva da solo, può continuare a girare nel sistema fino al riavvio,
- momento al quale non potrà fare l'accesso - locked out.
- - Scelta progettuale attuale: si privilegia la semplicità, l'utente finisce la sessione ma non può rientrare.
- 
- 2. LINGUA:
+ LINGUA:
  Ricordarsi di controllare la regola "CODICE IN INGLESE, OUTPUT IN ITALIANO" durante la revisione riga per riga.
 */
 
 // To resume this session: gemini --resume 6987a896-4a04-4c6c-bbf2-7ff9364b4ba8
+
+// Andare a sistemare la gerarchia di cartelle e file in shared!!!
+
+// da 499 a 562
