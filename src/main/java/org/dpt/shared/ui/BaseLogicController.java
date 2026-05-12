@@ -1,5 +1,6 @@
 package org.dpt.shared.ui;
 
+import org.dpt.exception.DPTException;
 import org.dpt.shared.context.ControllerContext;
 
 /**
@@ -45,9 +46,12 @@ public abstract class BaseLogicController {
                     handleChoice(choice);
                 }
                 
-            } catch (Exception e) {
-                // Centralizzazione della gestione errori UI
+            } catch (DPTException e) {
+                // Gestione specifica delle eccezioni di dominio (previste)
                 reportError(e.getMessage());
+            } catch (RuntimeException e) {
+                // Gestione degli errori imprevisti (bug o problemi tecnici seri)
+                reportError("Errore imprevisto del sistema: " + e.getMessage());
             }
         }
         
@@ -59,7 +63,7 @@ public abstract class BaseLogicController {
     protected abstract void showHeader();
     protected abstract void renderMenu();
     protected abstract int askForChoice();
-    protected abstract void handleChoice(int choice) throws Exception;
+    protected abstract void handleChoice(int choice);
     protected abstract void onLogout();
     protected abstract void reportError(String message);
 }

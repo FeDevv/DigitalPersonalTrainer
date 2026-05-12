@@ -66,7 +66,7 @@ public class ClientLogicController extends BaseLogicController {
     }
 
     @Override
-    protected void handleChoice(int choice) throws Exception {
+    protected void handleChoice(int choice) {
         switch (choice) {
             case 1 -> startWorkoutSession();
             case 2 -> viewActiveRoutine();

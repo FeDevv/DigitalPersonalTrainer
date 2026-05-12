@@ -62,7 +62,7 @@ public class OwnerLogicController extends BaseLogicController {
     }
 
     @Override
-    protected void handleChoice(int choice) throws Exception {
+    protected void handleChoice(int choice) {
         switch (choice) {
             case 1 -> manageMacchinari();
             case 2 -> manageEsercizi();

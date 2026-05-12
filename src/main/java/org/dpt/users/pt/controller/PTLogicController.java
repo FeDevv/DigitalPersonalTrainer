@@ -67,7 +67,7 @@ public class PTLogicController extends BaseLogicController {
     }
 
     @Override
-    protected void handleChoice(int choice) throws Exception {
+    protected void handleChoice(int choice) {
         switch (choice) {
             case 1 -> createNewWorkoutSheet();
             case 2 -> viewSheetHistory();

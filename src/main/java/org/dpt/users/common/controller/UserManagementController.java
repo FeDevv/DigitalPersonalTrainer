@@ -21,6 +21,7 @@ public class UserManagementController {
     private final ReceptionistDAO receptionistDAO;
     private final ClientDAO clientDAO;
     private final boolean canCreateClients;
+    private static final String UPDATED = "Stato utente aggiornato.";
 
     private final Map<Role, UserTypeHandler> userHandlers = new EnumMap<>(Role.class);
 
@@ -43,7 +44,7 @@ public class UserManagementController {
             @Override public void showList() { ui.showUtenti(ptDAO.getAll(), Role.PT.getPlural()); }
             @Override public void toggleStatus() {
                 ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
-                ui.reportSuccess("Stato utente aggiornato.");
+                ui.reportSuccess(UPDATED);
             }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); ui.reportSuccess("Personal Trainer inserito."); }
         });
@@ -53,7 +54,7 @@ public class UserManagementController {
             @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
             @Override public void toggleStatus() {
                 receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
-                ui.reportSuccess("Stato utente aggiornato.");
+                ui.reportSuccess(UPDATED);
             }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); ui.reportSuccess("Addetto segreteria inserito."); }
         });
@@ -65,7 +66,7 @@ public class UserManagementController {
                 int id = ui.askForIDUtente();
                 if (ui.askForNewStatus()) clientDAO.activate(id);
                 else clientDAO.deactivate(id);
-                ui.reportSuccess("Stato utente aggiornato.");
+                ui.reportSuccess(UPDATED);
             }
             @Override public void createNew() {
                 if (canCreateClients) {
