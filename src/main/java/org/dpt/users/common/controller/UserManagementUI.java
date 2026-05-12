@@ -12,17 +12,17 @@ import java.util.List;
  * Permette al UserManagementController di operare in modo agnostico rispetto alla View specifica.
  */
 public interface UserManagementUI {
-    void showUtenzeMenu();
-    void showUtenzaActionMenu(Role tipo);
+    void showUsersMenu();
+    void showUserActionMenu(Role tipo);
     int askForChoice();
     
     UserCreationDTO askForStaffData();
     ClientCreationDTO askForClientData();
     
-    int askForIDUtente();
+    int askForUserID();
     boolean askForNewStatus();
 
-    void showUtenti(List<? extends User> lista, String titolo);
+    void showUsers(List<? extends User> lista, String titolo);
 
     void reportError(String message);
     void reportSuccess(String message);

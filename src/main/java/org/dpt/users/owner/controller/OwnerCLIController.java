@@ -31,16 +31,16 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     public void showMainMenu() { ownerView.displayMainMenu(); }
 
     @Override
-    public void showMacchinariMenu() { ownerView.displayMacchinariMenu(); }
+    public void showMachineMenu() { ownerView.displayMachineMenu(); }
 
     @Override
-    public void showEserciziMenu() { ownerView.displayEserciziMenu(); }
+    public void showExerciseMenu() { ownerView.displayExercisesMenu(); }
 
     @Override
-    public void showUtenzeMenu() { ownerView.displayUtenzeMenu(); }
+    public void showUsersMenu() { ownerView.displayUsersMenu(); }
 
     @Override
-    public void showUtenzaActionMenu(Role role) { ownerView.displayUtenzaActionMenu(role); }
+    public void showUserActionMenu(Role role) { ownerView.displayUserActionMenu(role); }
 
     @Override
     public int askForChoice() { return readInt(""); }
@@ -65,7 +65,7 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
                 ownerView.displayError("Non ci sono macchinari disponibili. L'esercizio verrà creato come corpo libero.");
                 corpoLibero = true;
             } else {
-                ownerView.displayMacchinari(availableMachines);
+                ownerView.displayMachines(availableMachines);
                 machineId = readInt("Inserisci ID Macchinario associato:");
             }
         }
@@ -91,13 +91,13 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     // --- TOGGLE & STATO ---
 
     @Override
-    public int askForIDMacchinarioDaToggle() { return readInt("ID Macchinario da attivare/disattivare:"); }
+    public int askForMachineIDToggle() { return readInt("ID Macchinario da attivare/disattivare:"); }
 
     @Override
-    public int askForIDEsercizioDaToggle() { return readInt("ID Esercizio da attivare/disattivare:"); }
+    public int askForExerciseIDToggle() { return readInt("ID Esercizio da attivare/disattivare:"); }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare:"); }
+    public int askForUserID() { return readInt("ID Utente da attivare/disattivare:"); }
 
     @Override
     public boolean askForNewStatus() {
@@ -110,13 +110,13 @@ public class OwnerCLIController extends BaseCLIController implements OwnerUI {
     }
 
     @Override
-    public void showMacchinari(List<Machine> lista) { ownerView.displayMacchinari(lista); }
+    public void showMachines(List<Machine> lista) { ownerView.displayMachines(lista); }
 
     @Override
-    public void showEsercizi(List<Exercise> lista) { ownerView.displayEsercizi(lista); }
+    public void showExercises(List<Exercise> lista) { ownerView.displayExercises(lista); }
 
     @Override
-    public void showUtenti(List<? extends User> lista, String titolo) { ownerView.renderUserTable(lista, titolo); }
+    public void showUsers(List<? extends User> lista, String titolo) { ownerView.renderUserTable(lista, titolo); }
 
     @Override
     public void reportSuccess(String message) { ownerView.displaySuccess(message); }

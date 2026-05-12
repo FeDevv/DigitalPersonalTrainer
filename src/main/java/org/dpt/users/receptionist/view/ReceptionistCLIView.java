@@ -17,7 +17,7 @@ public class ReceptionistCLIView extends BaseCLIView {
         displayLine("0. Logout");
     }
 
-    public void displayUtenzeMenu() {
+    public void displayUsersMenu() {
         displaySectionTitle("Gestione UTENZE");
         displayLine("1. Gestione PERSONAL TRAINER");
         displayLine("2. Gestione ADDETTI SEGRETERIA");
@@ -25,7 +25,7 @@ public class ReceptionistCLIView extends BaseCLIView {
         displayLine("0. Torna indietro");
     }
 
-    public void displayUtenzaActionMenu(Role role) {
+    public void displayUserActionMenu(Role role) {
         displaySectionTitle("Azioni " + role);
         displayLine("1. Visualizza lista " + role.getPlural());
         displayLine("2. Attiva/Disattiva " + role.getSingular());

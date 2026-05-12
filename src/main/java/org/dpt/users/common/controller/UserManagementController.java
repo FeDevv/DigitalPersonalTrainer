@@ -41,9 +41,9 @@ public class UserManagementController {
     private void initializeHandlers() {
         // Gestore per i Personal Trainer
         userHandlers.put(Role.PT, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(ptDAO.getAll(), Role.PT.getPlural()); }
+            @Override public void showList() { ui.showUsers(ptDAO.getAll(), Role.PT.getPlural()); }
             @Override public void toggleStatus() {
-                ptDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
+                ptDAO.updateStatus(ui.askForUserID(), ui.askForNewStatus());
                 ui.reportSuccess(UPDATED);
             }
             @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); ui.reportSuccess("Personal Trainer inserito."); }
@@ -51,9 +51,9 @@ public class UserManagementController {
 
         // Gestore per gli Addetti Segreteria
         userHandlers.put(Role.RECEPTIONIST, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
+            @Override public void showList() { ui.showUsers(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
             @Override public void toggleStatus() {
-                receptionistDAO.updateStatus(ui.askForIDUtente(), ui.askForNewStatus());
+                receptionistDAO.updateStatus(ui.askForUserID(), ui.askForNewStatus());
                 ui.reportSuccess(UPDATED);
             }
             @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); ui.reportSuccess("Addetto segreteria inserito."); }
@@ -61,9 +61,9 @@ public class UserManagementController {
 
         // Gestore per i Clienti
         userHandlers.put(Role.CLIENT, new UserTypeHandler() {
-            @Override public void showList() { ui.showUtenti(clientDAO.getAll(), Role.CLIENT.getPlural()); }
+            @Override public void showList() { ui.showUsers(clientDAO.getAll(), Role.CLIENT.getPlural()); }
             @Override public void toggleStatus() {
-                int id = ui.askForIDUtente();
+                int id = ui.askForUserID();
                 if (ui.askForNewStatus()) clientDAO.activate(id);
                 else clientDAO.deactivate(id);
                 ui.reportSuccess(UPDATED);
@@ -79,28 +79,28 @@ public class UserManagementController {
         });
     }
 
-    public void manageUtenze() {
+    public void manageUsers() {
         boolean back = false;
         while (!back) {
-            ui.showUtenzeMenu();
+            ui.showUsersMenu();
             int choice = ui.askForChoice();
             switch (choice) {
-                case 1 -> manageUtenzaSpecifica(Role.PT);
-                case 2 -> manageUtenzaSpecifica(Role.RECEPTIONIST);
-                case 3 -> manageUtenzaSpecifica(Role.CLIENT);
+                case 1 -> manageSpecificUser(Role.PT);
+                case 2 -> manageSpecificUser(Role.RECEPTIONIST);
+                case 3 -> manageSpecificUser(Role.CLIENT);
                 case 0 -> back = true;
                 default -> ui.reportError("Scelta non valida.");
             }
         }
     }
 
-    private void manageUtenzaSpecifica(Role role) {
+    private void manageSpecificUser(Role role) {
         UserTypeHandler handler = userHandlers.get(role);
         if (handler == null) return;
 
         boolean back = false;
         while (!back) {
-            ui.showUtenzaActionMenu(role);
+            ui.showUserActionMenu(role);
             int choice = ui.askForChoice();
             try {
                 switch (choice) {

@@ -76,11 +76,10 @@ public class Orchestrator {
 
         dispatchMap.put(Role.CLIENT, (config, token) -> {
             ControllerContext ctx = new ControllerContext(config, sharedScanner, token, conn);
-            ClientDAO clientDAO = new ClientDAO(conn);
             WorkoutSheetDAO sheetDAO = new WorkoutSheetDAO(conn);
             WorkoutSessionDAO sessionDAO = new WorkoutSessionDAO(conn);
             PerformedSetDAO setDAO = new PerformedSetDAO(conn);
-            new ClientLogicController(ctx, clientDAO, sheetDAO, sessionDAO, setDAO).execute();
+            new ClientLogicController(ctx, sheetDAO, sessionDAO, setDAO).execute();
         });
     }
 

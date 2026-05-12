@@ -64,9 +64,9 @@ public class OwnerLogicController extends BaseLogicController {
     @Override
     protected void handleChoice(int choice) {
         switch (choice) {
-            case 1 -> manageMacchinari();
-            case 2 -> manageEsercizi();
-            case 3 -> userManagementController.manageUtenze();
+            case 1 -> manageMachines();
+            case 2 -> manageExercises();
+            case 3 -> userManagementController.manageUsers();
             default -> ui.reportError(INVALID_CHOICE);
         }
     }
@@ -81,16 +81,16 @@ public class OwnerLogicController extends BaseLogicController {
         ui.reportError(message);
     }
 
-    private void manageMacchinari() {
+    private void manageMachines() {
         boolean back = false;
         while (!back) {
-            ui.showMacchinariMenu();
+            ui.showMachineMenu();
             int choice = ui.askForChoice();
             try {
                 switch (choice) {
-                    case 1 -> ui.showMacchinari(machineDAO.getAll());
+                    case 1 -> ui.showMachines(machineDAO.getAll());
                     case 2 -> {
-                        int id = ui.askForIDMacchinarioDaToggle();
+                        int id = ui.askForMachineIDToggle();
                         boolean status = ui.askForNewStatus();
                         machineDAO.updateStatus(id, status);
                         ui.reportSuccess("Stato aggiornato.");
@@ -109,16 +109,16 @@ public class OwnerLogicController extends BaseLogicController {
         }
     }
 
-    private void manageEsercizi() {
+    private void manageExercises() {
         boolean back = false;
         while (!back) {
-            ui.showEserciziMenu();
+            ui.showExerciseMenu();
             int choice = ui.askForChoice();
             try {
                 switch (choice) {
-                    case 1 -> ui.showEsercizi(exerciseDAO.getAll());
+                    case 1 -> ui.showExercises(exerciseDAO.getAll());
                     case 2 -> {
-                        int id = ui.askForIDEsercizioDaToggle();
+                        int id = ui.askForExerciseIDToggle();
                         boolean status = ui.askForNewStatus();
                         exerciseDAO.updateStatus(id, status);
                         ui.reportSuccess("Stato aggiornato.");

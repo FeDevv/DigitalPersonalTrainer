@@ -61,7 +61,7 @@ public class ReceptionistLogicController extends BaseLogicController {
     @Override
     protected void handleChoice(int choice) {
         switch (choice) {
-            case 1 -> userManagementController.manageUtenze();
+            case 1 -> userManagementController.manageUsers();
             case 2 -> makeAssignment();
             default -> ui.reportError("Scelta non valida.");
         }

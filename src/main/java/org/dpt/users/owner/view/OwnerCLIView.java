@@ -25,7 +25,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("0. Logout");
     }
 
-    public void displayMacchinariMenu() {
+    public void displayMachineMenu() {
         displaySectionTitle("Gestione MACCHINARI");
         displayLine("1. Visualizza tutti i MACCHINARI");
         displayLine("2. Attiva/Disattiva MACCHINARIO");
@@ -33,7 +33,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("0. " + GO_BACK);
     }
 
-    public void displayEserciziMenu() {
+    public void displayExercisesMenu() {
         displaySectionTitle("Gestione ESERCIZI");
         displayLine("1. Visualizza tutti gli ESERCIZI");
         displayLine("2. Attiva/Disattiva ESERCIZIO");
@@ -41,7 +41,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("0. " + GO_BACK);
     }
 
-    public void displayUtenzeMenu() {
+    public void displayUsersMenu() {
         displaySectionTitle("Gestione UTENZE");
         displayLine("1. Gestione PERSONAL TRAINER");
         displayLine("2. Gestione ADDETTI SEGRETERIA");
@@ -49,7 +49,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("0. " + GO_BACK);
     }
 
-    public void displayUtenzaActionMenu(Role role) {
+    public void displayUserActionMenu(Role role) {
         displaySectionTitle("Azioni " + role);
         displayLine("1. Visualizza lista " + role.getPlural());
         displayLine("2. Attiva/Disattiva " + role.getSingular());
@@ -59,7 +59,7 @@ public class OwnerCLIView extends BaseCLIView {
         displayLine("0. " + GO_BACK);
     }
 
-    public void displayMacchinari(List<Machine> lista) {
+    public void displayMachines(List<Machine> lista) {
         displaySectionTitle("Elenco Macchinari");
         
         String[] headers = {"ID", "NOME MACCHINARIO", "STATO"};
@@ -75,7 +75,7 @@ public class OwnerCLIView extends BaseCLIView {
         renderTable(headers, rows, new int[]{5, 30, 10});
     }
 
-    public void displayEsercizi(List<Exercise> lista) {
+    public void displayExercises(List<Exercise> lista) {
         displaySectionTitle("Elenco Esercizi");
         
         String[] headers = {"ID", "NOME ESERCIZIO", "STATO", "TIPO/MACCHINA"};

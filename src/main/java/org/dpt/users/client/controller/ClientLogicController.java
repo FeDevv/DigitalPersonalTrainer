@@ -22,6 +22,7 @@ public class ClientLogicController extends BaseLogicController {
 
     private final ClientUI ui;
     private final Client profile;
+    private final ClientDAO clientDAO;
     private final WorkoutSheetDAO sheetDAO;
     private final WorkoutSessionDAO sessionDAO;
     private final PerformedSetDAO setDAO;
@@ -30,22 +31,22 @@ public class ClientLogicController extends BaseLogicController {
     private boolean workoutInterrupted;
 
     public ClientLogicController(ControllerContext ctx,
-                                 ClientDAO clientDAO, WorkoutSheetDAO sheetDAO,
+                                 WorkoutSheetDAO sheetDAO,
                                  WorkoutSessionDAO sessionDAO, PerformedSetDAO setDAO) {
         super(ctx);
         this.ui = ClientUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
+        this.clientDAO = new ClientDAO(ctx.connection());
         this.sheetDAO = sheetDAO;
         this.sessionDAO = sessionDAO;
         this.setDAO = setDAO;
 
-        this.profile = clientDAO.findById(ctx.token().userId())
+        this.profile = this.clientDAO.findById(ctx.token().userId())
                 .orElseThrow(() -> new DatabaseException("Profilo cliente non trovato."));
     }
 
     @Override
     protected boolean isUserActive() {
-        // Recuperiamo il DAO nel caso non sia già disponibile come campo
-        return context.connection() != null && new ClientDAO(context.connection()).findById(profile.getId())
+        return clientDAO.findById(profile.getId())
                 .map(Client::isActive)
                 .orElse(false);
     }

@@ -29,10 +29,10 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     public void showMainMenu() { recView.displayMainMenu(); }
 
     @Override
-    public void showUtenzeMenu() { recView.displayUtenzeMenu(); }
+    public void showUsersMenu() { recView.displayUsersMenu(); }
 
     @Override
-    public void showUtenzaActionMenu(Role role) { recView.displayUtenzaActionMenu(role); }
+    public void showUserActionMenu(Role role) { recView.displayUserActionMenu(role); }
 
     @Override
     public int askForChoice() { return readInt(""); }
@@ -63,7 +63,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     }
 
     @Override
-    public int askForIDUtente() { return readInt("ID Utente da attivare/disattivare:"); }
+    public int askForUserID() { return readInt("ID Utente da attivare/disattivare:"); }
 
     @Override
     public boolean askForNewStatus() {
@@ -82,7 +82,7 @@ public class ReceptionistCLIController extends BaseCLIController implements Rece
     public int askForClientId() { return readInt("ID del Cliente:"); }
 
     @Override
-    public void showUtenti(List<? extends User> lista, String titolo) { recView.renderUserTable(lista, titolo); }
+    public void showUsers(List<? extends User> lista, String titolo) { recView.renderUserTable(lista, titolo); }
 
     @Override
     public void reportSuccess(String message) { recView.displaySuccess(message); }
