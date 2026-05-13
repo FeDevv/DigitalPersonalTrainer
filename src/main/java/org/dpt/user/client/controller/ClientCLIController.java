@@ -1,0 +1,95 @@
+package org.dpt.user.client.controller;
+
+import org.dpt.shared.mvc.AbstractCLIController;
+import org.dpt.domain.workout.sheet.model.ActiveSheetItem;
+import org.dpt.domain.workout.sheet.model.WorkoutSheet;
+import org.dpt.user.client.view.ClientCLIView;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class ClientCLIController extends AbstractCLIController implements ClientUI {
+
+    private final ClientCLIView clientView;
+
+    public ClientCLIController(Scanner scanner) {
+        super(scanner, new ClientCLIView());
+        this.clientView = (ClientCLIView) super.view;
+    }
+
+    @Override
+    public void showHeader(String clientName) { clientView.displayClientHeader(clientName); }
+
+    @Override
+    public void showMainMenu() { clientView.displayMainMenu(); }
+
+    @Override
+    public int askForChoice() { return readInt(""); }
+
+    @Override
+    public void showRoutine(String title, List<ActiveSheetItem> routine) { clientView.displayActiveRoutine(title, routine); }
+
+    @Override
+    public void showSheetHistory(List<WorkoutSheet> history) { clientView.displaySheetHistory(history); }
+
+    @Override
+    public int askForID(String prompt) {
+        return readInt(prompt);
+    }
+
+    // --- WORKOUT ---
+    public void showWorkoutStart(String sheetName) { clientView.displayWorkoutStart(sheetName); }
+
+    @Override
+    public void showExerciseProgress(int currentEx, int totalEx, String exName, String notes) {
+        clientView.displayExerciseHeader(currentEx, totalEx, exName, notes);
+    }
+
+    @Override
+    public void showSetProgress(int currentSet, int totalSets, int reps) {
+        clientView.displaySetInfo(currentSet, totalSets, reps);
+    }
+
+    @Override
+    public int askSetAction() {
+        clientView.displaySetMenu();
+        int choice = readInt("");
+        while (choice < 0 || choice > 3) {
+            clientView.displayError("Scelta non valida.");
+            choice = readInt("");
+        }
+        return choice;
+    }
+
+    @Override
+    public Double askForWeight() {
+        String input = readOptionalString("Carico utilizzato (kg) [premi invio per saltare]:");
+        if (input.isEmpty()) return null;
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException _) {
+            clientView.displayError("Formato non valido. Peso impostato a NULL.");
+            return null;
+        }
+    }
+
+    @Override
+    public void showRestTimer(int seconds) {
+        clientView.displayRestTimer(seconds);
+        scanner.nextLine(); // serve per aspettare l'invio per continuare
+    }
+
+    @Override
+    public void showWorkoutSummary(int completedSets, int totalSets, int percentage) {
+        clientView.displayWorkoutSummary(completedSets, totalSets, percentage);
+    }
+
+    @Override
+    public void reportInfo(String message) { clientView.displayLine("\n[INFO] " + message); }
+
+    @Override
+    public void reportSuccess(String message) { clientView.displaySuccess(message); }
+
+    @Override
+    public void reportGoodbye() { clientView.displayGoodbye(); }
+}

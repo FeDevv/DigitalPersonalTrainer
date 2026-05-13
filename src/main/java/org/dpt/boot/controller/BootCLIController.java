@@ -2,14 +2,14 @@ package org.dpt.boot.controller;
 
 import org.dpt.boot.model.UIMode;
 import org.dpt.boot.view.BootCLIView;
-import org.dpt.shared.ui.BaseCLIController;
+import org.dpt.shared.mvc.AbstractCLIController;
 
 import java.util.Scanner;
 
 /**
  * Gestisce il flusso dell'interfaccia CLI per il boot.
  */
-public class BootCLIController extends BaseCLIController {
+public class BootCLIController extends AbstractCLIController {
 
     private final BootCLIView bootView;
 

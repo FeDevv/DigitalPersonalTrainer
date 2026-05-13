@@ -12,6 +12,17 @@ public class Main {
 
 }
 
-// riscrivere i commenti
-// Andare a sistemare la gerarchia di cartelle e file in shared!!!
-// studiare
+// riscrivendo i commenti
+
+// To resume this session: gemini --resume c4c91b77-3068-44e0-9f6f-358fbe6e0d56
+/*
+* Packages DONE
+* - connection
+* - shared
+* - auth
+* - boot
+* */
+
+// domain - ricontrollare se i commenti in workout sono corretti. Teoricamente domain.catalog e domain.user sono ben commentati.
+
+// duplicazione PTCLIView e ClientCLIView - displaySheetDetails e displayActiveRoutine rispettivamente

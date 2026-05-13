@@ -1,6 +1,6 @@
 package org.dpt.connection;
 
-import org.dpt.shared.auth.Role;
+import org.dpt.auth.Role;
 import org.dpt.exception.DatabaseException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,17 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Gestore delle connessioni al Database (Singleton Bill Pugh).
- * Ottimizzato per thread-safety e performance senza blocchi synchronized.
- * Segue il principio di separazione delle responsabilità: nessuna interazione diretta con l'UI.
+ * Gestore centralizzato del ciclo di vita delle connessioni JDBC verso MariaDB.
+ * -
+ * Implementa il pattern Singleton tramite l'idioma "Bill Pugh Holder" per garantire
+ * la massima efficienza in termini di thread-safety e caricamento lazy, evitando
+ * l'overhead della sincronizzazione esplicita.
+ * -
+ * Il componente agisce come motore del meccanismo di sicurezza RBAC (Role-Based Access Control)
+ * dell'applicazione. Implementa la strategia "Handshake & Switch": dopo l'autenticazione
+ * iniziale, gestisce il ricollegamento fisico al database utilizzando l'utente DBMS
+ * specifico per il ruolo dell'utente, garantendo così l'integrità dei dati direttamente 
+ * tramite i privilegi definiti sul server SQL.
  */
 public class DBConnectionManager {
 
@@ -20,7 +28,8 @@ public class DBConnectionManager {
     private Connection currentConnection;
 
     /**
-     * Costruttore privato per impedire l'istanziazione esterna.
+     * Costruttore privato. Carica le configurazioni di rete dal file db.properties.
+     * @throws DatabaseException Se il file di configurazione è mancante o illeggibile.
      */
     private DBConnectionManager() {
         this.dbProps = new Properties();
@@ -28,17 +37,26 @@ public class DBConnectionManager {
     }
 
     /**
-     * Classe interna statica (Bill Pugh Holder).
-     * Caricata dalla JVM solo alla prima chiamata di getInstance().
+     * Holder statico per l'istanza Singleton. 
+     * Caricato dalla JVM solo alla prima invocazione di getInstance().
      */
     private static class InstanceHolder {
         private static final DBConnectionManager INSTANCE = new DBConnectionManager();
     }
 
+    /**
+     * Restituisce il punto di accesso unico al gestore delle connessioni.
+     * @return L'istanza Singleton di DBConnectionManager.
+     */
     public static DBConnectionManager getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
+    /**
+     * Carica le proprietà di configurazione dal classpath.
+     * In caso di errore, viene sollevata una DatabaseException per segnalare 
+     * l'impossibilità di inizializzare lo strato di persistenza.
+     */
     private void loadProperties() {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
             if (input == null) {
@@ -51,10 +69,15 @@ public class DBConnectionManager {
     }
 
     /**
-     * Implementa il Role Switching chiudendo la connessione attiva e aprendone una nuova.
-     * @param role Il ruolo con cui collegarsi.
-     * @return La nuova connessione stabilita.
-     * @throws DatabaseException Se la connessione fallisce o le credenziali mancano.
+     * Esegue lo switching della connessione in base al ruolo specificato.
+     * -
+     * Questo metodo chiude la connessione esistente e ne instaura una nuova 
+     * utilizzando le credenziali MariaDB associate al ruolo. Questo approccio 
+     * delega la sicurezza dei dati al DBMS, sfruttando i GRANT specifici.
+     * 
+     * @param role Il ruolo (Role) con cui stabilire la sessione database.
+     * @return La connessione JDBC attiva con i privilegi del ruolo.
+     * @throws DatabaseException Se la connessione fallisce o mancano le credenziali.
      */
     public Connection connectAs(Role role) throws DatabaseException {
         closeConnection();
@@ -78,14 +101,17 @@ public class DBConnectionManager {
         }
     }
 
+    /**
+     * Recupera il riferimento alla connessione attualmente attiva.
+     * @return Connection JDBC corrente, o null se non è stata stabilita una sessione.
+     */
     public Connection getConnection() {
         return currentConnection;
     }
 
     /**
-     * Chiude la connessione corrente se aperta.
-     * Gestisce l'eventuale SQLException rilanciandola come DatabaseException 
-     * per permettere ai layer superiori di decidere come notificare l'errore.
+     * Chiude la sessione database corrente rilasciando le risorse sul server.
+     * Garantisce l'idempotenza e gestisce eventuali eccezioni durante il teardown.
      */
     public void closeConnection() {
         try {

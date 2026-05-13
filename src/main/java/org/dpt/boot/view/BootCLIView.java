@@ -1,26 +1,37 @@
 package org.dpt.boot.view;
 
 import org.dpt.boot.model.UIMode;
-import org.dpt.shared.ui.BaseCLIView;
+import org.dpt.shared.mvc.AbstractCLIView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Gestisce ESCLUSIVAMENTE l'output a schermo per il boot.
+ * Componente di visualizzazione CLI specializzato per la fase di avvio.
+ * -
+ * Estende {@link AbstractCLIView} per ereditare le capacità di rendering grafico 
+ * e tabellare, focalizzandosi esclusivamente sulla presentazione dei messaggi di 
+ * benvenuto e del menu di configurazione iniziale del sistema.
  */
 @SuppressWarnings("java:S106")
-public class BootCLIView extends BaseCLIView {
+public class BootCLIView extends AbstractCLIView {
 
+    /**
+     * Visualizza il banner di benvenuto e notifica l'inizio dell'inizializzazione.
+     */
     public void displayWelcome() {
         displayWelcomeBanner();
-        displayLine("Inizializzazione sistema in corso...");
+        displayLine("Inizializzazione dei moduli core in corso...");
     }
 
+    /**
+     * Renderizza il menu di selezione della modalità UI utilizzando il toolkit tabellare.
+     * @param modes Array di modalità disponibili acquisite dall'enum UIMode.
+     */
     public void displayMenu(UIMode[] modes) {
-        displaySectionTitle("Configurazione Interfaccia");
+        displaySectionTitle("Configurazione Ambiente di Esecuzione");
         
-        String[] headers = {"ID", "MODALITÀ", "DESCRIZIONE"};
+        String[] headers = {"ID", "MODALITÀ", "DESCRIZIONE TECNICA"};
         List<String[]> rows = new ArrayList<>();
         for (UIMode mode : modes) {
             rows.add(new String[]{
@@ -30,6 +41,6 @@ public class BootCLIView extends BaseCLIView {
             });
         }
         
-        renderTable(headers, rows, new int[]{3, 10, 30});
+        renderTable(headers, rows, new int[]{3, 10, 42});
     }
 }
