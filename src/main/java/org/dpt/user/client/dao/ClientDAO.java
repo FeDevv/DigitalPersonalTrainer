@@ -11,12 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Data Access Object specializzato per la gestione dell'entità Cliente.
+ * -
+ * Implementa l'accesso ai dati per la tabella 'CLIENTE', gestendo sia le query 
+ * di ricerca semplici che le operazioni amministrative complesse. 
+ * Si interfaccia con:
+ * <ul>
+ *   <li><b>Stored Procedures:</b> Utilizza {@code sp_disattiva_cliente} per garantire 
+ *       una disattivazione atomica (soft-delete) di account e schede associate.</li>
+ *   <li><b>Join Complesse:</b> Gestisce il recupero dei clienti assegnati a uno specifico 
+ *       Personal Trainer tramite l'analisi della tabella di relazione 'ASSEGNA'.</li>
+ * </ul>
+ */
 public class ClientDAO {
     private final Connection connection;
 
     private static final String FIND_BY_ID = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE ID_Cliente = ?";
     private static final String SELECT_ALL = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE ORDER BY ID_Cliente";
     private static final String FIND_ALL_BY_STATUS = "SELECT ID_Cliente, Nome, Cognome, Email, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita, Cliente_Attivo FROM CLIENTE WHERE Cliente_Attivo = ? ORDER BY ID_Cliente";
+    
+    /** Query di ricerca per PT: estrae solo gli atleti attivi attualmente assegnati all'istruttore. */
     private static final String FIND_ASSIGNED_TO_PT = """
                 SELECT c.ID_Cliente, c.Nome, c.Cognome, c.Email, c.Codice_Fiscale, c.Indirizzo_Residenza, c.Data_Nascita, c.Cliente_Attivo 
                 FROM CLIENTE c 
@@ -24,6 +39,7 @@ public class ClientDAO {
                 WHERE a.ID_PT = ? AND a.Assegnazione_Attiva = 1 AND c.Cliente_Attivo = 1
                 ORDER BY c.ID_Cliente
                 """;
+                
     private static final String DEACTIVATE_CLIENT = "{CALL sp_disattiva_cliente(?)}";
     private static final String INSERT_CLIENT = "INSERT INTO CLIENTE (Nome, Cognome, Email, Password, Codice_Fiscale, Indirizzo_Residenza, Data_Nascita) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_STATUS = "UPDATE CLIENTE SET Cliente_Attivo = ? WHERE ID_Cliente = ?";
@@ -32,6 +48,7 @@ public class ClientDAO {
         this.connection = connection;
     }
 
+    /** Recupera il profilo completo di un cliente tramite il suo identificativo univoco. */
     public Optional<Client> findById(int id) {
         try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
@@ -46,14 +63,17 @@ public class ClientDAO {
         return Optional.empty();
     }
 
+    /** Restituisce l'elenco di tutti i clienti registrati nel sistema. */
     public List<Client> getAll() {
         return findByQuery(SELECT_ALL, null);
     }
 
+    /** Filtra l'anagrafica clienti in base allo stato di attivazione. */
     public List<Client> findAll(boolean active) {
         return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
 
+    /** Recupera la lista degli atleti seguiti da un determinato Personal Trainer. */
     public List<Client> findAssignedToPT(int ptId) {
         return findByQuery(FIND_ASSIGNED_TO_PT, new Object[]{ptId});
     }
@@ -77,6 +97,7 @@ public class ClientDAO {
         return list;
     }
 
+    /** Centralizza il mapping tra le righe JDBC e l'oggetto di dominio Client. */
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
         ClientPersonalInfo info = new ClientPersonalInfo(
                 rs.getString("Codice_Fiscale"),
@@ -94,6 +115,10 @@ public class ClientDAO {
         );
     }
 
+    /** 
+     * Esegue la disattivazione logica del cliente invocando la logica procedurale del database.
+     * Questa operazione è irreversibile a livello di schede attive.
+     */
     public void deactivate(int clientId) {
         try (CallableStatement cstmt = connection.prepareCall(DEACTIVATE_CLIENT)) {
             cstmt.setInt(1, clientId);
@@ -103,10 +128,12 @@ public class ClientDAO {
         }
     }
 
+    /** Riattiva un profilo cliente precedentemente disabilitato. */
     public void activate(int id) {
         updateActiveStatus(id, true);
     }
 
+    /** Registra una nuova anagrafica cliente nel database. */
     public void insert(ClientCreationDTO data) {
         try (PreparedStatement pstmt = connection.prepareStatement(INSERT_CLIENT)) {
             pstmt.setString(1, data.userBase().firstName());
@@ -122,6 +149,7 @@ public class ClientDAO {
         }
     }
 
+    /** Metodo atomico per la modifica dello stato di attività di un cliente. */
     public void updateActiveStatus(int clientId, boolean active) {
         try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);

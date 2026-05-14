@@ -8,4 +8,3 @@
     Utilizzo di metodi template (executeQuery, executeUpdate) e varargs (Object... params)
     per eliminare il boilerplate nei DAO concreti, centralizzando la gestione delle eccezioni
     e delle risorse JDBC, lasciando ai figli solo il mapping (mapResultSetToEntity).
-

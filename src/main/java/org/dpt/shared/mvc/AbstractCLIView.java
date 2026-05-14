@@ -1,6 +1,7 @@
 package org.dpt.shared.mvc;
 
 import org.dpt.domain.user.User;
+import org.dpt.domain.workout.sheet.model.ActiveSheetItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,5 +169,30 @@ public class AbstractCLIView {
         }
 
         renderTable(headers, rows, new int[]{5, 30, 10});
+    }
+
+    /**
+     * Renderizza il dettaglio tecnico degli esercizi contenuti in una scheda d'allenamento.
+     * Metodo condiviso tra l'area PT e l'area Cliente per garantire coerenza visuale.
+     *
+     * @param title Titolo della sezione (es. nome della scheda).
+     * @param details Lista di item della scheda (esercizi, serie, reps, recupero).
+     */
+    public void renderExerciseTable(String title, List<ActiveSheetItem> details) {
+        displaySectionTitle(title);
+
+        String[] headers = {"ESERCIZIO", "SERIE", "REP", "RECUPERO", "NOTE"};
+        List<String[]> rows = new ArrayList<>();
+        for (ActiveSheetItem item : details) {
+            rows.add(new String[]{
+                    item.exerciseName(),
+                    String.valueOf(item.expectedSets()),
+                    String.valueOf(item.expectedReps()),
+                    item.restTime() + "s",
+                    item.executionNotes() != null ? item.executionNotes() : "-"
+            });
+        }
+
+        renderTable(headers, rows, new int[]{31, 6, 6, 10, 25});
     }
 }

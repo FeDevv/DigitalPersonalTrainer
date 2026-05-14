@@ -2,7 +2,7 @@ package org.dpt.domain.workout.sheet.model;
 
 /**
  * Modello di scrittura per l'associazione tra Scheda ed Esercizio.
- * 
+ * -
  * Mappa la tabella di relazione 'COMPOSTA'. Viene utilizzato principalmente in 
  * fase di redazione della scheda per definire i parametri tecnici di un singolo 
  * esercizio inserito nel piano.

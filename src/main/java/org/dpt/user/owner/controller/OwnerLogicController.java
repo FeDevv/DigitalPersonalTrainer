@@ -15,16 +15,41 @@ import org.dpt.user.owner.model.Owner;
 import org.dpt.user.pt.dao.PTDAO;
 import org.dpt.user.receptionist.dao.ReceptionistDAO;
 
+/**
+ * Controller logico principale per le funzionalità del Proprietario.
+ * -
+ * Estende {@link AbstractLogicController} implementando il workflow operativo 
+ * dedicato alla gestione totale del centro sportivo.
+ * -
+ * Il controller orchestra tre macro-aree funzionali:
+ * <ul>
+ *   <li><b>Gestione Macchinari:</b> Coordinamento della manutenzione del parco macchine.</li>
+ *   <li><b>Gestione Catalogo (Esercizi):</b> Definizione del "saper fare" tecnico della palestra.</li>
+ *   <li><b>Gestione Risorse Umane:</b> Amministrazione dello staff e dei clienti tramite 
+ *       delega al {@link UserManagementController}.</li>
+ * </ul>
+ */
 public class OwnerLogicController extends AbstractLogicController {
 
     private final OwnerUI ui;
     private final Owner profile;
     private final MachineDAO machineDAO;
     private final ExerciseDAO exerciseDAO;
+    
+    /** Controller iniettato per la gestione condivisa delle anagrafiche. */
     private final UserManagementController userManagementController;
 
-    private static final String INVALID_CHOICE = "scelta non valida.";
+    private static final String INVALID_CHOICE = "Selezione non valida.";
 
+    /**
+     * Inizializza il modulo Owner caricando il profilo dell'utente loggato.
+     * @param ctx Contesto di esecuzione.
+     * @param ptDAO DAO per i Personal Trainer (per delega management).
+     * @param receptionistDAO DAO per la segreteria (per delega management).
+     * @param clientDAO DAO per i clienti (per delega management).
+     * @param machineDAO DAO per la gestione macchinari.
+     * @param exerciseDAO DAO per la gestione esercizi.
+     */
     public OwnerLogicController(ControllerContext ctx, 
                                 PTDAO ptDAO, ReceptionistDAO receptionistDAO, ClientDAO clientDAO,
                                 MachineDAO machineDAO, ExerciseDAO exerciseDAO) {
@@ -36,14 +61,15 @@ public class OwnerLogicController extends AbstractLogicController {
         OwnerDAO ownerDAO = new OwnerDAO(ctx.connection());
 
         this.profile = ownerDAO.findById(ctx.token().userId())
-                .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato."));
+                .orElseThrow(() -> new DatabaseException("Profilo proprietario non trovato nel sistema."));
 
+        // Inizializza il gestore utenti disabilitando la creazione diretta dei clienti per l'Owner (policy di dominio)
         this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, false);
     }
 
     @Override
     protected boolean isUserActive() {
-        return true; // Il proprietario non è disattivabile
+        return true; // Il profilo Proprietario non è soggetto a disattivazione software via soft-delete
     }
 
     @Override
@@ -61,6 +87,9 @@ public class OwnerLogicController extends AbstractLogicController {
         return ui.askForChoice();
     }
 
+    /**
+     * Dispatcher delle funzionalità Owner.
+     */
     @Override
     protected void handleChoice(int choice) {
         switch (choice) {
@@ -81,6 +110,7 @@ public class OwnerLogicController extends AbstractLogicController {
         ui.reportError(message);
     }
 
+    /** Workflow per la gestione dell'anagrafica macchinari. */
     private void manageMachines() {
         boolean back = false;
         while (!back) {
@@ -93,12 +123,12 @@ public class OwnerLogicController extends AbstractLogicController {
                         int id = ui.askForMachineIDToggle();
                         boolean status = ui.askForNewStatus();
                         machineDAO.updateStatus(id, status);
-                        ui.reportSuccess("Stato aggiornato.");
+                        ui.reportSuccess("Stato del macchinario aggiornato.");
                     }
                     case 3 -> {
                         MachineCreationDTO data = ui.askForMachineData();
                         machineDAO.insert(data, profile.getId());
-                        ui.reportSuccess("Macchinario inserito.");
+                        ui.reportSuccess("Nuovo macchinario registrato.");
                     }
                     case 0 -> back = true;
                     default -> ui.reportError(INVALID_CHOICE);
@@ -109,6 +139,7 @@ public class OwnerLogicController extends AbstractLogicController {
         }
     }
 
+    /** Workflow per la gestione del catalogo esercizi. */
     private void manageExercises() {
         boolean back = false;
         while (!back) {
@@ -121,12 +152,13 @@ public class OwnerLogicController extends AbstractLogicController {
                         int id = ui.askForExerciseIDToggle();
                         boolean status = ui.askForNewStatus();
                         exerciseDAO.updateStatus(id, status);
-                        ui.reportSuccess("Stato aggiornato.");
+                        ui.reportSuccess("stato dell'esercizio aggiornato.");
                     }
                     case 3 -> {
+                        // Passa solo i macchinari attivi per l'associazione
                         ExerciseCreationDTO data = ui.askForExerciseData(machineDAO.findAll(true));
                         exerciseDAO.insert(data, profile.getId());
-                        ui.reportSuccess("Esercizio inserito.");
+                        ui.reportSuccess("Nuovo esercizio aggiunto.");
                     }
                     case 0 -> back = true;
                     default -> ui.reportError(INVALID_CHOICE);

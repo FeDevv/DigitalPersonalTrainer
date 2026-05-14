@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 /**
  * Modello di dominio che rappresenta una Scheda di Allenamento (Workout Plan).
- * 
+ * -
  * Mappa la tabella 'SCHEDA' del database. La scheda funge da contenitore logico
  * per un insieme di esercizi (SheetItem) assegnati a un cliente da un PT.
  * 

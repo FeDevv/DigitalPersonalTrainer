@@ -12,7 +12,17 @@ import org.dpt.user.receptionist.factory.ReceptionistUIFactory;
 import org.dpt.user.receptionist.model.Receptionist;
 
 /**
- * Controller Logico per il modulo Addetto Segreteria.
+ * Controller logico principale per le funzionalità dell'Addetto Segreteria.
+ * -
+ * Orchestra le operazioni amministrative e di front-office del sistema, tra cui:
+ * <ul>
+ *   <li><b>Gestione Utenze:</b> Delega al {@link UserManagementController} la manutenzione
+ *       delle anagrafiche di tutto il personale e dei clienti.</li>
+ *   <li><b>Intermediazione Contrattuale:</b> Gestisce il workflow di assegnazione tra 
+ *       Personal Trainer e Clienti tramite {@link AssignmentDAO}.</li>
+ *   <li><b>Integrità della Sessione:</b> Verifica costantemente lo stato dell'utenza 
+ *       corrente per prevenire accessi da account disattivati (soft-delete).</li>
+ * </ul>
  */
 public class ReceptionistLogicController extends AbstractLogicController {
 
@@ -21,8 +31,12 @@ public class ReceptionistLogicController extends AbstractLogicController {
 
     private final AssignmentDAO assignmentDAO;
 
+    /** Controller riutilizzabile per le operazioni CRUD sugli utenti. */
     private final UserManagementController userManagementController;
 
+    /**
+     * Inizializza il modulo Segreteria iniettando i DAO necessari per le operazioni cross-entità.
+     */
     public ReceptionistLogicController(ControllerContext ctx, PTDAO ptDAO, ClientDAO clientDAO) {
         super(ctx);
         this.ui = ReceptionistUIFactory.getUI(ctx.config().uiMode(), ctx.scanner());
@@ -36,6 +50,10 @@ public class ReceptionistLogicController extends AbstractLogicController {
         this.userManagementController = new UserManagementController(ui, ptDAO, receptionistDAO, clientDAO, true);
     }
 
+    /**
+     * Verifica se l'operatore è ancora attivo nel database.
+     * Implementa un controllo "Fail-Fast" per bloccare sessioni di utenti disattivati.
+     */
     @Override
     protected boolean isUserActive() {
         return new ReceptionistDAO(context.connection()).findById(profile.getId())
@@ -58,6 +76,11 @@ public class ReceptionistLogicController extends AbstractLogicController {
         return ui.askForChoice();
     }
 
+    /**
+     * Gestisce il dispatching delle funzionalità del modulo.
+     * 1. Gestione Utenze: Apre il sottomenu condiviso.
+     * 2. Assegnazione: Avvia il workflow di legame PT-CLIENTE.
+     */
     @Override
     protected void handleChoice(int choice) {
         switch (choice) {
@@ -77,6 +100,10 @@ public class ReceptionistLogicController extends AbstractLogicController {
         ui.reportError(message);
     }
 
+    /**
+     * Coordina il workflow di assegnazione.
+     * Richiede l'input IDs all'interfaccia e invoca la logica transazionale sul DB tramite DAO.
+     */
     private void makeAssignment() {
         try {
             int ptId = ui.askForPTId();

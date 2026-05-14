@@ -10,17 +10,27 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 /**
- * Data Access Object specifico per il Proprietario.
+ * Data Access Object dedicato al recupero delle informazioni del Proprietario.
+ * -
+ * Interroga esclusivamente la tabella 'PROPRIETARIO'. Viene utilizzato 
+ * principalmente in fase di inizializzazione della sessione operativa dell'Owner 
+ * per caricarne il profilo completo a partire dal token di autenticazione.
  */
 public class OwnerDAO {
     private final Connection connection;
 
+    /** Query SQL per la ricerca univoca del proprietario. */
     private static final String FIND_BY_ID = "SELECT ID_Proprietario, Nome, Cognome, Email FROM PROPRIETARIO WHERE ID_Proprietario = ?";
 
     public OwnerDAO(Connection connection) {
         this.connection = connection;
     }
 
+    /**
+     * Carica il profilo del proprietario tramite Primary Key.
+     * @param id ID del proprietario.
+     * @return Optional con l'oggetto Owner popolato.
+     */
     public Optional<Owner> findById(int id) {
         try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
@@ -30,7 +40,7 @@ public class OwnerDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Errore durante il caricamento del profilo del proprietario", e);
+            throw new DatabaseException("Errore critico nel recupero delle informazioni anagrafiche del proprietario", e);
         }
         return Optional.empty();
     }

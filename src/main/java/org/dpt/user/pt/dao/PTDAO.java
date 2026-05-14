@@ -15,6 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Data Access Object specializzato per l'entità Personal Trainer.
+ * -
+ * Implementa le operazioni CRUD sulla tabella 'PT' e gestisce l'estrazione di 
+ * reportistica avanzata sulle prestazioni degli atleti. 
+ * Si avvale di query complesse con sottointerrogazioni per calcolare 
+ * statistiche aggregate in tempo reale direttamente sul server MariaDB.
+ */
 public class PTDAO {
     private final Connection connection;
 
@@ -24,6 +32,7 @@ public class PTDAO {
     private static final String INSERT_PT = "INSERT INTO PT (Nome, Cognome, Email, Password) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_STATUS = "UPDATE PT SET PT_Attivo = ? WHERE ID_PT = ?";
     
+    /** Query per report prestazioni: aggrega i dati della vista con un conteggio totale per cliente. */
     private static final String PERFORMANCE_REPORT = """
                 SELECT v.Nominativo_Cliente, stats.Num_Allenamenti, v.Data, v.Durata_Minuti, v.Percentuale_Completamento
                 FROM vw_prestazioni_pt v
@@ -41,6 +50,7 @@ public class PTDAO {
         this.connection = connection;
     }
 
+    /** Carica il profilo tecnico del PT tramite ID. */
     public Optional<PT> findById(int id) {
         try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
@@ -55,10 +65,12 @@ public class PTDAO {
         return Optional.empty();
     }
 
+    /** Recupera l'anagrafica completa dei Personal Trainer. */
     public List<PT> getAll() {
         return findByQuery(SELECT_ALL, null);
     }
 
+    /** Recupera i PT filtrati per stato di attività (soft-delete). */
     public List<PT> findAll(boolean active) {
         return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
@@ -92,6 +104,7 @@ public class PTDAO {
         );
     }
 
+    /** Registra un nuovo Personal Trainer nel sistema. */
     public void insert(UserCreationDTO data) {
         try (PreparedStatement pstmt = connection.prepareStatement(INSERT_PT)) {
             pstmt.setString(1, data.firstName());
@@ -104,6 +117,7 @@ public class PTDAO {
         }
     }
 
+    /** Modifica lo stato operativo del PT (abilitazione/disabilitazione). */
     public void updateStatus(int id, boolean active) {
         try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);
@@ -117,6 +131,13 @@ public class PTDAO {
         }
     }
 
+    /**
+     * Genera un report analitico sulle prestazioni degli atleti nel periodo specificato.
+     * @param ptId ID del Personal Trainer richiedente.
+     * @param start Data inizio intervallo.
+     * @param end Data fine intervallo.
+     * @return Lista di DTO contenenti statistiche e dettagli sessioni.
+     */
     public List<PerformanceDTO> getPerformanceReport(int ptId, LocalDate start, LocalDate end) {
         List<PerformanceDTO> report = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(PERFORMANCE_REPORT)) {

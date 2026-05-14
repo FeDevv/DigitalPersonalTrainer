@@ -46,8 +46,8 @@ public class WorkoutSheetDAO {
     }
 
     /**
-     * Recupera l'allenamento corrente per un determinato atleta tramite vista denormalizzata.
-     * @param clientId ID dell'atleta.
+     * Recupera l'allenamento corrente per un determinato cliente tramite vista denormalizzata.
+     * @param clientId ID del cliente.
      * @return Lista di elementi dettagliati (ActiveSheetItem).
      */
     public List<ActiveSheetItem> getActiveRoutine(int clientId) {

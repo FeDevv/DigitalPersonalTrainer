@@ -137,7 +137,7 @@ public class Orchestrator {
             Configuration config = bootController.execute(args);
 
             if (config.uiMode() == UIMode.GUI) {
-                view.displayError("Interfaccia Grafica prevista ma non implementata. Caricamento CLI di fallback.");
+                view.displayError("Interfaccia Grafica prevista ma non implementata.");
                 return;
             }
 

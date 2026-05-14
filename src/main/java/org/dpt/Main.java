@@ -2,9 +2,18 @@ package org.dpt;
 
 /**
  * Punto di ingresso principale dell'applicazione Digital Personal Trainer.
+ * -
+ * Questa classe ha il compito di avviare l'intero ecosistema applicativo 
+ * istanziando l'Orchestrator centrale, che prenderà il controllo del 
+ * flusso di esecuzione e della gestione dei moduli.
  */
 public class Main {
 
+    /**
+     * Metodo di avvio (entry point).
+     * 
+     * @param args Argomenti della riga di comando passati all'applicazione.
+     */
     static void main(String[] args) {
         Orchestrator orchestrator = new Orchestrator();
         orchestrator.run(args);
@@ -12,17 +21,4 @@ public class Main {
 
 }
 
-// riscrivendo i commenti
-
-// To resume this session: gemini --resume c4c91b77-3068-44e0-9f6f-358fbe6e0d56
-/*
-* Packages DONE
-* - connection
-* - shared
-* - auth
-* - boot
-* */
-
-// domain - ricontrollare se i commenti in workout sono corretti. Teoricamente domain.catalog e domain.user sono ben commentati.
-
-// duplicazione PTCLIView e ClientCLIView - displaySheetDetails e displayActiveRoutine rispettivamente
+// tutto funziona, controllare solo la bontà degli output!! 👌🏼

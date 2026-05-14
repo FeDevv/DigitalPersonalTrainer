@@ -13,6 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Data Access Object specializzato per l'entità Addetto Segreteria.
+ * -
+ * Implementa le operazioni CRUD sulla tabella 'ADDETTO_SEGRETERIA'. 
+ * Gestisce il ciclo di vita delle utenze amministrative di supporto, 
+ * includendo la registrazione iniziale e il management dello stato operativo.
+ */
 public class ReceptionistDAO {
     private final Connection connection;
 
@@ -26,6 +33,7 @@ public class ReceptionistDAO {
         this.connection = connection;
     }
 
+    /** Recupera il profilo dell'addetto tramite identificativo univoco. */
     public Optional<Receptionist> findById(int id) {
         try (PreparedStatement pstmt = connection.prepareStatement(FIND_BY_ID)) {
             pstmt.setInt(1, id);
@@ -40,10 +48,12 @@ public class ReceptionistDAO {
         return Optional.empty();
     }
 
+    /** Restituisce l'elenco completo di tutto il personale di segreteria. */
     public List<Receptionist> getAll() {
         return findByQuery(SELECT_ALL, null);
     }
 
+    /** Recupera gli addetti filtrati per stato di attività (soft-delete). */
     public List<Receptionist> findAll(boolean active) {
         return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
     }
@@ -77,6 +87,7 @@ public class ReceptionistDAO {
         );
     }
 
+    /** Registra un nuovo operatore di segreteria nel database. */
     public void insert(UserCreationDTO data) {
         try (PreparedStatement pstmt = connection.prepareStatement(INSERT_RECEPTIONIST)) {
             pstmt.setString(1, data.firstName());
@@ -89,6 +100,7 @@ public class ReceptionistDAO {
         }
     }
 
+    /** Modifica lo stato operativo (abilitazione/disabilitazione) dell'account. */
     public void updateStatus(int id, boolean active) {
         try (PreparedStatement pstmt = connection.prepareStatement(UPDATE_STATUS)) {
             pstmt.setBoolean(1, active);

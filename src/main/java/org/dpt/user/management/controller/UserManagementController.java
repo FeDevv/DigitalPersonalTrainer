@@ -10,9 +10,19 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * Controller condiviso per la gestione delle anagrafiche utenti.
- * Centralizza la logica di visualizzazione, attivazione/disattivazione e creazione
- * per evitare duplicazioni tra i moduli Owner e Receptionist.
+ * Controller specializzato nell'amministrazione delle anagrafiche di sistema.
+ * -
+ * Agisce come un componente riutilizzabile e "Shared", orchestrando le operazioni 
+ * comuni di gestione utenti (PT, Segreteria, Clienti) per i moduli che ne hanno 
+ * il privilegio (Owner e Receptionist).
+ * -
+ * L'architettura del controller si avvale di:
+ * <ul>
+ *   <li><b>Strategy Map:</b> Una collezione di {@link UserTypeHandler} per eliminare
+ *       gli switch nidificati e gestire polimorficamente i diversi ruoli.</li>
+ *   <li><b>Cross-DAO Orchestration:</b> Coordina l'accesso a diversi DAO verticali
+ *       mantenendo il rispetto del perimetro autorizzativo (canCreateClients).</li>
+ * </ul>
  */
 public class UserManagementController {
 
@@ -20,11 +30,18 @@ public class UserManagementController {
     private final PTDAO ptDAO;
     private final ReceptionistDAO receptionistDAO;
     private final ClientDAO clientDAO;
+    
+    /** Flag di autorizzazione granulare: definisce se l'attore corrente può registrare nuovi clienti. */
     private final boolean canCreateClients;
-    private static final String UPDATED = "Stato utente aggiornato.";
+    
+    private static final String UPDATED = "Stato dell'account aggiornato correttamente.";
 
+    /** Registro delle strategie operative suddivise per ruolo. */
     private final Map<Role, UserTypeHandler> userHandlers = new EnumMap<>(Role.class);
 
+    /**
+     * Inizializza il controller amministrativo iniettando i DAO necessari.
+     */
     public UserManagementController(UserManagementUI ui, 
                                     PTDAO ptDAO, 
                                     ReceptionistDAO receptionistDAO, 
@@ -38,28 +55,32 @@ public class UserManagementController {
         initializeHandlers();
     }
 
+    /**
+     * Configura le strategie di gestione per ogni tipologia di utente supportata.
+     * Definisce le implementazioni anonime per le operazioni di I/O e Persistenza.
+     */
     private void initializeHandlers() {
-        // Gestore per i Personal Trainer
+        // Gestore per l'anagrafica Personal Trainer
         userHandlers.put(Role.PT, new UserTypeHandler() {
             @Override public void showList() { ui.showUsers(ptDAO.getAll(), Role.PT.getPlural()); }
             @Override public void toggleStatus() {
                 ptDAO.updateStatus(ui.askForUserID(), ui.askForNewStatus());
                 ui.reportSuccess(UPDATED);
             }
-            @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); ui.reportSuccess("Personal Trainer inserito."); }
+            @Override public void createNew() { ptDAO.insert(ui.askForStaffData()); ui.reportSuccess("Personal Trainer inserito nel sistema."); }
         });
 
-        // Gestore per gli Addetti Segreteria
+        // Gestore per l'anagrafica Addetti Segreteria
         userHandlers.put(Role.RECEPTIONIST, new UserTypeHandler() {
             @Override public void showList() { ui.showUsers(receptionistDAO.getAll(), Role.RECEPTIONIST.getPlural()); }
             @Override public void toggleStatus() {
                 receptionistDAO.updateStatus(ui.askForUserID(), ui.askForNewStatus());
                 ui.reportSuccess(UPDATED);
             }
-            @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); ui.reportSuccess("Addetto segreteria inserito."); }
+            @Override public void createNew() { receptionistDAO.insert(ui.askForStaffData()); ui.reportSuccess("Addetto segreteria inserito nel sistema."); }
         });
 
-        // Gestore per i Clienti
+        // Gestore per l'anagrafica Clienti (Atleti)
         userHandlers.put(Role.CLIENT, new UserTypeHandler() {
             @Override public void showList() { ui.showUsers(clientDAO.getAll(), Role.CLIENT.getPlural()); }
             @Override public void toggleStatus() {
@@ -71,14 +92,17 @@ public class UserManagementController {
             @Override public void createNew() {
                 if (canCreateClients) {
                     clientDAO.insert(ui.askForClientData());
-                    ui.reportSuccess("Cliente inserito correttamente.");
+                    ui.reportSuccess("Cliente iscritto correttamente.");
                 } else {
-                    ui.reportError("I Clienti possono essere inseriti solo dalla Segreteria.");
+                    ui.reportError("L'inserimento dei Clienti è riservato esclusivamente alla Segreteria.");
                 }
             }
         });
     }
 
+    /**
+     * Avvia il workflow interattivo per la selezione del ruolo da amministrare.
+     */
     public void manageUsers() {
         boolean back = false;
         while (!back) {
@@ -89,11 +113,14 @@ public class UserManagementController {
                 case 2 -> manageSpecificUser(Role.RECEPTIONIST);
                 case 3 -> manageSpecificUser(Role.CLIENT);
                 case 0 -> back = true;
-                default -> ui.reportError("Scelta non valida.");
+                default -> ui.reportError("Selezione non valida.");
             }
         }
     }
 
+    /**
+     * Delega l'azione di gestione allo handler specifico per il ruolo scelto.
+     */
     private void manageSpecificUser(Role role) {
         UserTypeHandler handler = userHandlers.get(role);
         if (handler == null) return;
@@ -108,7 +135,7 @@ public class UserManagementController {
                     case 2 -> handler.toggleStatus();
                     case 3 -> handler.createNew();
                     case 0 -> back = true;
-                    default -> ui.reportError("Scelta non valida.");
+                    default -> ui.reportError("Selezione non valida.");
                 }
             } catch (Exception e) {
                 ui.reportError(e.getMessage());

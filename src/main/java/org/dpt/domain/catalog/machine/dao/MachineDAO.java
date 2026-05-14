@@ -20,7 +20,7 @@ import java.util.Optional;
 public class MachineDAO {
     private final Connection connection;
 
-    /** Query SQL ottimizzate per la gestione degli asset fisici. */
+    /** Query SQL ottimizzate per la gestione dei macchinari. */
     private static final String FIND_BY_ID = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO WHERE ID_Macchinario = ?";
     private static final String SELECT_ALL = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO ORDER BY ID_Macchinario";
     private static final String FIND_ALL_BY_STATUS = "SELECT ID_Macchinario, ID_Proprietario, Nome, Descrizione_Macchinario, Macchinario_Attivo FROM MACCHINARIO WHERE Macchinario_Attivo = ? ORDER BY ID_Macchinario";

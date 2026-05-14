@@ -15,10 +15,21 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Implementazione concreta dell'interfaccia PTUI per l'ambiente CLI.
+ * -
+ * Estende {@link AbstractCLIController} per la gestione dei buffer di input.
+ * Gestisce l'acquisizione guidata dei parametri di allenamento (serie, rep, carichi)
+ * e il parsing robusto delle date per la generazione della reportistica tecnica.
+ */
 public class PTCLIController extends AbstractCLIController implements PTUI {
 
     private final PTCLIView ptView;
 
+    /**
+     * Inizializza il controller UI associandogli la view specifica per il PT.
+     * @param scanner Scanner condiviso per l'input utente.
+     */
     public PTCLIController(Scanner scanner) {
         super(scanner, new PTCLIView());
         this.ptView = (PTCLIView) super.view;
@@ -36,38 +47,47 @@ public class PTCLIController extends AbstractCLIController implements PTUI {
     @Override
     public void showAssignedClients(List<Client> clients) { ptView.displayClients(clients); }
 
+    /**
+     * Presenta la lista degli atleti e richiede la selezione tramite ID.
+     */
     @Override
     public int askForClientId(List<Client> availableClients) {
         showAssignedClients(availableClients);
-        return readInt("Inserisci ID Cliente per cui redigere la scheda:");
+        return readInt("Inserisci l'identificativo (ID) del cliente:");
     }
 
     @Override
     public String askForSheetTitle() {
-        return readString("Titolo della Scheda (es. Forza Invernale):");
+        return readString("Titolo descrittivo del piano (es. 'Forza Mesociclo 1'):");
     }
 
     @Override
     public void showExerciseCatalog(List<Exercise> exercises) { ptView.displayExerciseCatalog(exercises); }
 
+    /**
+     * Guida l'istruttore nella selezione di un esercizio attivo dal catalogo.
+     */
     @Override
     public int askForExerciseId(List<Exercise> availableExercises) {
         showExerciseCatalog(availableExercises);
-        return readInt("Inserisci ID Esercizio da aggiungere:");
+        return readInt("Inserisci l'identificativo (ID) dell'esercizio:");
     }
 
+    /**
+     * Acquisisce i dettagli tecnici per un esercizio all'interno del piano.
+     */
     @Override
     public SheetItem askForExerciseDetails(int sheetId, int exerciseId) {
-        int sets = readInt("Numero di Serie:");
-        int reps = readInt("Numero di Ripetizioni:");
-        int rest = readInt("Recupero (in secondi):");
-        String notes = readOptionalString("Note di esecuzione [premi invio per saltare]:");
+        int sets = readInt("Numero di Serie previste:");
+        int reps = readInt("Ripetizioni per serie:");
+        int rest = readInt("Tempo di recupero (secondi):");
+        String notes = readOptionalString("Note tecniche di esecuzione (opzionali):");
         return new SheetItem(sheetId, exerciseId, rest, notes, sets, reps);
     }
 
     @Override
     public boolean askIfAddAnotherExercise() {
-        return readString("Vuoi aggiungere un altro esercizio? (s/n):").equalsIgnoreCase("s");
+        return readString("Vuoi inserire un ulteriore esercizio nel piano? (s/n):").equalsIgnoreCase("s");
     }
 
     @Override
@@ -90,21 +110,24 @@ public class PTCLIController extends AbstractCLIController implements PTUI {
 
     @Override
     public LocalDate askForStartDate() {
-        return askForDate("Data Inizio Report (AAAA-MM-GG):");
+        return askForDate("Inizio periodo analisi (AAAA-MM-GG):");
     }
 
     @Override
     public LocalDate askForEndDate() {
-        return askForDate("Data Fine Report (AAAA-MM-GG):");
+        return askForDate("Fine periodo analisi (AAAA-MM-GG):");
     }
 
+    /**
+     * Metodo helper per il parsing robusto di oggetti LocalDate tramite stringhe.
+     */
     private LocalDate askForDate(String prompt) {
         while (true) {
             String input = readString(prompt);
             try {
                 return LocalDate.parse(input);
             } catch (DateTimeParseException _) {
-                ptView.displayError("Formato data non valido. Usa AAAA-MM-GG.");
+                ptView.displayError("Formato data non riconosciuto. Utilizzare lo standard ISO-8601 (AAAA-MM-GG).");
             }
         }
     }
