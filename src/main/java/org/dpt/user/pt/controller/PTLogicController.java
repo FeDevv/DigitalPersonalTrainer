@@ -134,7 +134,7 @@ public class PTLogicController extends AbstractLogicController {
             // Loop di popolamento dettaglio esercizi
             boolean adding = true;
             while (adding) {
-                int exerciseId = ui.askForExerciseId(exerciseDAO.findAll(true));
+                int exerciseId = ui.askForExerciseId(exerciseDAO.findAllSelectable());
                 SheetItem details = ui.askForExerciseDetails(newSheet.id(), exerciseId);
                 
                 sheetDAO.addExerciseToSheet(
@@ -149,7 +149,7 @@ public class PTLogicController extends AbstractLogicController {
                 adding = ui.askIfAddAnotherExercise();
             }
 
-            ui.reportSuccess("Programmazione: La scheda '" + title + "' è stata attivata con successo.");
+            ui.reportSuccess("La scheda '" + title + "' è stata attivata con successo.");
         } catch (Exception e) {
             ui.reportError("Errore durante la redazione del piano: " + e.getMessage());
         }

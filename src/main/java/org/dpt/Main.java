@@ -21,4 +21,5 @@ public class Main {
 
 }
 
-// tutto funziona, controllare solo la bontà degli output!! 👌🏼
+// aggiunto trigger alle linee 607-628
+// aggiunta vista alle linee 273-287

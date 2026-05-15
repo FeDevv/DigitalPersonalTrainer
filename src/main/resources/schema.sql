@@ -42,6 +42,7 @@ CREATE USER 'dpt_client'@'localhost' IDENTIFIED BY 'dpt_cli_pwd';
 
 DROP VIEW IF EXISTS vw_prestazioni_pt;
 DROP VIEW IF EXISTS vw_scheda_attiva_cliente;
+DROP VIEW IF EXISTS vw_esercizi_selezionabili;
 DROP EVENT IF EXISTS evt_chiusura_sessioni_timeout;
 DROP PROCEDURE IF EXISTS sp_disattiva_cliente;
 DROP PROCEDURE IF EXISTS sp_crea_nuova_scheda;
@@ -269,6 +270,22 @@ FROM CLIENTE c
 JOIN SCHEDA sch ON c.ID_Cliente = sch.ID_Cliente AND sch.Scheda_Attiva = 1
 JOIN COMPOSTA comp ON sch.ID_Scheda = comp.ID_Scheda
 JOIN ESERCIZIO e ON comp.Codice_Esercizio = e.Codice_Esercizio;
+
+-- Vista per la selezione dinamica degli esercizi
+-- Filtra solo quelli attivi il cui macchinario è anch'esso attivo (o sono a corpo libero)
+CREATE VIEW vw_esercizi_selezionabili AS
+SELECT
+    e.Codice_Esercizio,
+    e.ID_Proprietario,
+    e.ID_Macchinario,
+    e.Nome,
+    e.Descrizione_Esercizio,
+    e.Corpo_Libero,
+    e.Esercizio_Attivo
+FROM ESERCIZIO e
+LEFT JOIN MACCHINARIO m ON e.ID_Macchinario = m.ID_Macchinario
+WHERE e.Esercizio_Attivo = 1
+  AND (e.Corpo_Libero = 1 OR m.Macchinario_Attivo = 1);
 
 -- -----------------------------------------------------------------------------
 -- 6. BUSINESS LOGICA PROCEDURALE (TRIGGERS)
@@ -600,6 +617,30 @@ BEGIN
     
     IF v_cliente_attivo = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sicurezza: Il Cliente è disattivato.';
+    END IF;
+END //
+
+-- [SICUREZZA]: Blocco assegnazione se PT o Cliente sono disattivati
+CREATE TRIGGER trg_check_stato_assegnazione_insert
+    BEFORE INSERT ON ASSEGNA
+    FOR EACH ROW
+BEGIN
+    DECLARE v_pt_attivo TINYINT;
+    DECLARE v_cliente_attivo TINYINT;
+
+    -- Recupero gli stati attuali di PT e Cliente
+    SELECT PT_Attivo INTO v_pt_attivo FROM PT WHERE ID_PT = NEW.ID_PT;
+    SELECT Cliente_Attivo INTO v_cliente_attivo FROM CLIENTE WHERE ID_Cliente = NEW.ID_Cliente;
+
+    -- Fail-fast: blocco appena trovo un'incoerenza
+    IF v_pt_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sicurezza: Impossibile assegnare. Il PT è disattivato.';
+    END IF;
+
+    IF v_cliente_attivo = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sicurezza: Impossibile assegnare. Il Cliente è disattivato.';
     END IF;
 END //
 

@@ -25,6 +25,7 @@ public class ExerciseDAO {
     private static final String FIND_BY_ID = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO WHERE Codice_Esercizio = ?";
     private static final String SELECT_ALL = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO ORDER BY Codice_Esercizio";
     private static final String FIND_ALL_BY_STATUS = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Codice_Esercizio";
+    private static final String SELECT_SELECTABLE = "SELECT * FROM vw_esercizi_selezionabili ORDER BY Nome";
     private static final String INSERT_EXERCISE = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, 1)";
     private static final String UPDATE_STATUS = "UPDATE ESERCIZIO SET Esercizio_Attivo = ? WHERE Codice_Esercizio = ?";
 
@@ -70,6 +71,15 @@ public class ExerciseDAO {
      */
     public List<Exercise> findAll(boolean active) {
         return findByQuery(FIND_ALL_BY_STATUS, new Object[]{active});
+    }
+
+    /**
+     * Recupera solo gli esercizi effettivamente selezionabili per una scheda.
+     * Un esercizio è selezionabile se è attivo E (è a corpo libero O il macchinario associato è attivo).
+     * @return Lista di esercizi disponibili filtrati tramite vista DB.
+     */
+    public List<Exercise> findAllSelectable() {
+        return findByQuery(SELECT_SELECTABLE, null);
     }
 
     /**

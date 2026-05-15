@@ -38,7 +38,7 @@ public class AssignmentDAO {
             cstmt.setInt(3, receptionistId);
             cstmt.execute();
         } catch (SQLException e) {
-            throw new DatabaseException("Procedure Errore: imprevisto durante l'assegnazione del cliente al trainer.", e);
+            throw new DatabaseException("Errore tecnico durante l'assegnazione.", e);
         }
     }
 }
