@@ -4,40 +4,65 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 
+      Digital Personal Trainer -
+      Definizione del Modello di Progetto (POM) per l'automazione del ciclo di build.
+    -->
     <groupId>org.dpt</groupId>
     <artifactId>DigitalPersonalTrainer</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <!-- 
+          Configurazione dell'ambiente di compilazione.
+        -->
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- Gestione centralizzata del versionamento delle librerie esterne (Dependency Management) -->
         <junit.version>5.11.0</junit.version>
         <mariadb.version>3.4.1</mariadb.version>
         <sonar.organization>fedevv</sonar.organization>
     </properties>
 
     <dependencies>
-        <!-- MariaDB Connector -->
+        <!-- 
+          MariaDB JDBC Connector: Infrastruttura di persistenza.
+          Fornisce l'implementazione del protocollo JDBC per la comunicazione a basso livello 
+          tra la logica Java e il DBMS relazionale MariaDB.
+        -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>${mariadb.version}</version>
         </dependency>
 
-        <!-- JUnit 5 -->
+        <!-- 
+          JUnit Jupiter API: Framework di testing unitario.
+          Definisce le annotazioni e le asserzioni necessarie per la validazione formale 
+          delle componenti atomiche del sistema.
+        -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JUnit Jupiter Engine: Motore di esecuzione dei test (Runtime) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- 
+          JUnit Jupiter Params: Estensione per il testing parametrizzato.
+          Supporta la validazione di set di dati complessi (es. verifica dell'integrità sintattica 
+          degli indirizzi email) tramite una singola unità di test.
+        -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
@@ -45,6 +70,11 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- 
+          SLF4J Simple: Sottosistema di logging.
+          Implementazione astratta per la gestione della messaggistica di runtime e la 
+          diagnostica delle interazioni tra i layer applicativi.
+        -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -54,6 +84,11 @@
 
     <build>
         <plugins>
+            <!-- 
+              Maven Compiler Plugin: Orchestrazione della compilazione.
+              Coordina la trasformazione del codice sorgente in bytecode, garantendo 
+              la conformità con le specifiche della Java Virtual Machine (JVM).
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -62,6 +97,40 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
+            </plugin>
+
+            <!-- 
+              Maven Assembly Plugin: Packaging e Distribuzione.
+              Responsabile della generazione del "Fat JAR" (Uber JAR). Consente di aggregare 
+              le risorse binarie del progetto e le dipendenze di terze parti in un unico 
+              artefatto atomico ed eseguibile, definendo l'Entry Point tramite il file di Manifest.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- Definizione della classe di ingresso principale dell'ecosistema -->
+                            <mainClass>org.dpt.Main</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <!-- Inclusione delle librerie transitive nel pacchetto di distribuzione -->
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- Vincola la generazione dell'artefatto alla fase di packaging del ciclo di vita -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
