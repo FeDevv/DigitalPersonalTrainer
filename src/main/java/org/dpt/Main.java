@@ -20,6 +20,3 @@ public class Main {
     }
 
 }
-
-// aggiunto trigger alle linee 607-628
-// aggiunta vista alle linee 273-287
