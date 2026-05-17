@@ -193,7 +193,7 @@ public class PTLogicController extends AbstractLogicController {
     /** Consultazione rapida dei macchinari e degli esercizi attivi. */
     private void viewCatalog() {
         try {
-            ui.showCatalog(machineDAO.findAll(true), exerciseDAO.findAll(true));
+            ui.showCatalog(machineDAO.findAll(true), exerciseDAO.findAllSelectable());
         } catch (DatabaseException e) {
             ui.reportError(e.getMessage());
         }

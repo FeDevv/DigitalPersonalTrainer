@@ -285,7 +285,8 @@ SELECT
 FROM ESERCIZIO e
 LEFT JOIN MACCHINARIO m ON e.ID_Macchinario = m.ID_Macchinario
 WHERE e.Esercizio_Attivo = 1
-  AND (e.Corpo_Libero = 1 OR m.Macchinario_Attivo = 1);
+  AND (e.Corpo_Libero = 1 OR m.Macchinario_Attivo = 1)
+ORDER BY e.Codice_Esercizio;
 
 -- -----------------------------------------------------------------------------
 -- 6. BUSINESS LOGICA PROCEDURALE (TRIGGERS)
@@ -778,6 +779,7 @@ GRANT SELECT ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_pt'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.SCHEDA TO 'dpt_pt'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.COMPOSTA TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.vw_prestazioni_pt TO 'dpt_pt'@'localhost';
+GRANT SELECT ON digital_personal_trainer.vw_esercizi_selezionabili TO 'dpt_pt'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_crea_nuova_scheda TO 'dpt_pt'@'localhost';
 
 -- [RECEPTIONIST]: Anagrafiche e Assegnazioni (Segreteria)

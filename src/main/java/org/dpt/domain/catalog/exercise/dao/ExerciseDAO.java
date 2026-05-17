@@ -25,7 +25,7 @@ public class ExerciseDAO {
     private static final String FIND_BY_ID = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO WHERE Codice_Esercizio = ?";
     private static final String SELECT_ALL = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO ORDER BY Codice_Esercizio";
     private static final String FIND_ALL_BY_STATUS = "SELECT Codice_Esercizio, ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo FROM ESERCIZIO WHERE Esercizio_Attivo = ? ORDER BY Codice_Esercizio";
-    private static final String SELECT_SELECTABLE = "SELECT * FROM vw_esercizi_selezionabili ORDER BY Nome";
+    private static final String SELECT_SELECTABLE = "SELECT * FROM vw_esercizi_selezionabili";
     private static final String INSERT_EXERCISE = "INSERT INTO ESERCIZIO (ID_Proprietario, ID_Macchinario, Nome, Descrizione_Esercizio, Corpo_Libero, Esercizio_Attivo) VALUES (?, ?, ?, ?, ?, 1)";
     private static final String UPDATE_STATUS = "UPDATE ESERCIZIO SET Esercizio_Attivo = ? WHERE Codice_Esercizio = ?";
 
@@ -66,6 +66,8 @@ public class ExerciseDAO {
 
     /**
      * Filtra gli esercizi in base allo stato di attività.
+     * Non usato per rispettare il vincolo di least knowledge (un pt non dovrebbe poter vedere esercizi
+     * che non sono praticabili a causa del macchinario guasto.)
      * @param active true per visualizzare solo quelli operativi.
      * @return Lista filtrata di Exercise.
      */
