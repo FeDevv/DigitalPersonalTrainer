@@ -1,0 +1,133 @@
+## ☕ Analisi del Codice Java (org.dpt)
+
+### 1. Main.java
+*   **Ruolo**: Entry point principale dell'applicazione.
+*   **Logica**: Minimale e delegata. Si limita a istanziare l'**Orchestrator** centrale e ad avviarne il metodo `run(args)`. 
+*   **Paradigma**: Segue il principio di separazione delle responsabilità, evitando di sporcare il punto di ingresso con logiche di configurazione o business.
+
+### 2. Orchestrator.java
+*   **Ruolo**: "Regista" centrale del sistema. Coordina i moduli, gestisce il ciclo di vita globale e inizializza le dipendenze.
+*   **Pattern Strategy**: Utilizza una `dispatchMap` (mappa di strategie di lancio) per avviare il modulo corretto in base al ruolo dell'utente (`OWNER`, `PT`, etc.). Questo rende il sistema facilmente estensibile senza modificare il codice esistente (**Open/Closed Principle**).
+*   **Dependency Injection (DI) Manuale**: L'Orchestrator crea e inietta i DAO e i Controller. Questo centralizza la configurazione del sistema e garantisce il **disaccoppiamento** tra i vari pacchetti (i moduli non sanno come sono creati i propri DAO).
+*   **Ciclo di Vita (Lifecycle)**:
+    1.  **Boot**: Caricamento configurazioni iniziali.
+    2.  **Handshake (Login Loop)**: Connessione al DB come utente tecnico `dpt_login` per validare le credenziali.
+    3.  **Role Switching & Dispatching**: Dopo il login, ricollega il DB con i privilegi reali del ruolo e lancia il modulo operativo.
+*   **Teardown**: Garantisce la chiusura pulita delle risorse (connessione JDBC e Scanner) al termine dell'esecuzione.
+
+### 3. DBConnectionManager.java
+*   **Ruolo**: Gestore unico del ciclo di vita delle connessioni JDBC verso MariaDB.
+*   **Singleton (Bill Pugh Holder)**: Utilizza una classe interna statica (`InstanceHolder`) per garantire un'istanza unica, thread-safe e caricata in modo lazy. È l'approccio più efficiente su Java perché evita l'overhead della sincronizzazione esplicita.
+*   **Strategia "Handshake & Switch"**: È l'esecutore materiale della sicurezza RBAC. Il metodo `connectAs(Role)` chiude la connessione corrente e ne apre una nuova usando le credenziali DBMS specifiche del ruolo. 
+*   **Delega della Sicurezza**: Spostando la connessione su utenti DB diversi, l'applicazione non deve gestire complessi controlli `if(role == ...)` per ogni query; è il database stesso a negare l'accesso se l'utente non ha i `GRANT` necessari (**Security by Design**).
+*   **Incapsulamento**: Gestisce autonomamente il caricamento del file `db.properties`, nascondendo i dettagli di configurazione al resto dell'app.
+
+### 4. Pacchetto Boot (Inizializzazione)
+*   **Ruolo**: Gestisce la fase di pre-avvio dell'applicazione per determinare le impostazioni ambientali.
+*   **BootLogicController**: Implementa una gerarchia di scelta per la modalità UI (CLI/GUI). Ha precedenza il parsing degli argomenti da riga di comando (`--gui`, `--cli`), con fallback su un menu interattivo.
+*   **Configuration (Java Record)**: Utilizza la natura immutabile dei record per trasportare le impostazioni di avvio in tutto il sistema. Il **costruttore compatto** garantisce la *Fail-Fast validation*, impedendo l'avvio se i parametri critici (Locale, UIMode) sono nulli.
+
+### 5. Pacchetto Auth (Sicurezza e Handshake)
+*   **Enum Role**: Elemento chiave del **disaccoppiamento tra app e DB**. Mappa i ruoli applicativi alle credenziali DBMS e alle tabelle SQL. Il metodo `getPropertyKey()` permette il caricamento dinamico delle credenziali nel `DBConnectionManager`.
+*   **LoginDAO**: Esegue materialmente l'**Handshake**. Interroga le tabelle verticali (PT, CLIENTE, etc.) sotto l'utente `dpt_login` per verificare credenziali e stato (Active Check). 
+*   **LoginUIFactory**: Implementa il pattern **Factory Method** locale. Consente al `LoginLogicController` di rimanere agnostico rispetto alla tecnologia di interfaccia (CLI/GUI), ottenendo l'implementazione corretta a runtime.
+*   **Modelli Atomici**: `UserCredentials` e `AuthToken` (Java Records) garantiscono il trasporto sicuro e immutabile delle informazioni sensibili tra i layer durante l'autenticazione.
+
+### 6. Pacchetto Exception (Gestione Errori)
+*   **Gerarchia DPTException**: Classe base astratta che estende `RuntimeException`. La scelta delle **Unchecked Exceptions** riduce il boilerplate e permette una gestione centralizzata nel pacchetto `shared.mvc` tramite i blocchi catch del Template Method.
+*   **DatabaseException & SQLState 45000**: Questa eccezione implementa una logica di **Auto-Extraction**. Quando un trigger o una procedura MariaDB lanciano un errore (segnale 45000), la classe estrae automaticamente il messaggio originale del DB (es. "Violazione: Esercizio a corpo libero..."). Questo permette di presentare all'utente errori di business logic definiti lato server senza codice Java aggiuntivo.
+*   **ValidationException**: Supporta il pattern **Fail-Fast**, venendo lanciata immediatamente durante la creazione dei DTO/Record se i dati non rispettano i vincoli di dominio.
+
+### 7. Pacchetto Domain (Logica di Business e Modelli)
+*   **Sottodomini Verticali**: Il pacchetto è diviso in `catalog` (Esercizi/Macchine), `user` (Clienti/PT/etc) e `workout` (Schede/Sessioni). Questa struttura garantisce un'alta coesione interna ai moduli.
+*   **Read-Models tramite Viste**: Per operazioni complesse (es. visualizzare la routine attiva con tutti i dettagli di esercizi e macchine), il sistema non fa join multiple in Java, ma interroga **viste SQL** come `vw_scheda_attiva_cliente`. Questo sposta il carico di calcolo sul database e semplifica il mapping JDBC.
+*   **Verticalizzazione dei DAO**: Ogni DAO (es. `ExerciseDAO`, `WorkoutSheetDAO`) è responsabile di una singola area. È vietato a un DAO chiamare un altro DAO; il coordinamento è delegato ai `LogicController`.
+*   **Atomicità via Stored Procedure**: Operazioni critiche come la creazione di una nuova scheda (che deve disattivare quella vecchia) sono delegate a procedure come `sp_crea_nuova_scheda`, garantendo che l'intera operazione sia atomica e transazionale lato server.
+*   **Uso di Optional**: I metodi di ricerca (`findById`) restituiscono `Optional<T>`, forzando il chiamante a gestire esplicitamente l'eventuale assenza del dato, riducendo i rischi di `NullPointerException`.
+
+### 8. Pacchetto Shared (MVC & Utils)
+*   **AbstractLogicController (Template Method)**: Definisce lo scheletro comportamentale di ogni modulo. Gestisce centralmente:
+    *   **Heartbeat**: Verifica ad ogni ciclo se l'utente è ancora attivo nel DB.
+    *   **Error Handling**: Catch globale di `DPTException` per evitare crash del modulo.
+*   **AbstractCLIController (DRY & Robustness)**: Centralizza la logica di input. Gestisce il **consumo del buffer** dello Scanner (`nextLine()`) e implementa loop di riprova per input non validi.
+*   **AbstractCLIView (UX Terminale)**: Toolkit grafico che utilizza caratteri **Box-Drawing (UTF-8)** per renderizzare tabelle professionali e cornici. Astrae la complessità della formattazione tabellare dinamica.
+*   **ControllerContext (Parameter Object)**: Un Java Record che raggruppa Config, Scanner, Token e Connessione. Semplifica le firme dei costruttori e garantisce l'immutabilità del contesto di esecuzione.
+*   **ValidationUtils (Fail-Fast)**: Utility class non istanziabile che centralizza i vincoli di dominio (es. Regex email). Viene invocata nei costruttori dei DTO per bloccare dati errati "all'ingresso".
+
+### 9. Pacchetti User (Moduli Operativi)
+*   **Conformità Architetturale**: Tutti i pacchetti (`client`, `owner`, `pt`, `receptionist`) seguono rigorosamente lo stesso pattern: `LogicController` -> `UI Interface` -> `CLIController` via `Factory`. Questo garantisce un'altissima manutenibilità.
+*   **UserManagementController (Componente Shared)**: Componente di eccellenza tecnica che centralizza l'amministrazione delle anagrafiche.
+    *   **Strategy Pattern (`UserTypeHandler`)**: Utilizza un'interfaccia e una mappa (`EnumMap`) per gestire polimorficamente PT, Clienti e Segreteria. Questo elimina lunghi blocchi `if/else` e permette di estendere le anagrafiche senza modificare la logica di navigazione.
+    *   **Delega e Composizione**: Invece di ereditare, l'Owner e il Receptionist **compongono** il `UserManagementController` per gestire gli utenti, iniettando i DAO necessari.
+*   **Cross-DAO Coordination**: Nei `LogicController` (es. `OwnerLogicController`), avviene il coordinamento tra diversi DAO (es. `MachineDAO` e `ExerciseDAO`). Questo mantiene i DAO "puri" e verticali, evitando dipendenze circolari tra di loro.
+*   **Agnosticismo UI**: I `LogicController` interagiscono solo con interfacce (es. `OwnerUI`), rimanendo totalmente ignari se l'output sia verso un terminale o una finestra grafica.
+
+### 10. Glossario Tecnico e Pattern Java (Toolkit Progettuale)
+*   **MVC (Pattern Dual-Controller)**: Separazione netta tra **LogicController** (purezza della logica di business) e **UIController** (gestione input/output). Questo garantisce che la logica non dipenda mai dalla tecnologia di visualizzazione (**UI Agnosticism**).
+*   **Singleton (Bill Pugh Holder)**: Implementazione nel `DBConnectionManager`. È il modo più moderno ed efficiente su Java per garantire thread-safety e caricamento lazy di un'unica istanza senza i costi di performance del `synchronized`.
+*   **Factory Method (Locale)**: Ogni modulo (Login, Owner, etc.) ha una propria `UIFactory`. Questo pattern permette di istanziare l'implementazione UI corretta (CLI o GUI) a runtime in base alla configurazione iniziale.
+*   **Strategy Pattern & Functional Interfaces**: Usati nell'**Orchestrator** per il dispatching dei moduli e nel **UserManagementController** per gestire polimorficamente i diversi ruoli senza usare lunghi blocchi `switch` o `if/else`.
+*   **Template Method**: Implementato in `AbstractLogicController`. Definisce lo scheletro fisso dell'esecuzione (Heartbeat -> Menu -> Choice), lasciando alle sottoclassi solo l'implementazione delle azioni specifiche.
+*   **Parameter Object**: Il `ControllerContext` raggruppa le dipendenze condivise, pulendo le firme dei costruttori e rendendo il codice più leggibile.
+*   **Data Access Layer (DAO, DTO, Model)**:
+    *   **DAO (Data Access Object)**: Classi verticali e "pure" che incapsulano esclusivamente query JDBC.
+    *   **DTO (Java Record)**: Oggetti immutabili usati esclusivamente per il trasporto atomico e sicuro dei dati tra i layer (es. `ExerciseCreationDTO`).
+    *   **Model**: Classi che rappresentano le entità di dominio del sistema (es. `Client`, `Exercise`).
+*   **Java Records (Java 25)**: Utilizzati per la loro natura immutabile e sintesi sintattica. Ideali per DTO e Configurazione, garantiscono che i dati non vengano alterati accidentalmente durante il flusso operativo.
+*   **Dependency Injection (DI) Manuale**: Iniezione delle dipendenze (es. DAO) dall'alto (Orchestrator) verso il basso (Controller). Riduce l'accoppiamento e facilita il testing (mocking).
+*   **Maven & Fat JAR**: Automazione della build tramite `pom.xml`. Il plugin `maven-assembly` impacchetta l'intera app e le sue librerie in un unico file eseguibile, risolvendo i problemi di classpath in distribuzione.
+
+### 10.1 Focus Architetturale: Il Flusso dell'Orchestrator (Strategy & Deferred Execution)
+Per comprendere appieno l'eleganza dell'Orchestrator, è vitale capire come sfrutta l'`EnumMap` e le `Functional Interface`. Il flusso si divide in due momenti netti:
+1.  **La Struttura (Il Contratto)**: Definiamo `ModuleLauncher` come Functional Interface (ha un solo metodo `launch`). Creiamo una `dispatchMap` (`EnumMap`) che associa a ogni Ruolo un `ModuleLauncher`.
+2.  **La Preparazione (Deferred Execution)**: Nel metodo `initializeDispatchMap`, associamo a ogni chiave (es. `Role.OWNER`) una Lambda. **Attenzione:** qui NON istanziamo nulla e non eseguiamo codice. Stiamo solo "scrivendo la ricetta" di come l'app *dovrà* comportarsi (quali DAO creare, quale Controller avviare). 
+3.  **Il Tempismo (Dependency Injection)**: Questa preparazione avviene *dopo* il login. Perché? Perché solo dopo il login il `DBConnectionManager` ha effettuato lo switch alla connessione reale (es. `dpt_owner`). Preparando le Lambda ora, garantiamo che i DAO ricevano la connessione con i privilegi corretti.
+4.  **L'Esecuzione (Il Dispatch)**: Nel metodo `dispatch()`, prendiamo dalla Mappa la "ricetta" (il `ModuleLauncher`) associata al ruolo dell'utente e la eseguiamo chiamando `.launch()`. A questo punto, e solo a questo punto, l'app prende vita istanziando i DAO e i Controller, senza bisogno di lenti blocchi `if/else`.
+
+### 10.2 Cosa sono le Lambda Expression (Il motore del Dispatch)
+Una **Lambda Expression** in Java (`(parametri) -> { corpo }`) è un modo per trattare una porzione di codice come se fosse un dato.
+*   **Fase di Creazione (Come Oggetto)**: Quando inseriamo la lambda nella `EnumMap`, questa si comporta come una "chiavetta USB" contenente delle istruzioni. Occupa pochissima memoria e *non viene eseguita*. Stiamo solo definendo l'implementazione al volo dell'unico metodo (`launch`) della Functional Interface `ModuleLauncher`.
+*   **Fase di Invocazione (Come Metodo)**: Quando successivamente chiamiamo `launcher.launch(config, token)`, inseriamo virtualmente la chiavetta e premiamo "Play". La lambda cessa di essere un dato passivo e viene eseguita come un normale metodo, ricevendo gli input reali. Questo meccanismo evita di dover creare fisicamente decine di classi separate (es. `OwnerLauncher`, `PTLauncher`), rendendo il codice elegante e moderno.
+
+---
+---
+
+## 🗄️ Analisi del Database (schema.sql)
+
+Il sistema adotta un'architettura **Thin-Client**: il software Java è un'interfaccia intelligente, mentre la maggior parte della logica di business, della sicurezza e dell'integrità è delegata a MariaDB.
+
+### 1. Sicurezza e RBAC (Role-Based Access Control)
+*   **Strategia Handshake & Switch**: Definizione di 5 utenti DBMS distinti (`dpt_login`, `dpt_owner`, `dpt_pt`, `dpt_receptionist`, `dpt_client`).
+*   **Principio del Minimo Privilegio**: Ogni utente ha GRANT granulari (es. il cliente può fare `SELECT` solo su certi dati sensibili tramite la clausola dei campi tra parentesi, e non può cancellare nulla). Questo blinda il sistema anche in caso di attacco al client.
+
+### 2. Integrità e Vincoli di Dominio (Trigger)
+I trigger sono usati come "Sentinelle" per impedire stati inconsistenti che i semplici vincoli FK non coprirebbero:
+*   **Check Incrociati**: `trg_chk_corpo_libero` impedisce che un esercizio sia contemporaneamente a corpo libero e legato a un macchinario.
+*   **Integrità Temporale**: `trg_check_orari_sessione` garantisce che l'ora di fine non sia mai precedente all'inizio.
+*   **Business Rules**: `trg_check_data_nascita` impone l'età minima di 14 anni.
+*   **Sicurezza Attiva**: Vari trigger (es. `trg_check_cliente_attivo_sessione`) bloccano qualsiasi operazione se l'utente coinvolto è stato disattivato (Soft-delete).
+
+### 3. Automazione Procedurale (Trigger & Events)
+*   **Calcolo Tempo Reale**: `trg_aggiorna_percentuale_update` ricalcola la % di completamento della sessione in base alle serie smarcate. Questo toglie complessità al codice Java (il client deve solo fare un update su una riga, il DB pensa al resto).
+*   **Generazione Automatica**: `trg_popola_serie_sessione` usa un **Cursore** per leggere gli esercizi della scheda e generare istantaneamente tutte le righe in `SERIE_ESEGUITA` all'inizio dell'allenamento.
+*   **Maintenance (Events)**: `evt_chiusura_sessioni_timeout` è un job pianificato (Event Scheduler) che chiude forzatamente le sessioni dimenticate a fine giornata.
+
+### 4. Transazionalità e Atomicità (Stored Procedures)
+Le procedure incapsulano operazioni multi-tabella:
+*   **sp_crea_nuova_scheda**: In una singola transazione, archivia la vecchia scheda (`Scheda_Attiva = 0`) e inserisce la nuova. Garantisce che non esistano mai due schede attive per lo stesso cliente.
+*   **sp_assegna_pt**: Gestisce la storicizzazione delle assegnazioni disattivando la precedente.
+
+### 5. Astrazione e Read-Models (Views)
+*   **vw_scheda_attiva_cliente**: Unisce 4 tabelle (`CLIENTE`, `SCHEDA`, `COMPOSTA`, `ESERCIZIO`) in un'unica "fotografia" pronta per l'uso. Il DAO Java fa una semplice `SELECT *` risparmiando decine di righe di codice JDBC e riducendo il traffico di rete.
+*   **vw_prestazioni_pt**: Applica i filtri di visibilità, assicurando che un PT veda solo i dati degli allenamenti svolti mentre il cliente era assegnato a lui.
+
+### 6. Focus Tecnico: Operazioni Avanzate in SQL
+Durante l'esposizione, è fondamentale evidenziare questi costrutti non-standard che elevano la qualità del database:
+
+*   **Cursori nei Trigger (`trg_popola_serie_sessione`)**: È l'operazione più complessa. SQL è un linguaggio *set-based* (lavora su interi blocchi di dati). Un **Cursore** permette invece di iterare su un result set "riga per riga", comportandosi come un ciclo `for` in Java.
+    *   *Come funziona*: Quando si crea una `SESSIONE`, il cursore estrae tutti gli esercizi di quella scheda dalla tabella `COMPOSTA`. Apre un loop e "pesca" (`FETCH`) una riga alla volta. Per ogni esercizio letto, avvia un ciclo `WHILE` interno per eseguire `INSERT` ripetute nella tabella `SERIE_ESEGUITA` (una riga per ogni serie prevista). Il loop si interrompe grazie a un `CONTINUE HANDLER` che scatta automaticamente quando non ci sono più righe da leggere (`NOT FOUND`). Questo automatizza la preparazione dell'allenamento direttamente nel DB.
+*   **Logica XOR nei Trigger (`trg_chk_corpo_libero`)**: I vincoli standard (FK) non bastano per esprimere l'OR esclusivo. Il trigger implementa la logica per cui un esercizio o ha una FK su Macchinario valorizzata o ha il flag Corpo_Libero a 1, ma **mai entrambi** e **mai nessuno dei due**.
+*   **Segnali Personalizzati (`SIGNAL SQLSTATE '45000'`)**: Invece di far fallire le query con errori generici (es. "Constraint violation"), i trigger sollevano eccezioni custom (codice standard 45000). Questo segnale viene "ascoltato" dalla classe Java `DatabaseException` per estrarre e mostrare all'utente il messaggio esatto scritto nello schema SQL.
+*   **Event Scheduler (`evt_chiusura_sessioni_timeout`)**: Un vero e proprio "cron job" interno a MariaDB. Rende il database **auto-manutenibile**: ogni sera alle 23:59, anche se l'app Java è spenta, il DB ricalcola le percentuali e chiude forzatamente le sessioni rimaste aperte.
+
+
