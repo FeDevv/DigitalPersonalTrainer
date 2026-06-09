@@ -2,7 +2,6 @@
 -- PROGETTO: Digital Personal Trainer (DPT)
 -- DESCRIZIONE: Schema Database MariaDB - Struttura, Logica Procedurale e RBAC
 -- ARCHITETTURA: Thin-Client (Business Logic lato DB tramite Trigger e SP)
--- REGOLE DI BUSINESS: Allineate a specifica.txt
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
