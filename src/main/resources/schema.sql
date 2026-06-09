@@ -760,12 +760,12 @@ GRANT SELECT (ID_Addetto, Nome, Cognome, Email, Password, Addetto_Attivo) ON dig
 GRANT SELECT (ID_Cliente, Nome, Cognome, Email, Password, Cliente_Attivo) ON digital_personal_trainer.CLIENTE TO 'dpt_login'@'localhost';
 
 -- [OWNER]: Gestione del personale e del catalogo (Proprietario)
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_owner'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.PT TO 'dpt_owner'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_owner'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.CLIENTE TO 'dpt_owner'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.MACCHINARIO TO 'dpt_owner'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.ESERCIZIO TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PROPRIETARIO TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.PT TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ADDETTO_SEGRETERIA TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.CLIENTE TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.MACCHINARIO TO 'dpt_owner'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.ESERCIZIO TO 'dpt_owner'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_disattiva_cliente TO 'dpt_owner'@'localhost';
 
 -- [PT]: Gestione schede e monitoraggio (Personal Trainer)
@@ -776,8 +776,8 @@ GRANT SELECT ON digital_personal_trainer.ESERCIZIO TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.ASSEGNA TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.SESSIONE TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.SERIE_ESEGUITA TO 'dpt_pt'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.SCHEDA TO 'dpt_pt'@'localhost';
-GRANT SELECT, INSERT, UPDATE, DELETE ON digital_personal_trainer.COMPOSTA TO 'dpt_pt'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.SCHEDA TO 'dpt_pt'@'localhost';
+GRANT SELECT, INSERT, UPDATE ON digital_personal_trainer.COMPOSTA TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.vw_prestazioni_pt TO 'dpt_pt'@'localhost';
 GRANT SELECT ON digital_personal_trainer.vw_esercizi_selezionabili TO 'dpt_pt'@'localhost';
 GRANT EXECUTE ON PROCEDURE digital_personal_trainer.sp_crea_nuova_scheda TO 'dpt_pt'@'localhost';
